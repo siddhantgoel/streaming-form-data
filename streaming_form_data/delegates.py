@@ -11,20 +11,20 @@ class BaseDelegate(object):
 
 class ValueDelegate(BaseDelegate):
     def __init__(self):
-        self._value = None
+        self._values = []
 
     def start(self):
         pass
 
     def data_received(self, chunk):
-        self._value = chunk
+        self._values.append(chunk)
 
     def finish(self):
         pass
 
     @property
     def value(self):
-        return self._value
+        return b''.join(self._values)
 
 
 class FileDelegate(BaseDelegate):
