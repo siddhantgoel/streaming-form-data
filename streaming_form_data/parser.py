@@ -85,13 +85,13 @@ class StreamingFormDataParser(object):
         for line in lines:
             if not line:
                 continue
-            elif self._is_boundary(line):
+            elif self._is_boundary(line) or self._is_ender(line):
                 self._unset_active_part()
             elif self._is_header(line):
                 self._unset_active_part()
 
-                value, params = cgi.parse_header(line)
-                if value == 'Content-Disposition':
+                value, params = cgi.parse_header(line.decode('utf-8'))
+                if value.startswith('Content-Disposition'):
                     part = self._part_for(params['name'])
                     part.start()
 
@@ -106,4 +106,7 @@ class StreamingFormDataParser(object):
                     self._active_part.data_received(line)
 
     def _is_boundary(self, line):
-        return line == self._boundary
+        return line == self.__separator + self._boundary
+
+    def _is_ender(self, line):
+        return line == self.__separator + self._boundary + self.__separator

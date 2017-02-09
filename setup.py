@@ -1,11 +1,9 @@
 from setuptools import find_packages, setup
-import subprocess
 
 
 def readme():
     with open('README.md') as f:
         return f.read()
-    return output.decode('utf-8').strip()
 
 
 setup(
