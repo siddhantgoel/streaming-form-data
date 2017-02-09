@@ -4,9 +4,18 @@
 #
 #    pip-compile --output-file requirements.dev.txt requirements.dev.in
 #
+appdirs==1.4.0            # via setuptools
 flake8==3.3.0
 mccabe==0.6.1             # via flake8
+packaging==16.8           # via setuptools
+py==1.4.32                # via pytest
 pycodestyle==2.3.1        # via flake8
 pyflakes==1.5.0           # via flake8
+pyparsing==2.1.10         # via packaging
+pytest==3.0.6
 requests-toolbelt==0.7.0
 requests==2.13.0          # via requests-toolbelt
+six==1.10.0               # via packaging, setuptools
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools                # via pytest
