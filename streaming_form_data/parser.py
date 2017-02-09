@@ -40,7 +40,7 @@ class StreamingFormDataParser(object):
         self._active_part = None
 
         self.__leftover_chunk = None
-        self.__headers = ('Content-Disposition', 'Content-Type')
+        self.__headers = (b'Content-Disposition', b'Content-Type')
 
     @property
     def active_part(self):
@@ -96,3 +96,6 @@ class StreamingFormDataParser(object):
                     self.__leftover_chunk = line[index:]
                 else:
                     self._active_part.data_received(line)
+
+    def _is_boundary(self, line):
+        return line == self._boundary
