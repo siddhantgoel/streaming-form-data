@@ -22,7 +22,7 @@ def parse_content_boundary(headers):
     if not boundary:
         raise ParseFailedException()
 
-    return boundary
+    return boundary.encode('utf-8')
 
 
 class StreamingFormDataParser(object):
@@ -56,6 +56,9 @@ class StreamingFormDataParser(object):
         self._active_part = part
 
     def data_received(self, chunk):
+        if not self.expected_parts:
+            return
+
         if len(chunk) < len(self._boundary):
             raise ParseFailedException('Chunk size less than boundary')
 
