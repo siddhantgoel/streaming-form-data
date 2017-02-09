@@ -119,3 +119,35 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(first.value, expected_first_value.encode('utf-8'))
         self.assertEqual(second.value, expected_second_value.encode('utf-8'))
         self.assertEqual(third.value, expected_third_value.encode('utf-8'))
+
+    def test_break_chunk_at_boundary(self):
+        expected_first_value = 'hello' * 500
+        expected_second_value = 'hello' * 500
+
+        first = ValueDelegate()
+        second = ValueDelegate()
+
+        expected_parts = (
+            Part('first', first),
+            Part('second', second),
+        )
+
+        encoder = MultipartEncoder(fields={
+            'first': 'hello' * 500,
+            'second': 'hello' * 500
+        })
+
+        body = encoder.to_string()
+        boundary = encoder.boundary.encode('utf-8')
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': encoder.content_type})
+
+        index = body[50:].index(boundary) + 5
+
+        parser.data_received(body[:index])
+        parser.data_received(body[index:])
+
+        self.assertEqual(first.value, expected_first_value.encode('utf-8'))
+        self.assertEqual(second.value, expected_second_value.encode('utf-8'))
