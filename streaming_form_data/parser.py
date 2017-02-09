@@ -26,12 +26,12 @@ def parse_content_boundary(headers):
 
 
 class StreamingFormDataParser(object):
-    def __init__(self, expected_parts, request):
+    def __init__(self, expected_parts, headers):
         self.expected_parts = expected_parts
-        self.request = request
+        self.headers = headers
 
         self.__separator = b'--'
-        self._boundary = parse_content_boundary(request.headers)
+        self._boundary = parse_content_boundary(headers)
         self._delimiter = self.__separator + self._boundary + crlf
         self._ender = \
             self.__separator + self._boundary + self.__separator + crlf
