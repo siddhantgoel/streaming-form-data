@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+import mimetypes
 
 from requests_toolbelt import MultipartEncoder
 
@@ -15,10 +16,12 @@ def main():
     args = parse_args()
 
     with open(args.filename, 'rb') as file_:
+        content_type = mimetypes.guess_type(args.filename)[0]
+
         fields = {
             'name': 'random name',
             'age': '10',
-            'file': (args.filename, file_, 'image/png')
+            'file': (args.filename, file_, content_type)
         }
 
         encoder = MultipartEncoder(fields=fields)
