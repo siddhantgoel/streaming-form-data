@@ -16,11 +16,11 @@ def parse_content_boundary(headers):
     value, params = cgi.parse_header(content_type)
 
     if not value or value.lower() != 'multipart/form-data':
-        raise ParseFailedException()
+        raise ParseFailedException('Content-Type not multipart/form-data')
 
     boundary = params.get('boundary')
     if not boundary:
-        raise ParseFailedException()
+        raise ParseFailedException('Boundary not found')
 
     return boundary.encode('utf-8')
 
