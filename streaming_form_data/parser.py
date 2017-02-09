@@ -80,14 +80,19 @@ class StreamingFormDataParser(object):
         lines = chunk.split(crlf)
 
         for line in lines:
-            if self._is_boundary(line):
+            if not line:
+                continue
+            elif self._is_boundary(line):
                 self._unset_active_part()
             elif self._is_header(line):
                 self._unset_active_part()
 
                 value, params = cgi.parse_header(line)
                 if value == 'Content-Disposition':
-                    self._set_active_part(self._part_for(params['name']))
+                    part = self._part_for(params['name'])
+                    part.start()
+
+                    self._set_active_part(part)
             else:
                 if self.__separator in line:
                     index = line.index(self.__separator)
