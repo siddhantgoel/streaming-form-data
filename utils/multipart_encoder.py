@@ -6,7 +6,7 @@ from requests_toolbelt import MultipartEncoder
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('-f', '--filename', help='Data file')
+    parser.add_argument('-f', '--filename', required=True, help='Data file')
     parser.add_argument('-d', '--decode', help='Decode output before printing',
                         action='store_true')
     return parser.parse_args()
