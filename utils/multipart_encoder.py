@@ -19,17 +19,15 @@ def main():
         content_type = mimetypes.guess_type(args.filename)[0]
 
         fields = {
-            'name': 'random name',
-            'age': '10',
-            'file': (args.filename, file_, content_type)
+            'name': 'hello world',
         }
 
-        encoder = MultipartEncoder(fields=fields)
+        body = MultipartEncoder(fields=fields).to_string()
 
         if args.decode:
-            print(encoder.to_string().decode('utf-8'))
+            print(body.decode('utf-8'))
         else:
-            print(encoder.to_string())
+            print(body)
 
 
 if __name__ == '__main__':

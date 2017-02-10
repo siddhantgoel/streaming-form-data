@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
 from streaming_form_data.parser import StreamingFormDataParser
-from streaming_form_data.delegates import ValueDelegate
+from streaming_form_data.targets import ValueTarget
 from streaming_form_data.part import Part
 
 
@@ -14,9 +14,9 @@ class StreamingFormDataParserTestCase(TestCase):
             expected_parts=(), headers={'Content-Type': encoder.content_type})
         parser.data_received(encoder.to_string())
 
-    def test_basic(self):
-        delegate = ValueDelegate()
-        expected_parts = (Part('value', delegate),)
+    def test_basic_single(self):
+        target = ValueTarget()
+        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': 'hello world'})
 
@@ -25,12 +25,12 @@ class StreamingFormDataParserTestCase(TestCase):
             headers={'Content-Type': encoder.content_type})
         parser.data_received(encoder.to_string())
 
-        self.assertEqual(delegate.value, b'hello world')
+        self.assertEqual(target.value, b'hello world')
 
-    def test_multiple(self):
-        first = ValueDelegate()
-        second = ValueDelegate()
-        third = ValueDelegate()
+    def test_basic_multiple(self):
+        first = ValueTarget()
+        second = ValueTarget()
+        third = ValueTarget()
 
         expected_parts = (
             Part('first', first),
@@ -56,8 +56,8 @@ class StreamingFormDataParserTestCase(TestCase):
     def test_chunked_single(self):
         expected_value = 'hello' * 5000
 
-        delegate = ValueDelegate()
-        expected_parts = (Part('value', delegate),)
+        target = ValueTarget()
+        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': expected_value})
 
@@ -77,16 +77,16 @@ class StreamingFormDataParserTestCase(TestCase):
         for chunk in chunks:
             parser.data_received(chunk)
 
-        self.assertEqual(delegate.value, expected_value.encode('utf-8'))
+        self.assertEqual(target.value, expected_value.encode('utf-8'))
 
     def test_chunked_multiple(self):
         expected_first_value = 'foo' * 5000
         expected_second_value = 'bar' * 5000
         expected_third_value = 'baz' * 5000
 
-        first = ValueDelegate()
-        second = ValueDelegate()
-        third = ValueDelegate()
+        first = ValueTarget()
+        second = ValueTarget()
+        third = ValueTarget()
 
         expected_parts = (
             Part('first', first),
@@ -124,8 +124,8 @@ class StreamingFormDataParserTestCase(TestCase):
         expected_first_value = 'hello' * 500
         expected_second_value = 'hello' * 500
 
-        first = ValueDelegate()
-        second = ValueDelegate()
+        first = ValueTarget()
+        second = ValueTarget()
 
         expected_parts = (
             Part('first', first),

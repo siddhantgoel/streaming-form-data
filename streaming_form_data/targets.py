@@ -1,4 +1,4 @@
-class BaseDelegate(object):
+class BaseTarget(object):
     def start(self):
         raise NotImplementedError()
 
@@ -9,7 +9,18 @@ class BaseDelegate(object):
         raise NotImplementedError()
 
 
-class ValueDelegate(BaseDelegate):
+class NullTarget(BaseTarget):
+    def start(self):
+        pass
+
+    def data_received(self, chunk):
+        pass
+
+    def finish(self):
+        pass
+
+
+class ValueTarget(BaseTarget):
     def __init__(self):
         self._values = []
 
@@ -27,7 +38,7 @@ class ValueDelegate(BaseDelegate):
         return b''.join(self._values)
 
 
-class FileDelegate(BaseDelegate):
+class FileTarget(BaseTarget):
     def __init__(self, filename):
         self.filename = filename
 

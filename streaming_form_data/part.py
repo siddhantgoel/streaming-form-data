@@ -2,22 +2,22 @@ class Part(object):
     """A part of of multipart/form-data request
     """
 
-    def __init__(self, name, delegate):
+    def __init__(self, name, target):
         self.name = name
-        self.delegate = delegate
+        self.target = target
 
         self._reading = False
 
     def start(self):
         self._reading = True
-        self.delegate.start()
+        self.target.start()
 
     def data_received(self, chunk):
-        self.delegate.data_received(chunk)
+        self.target.data_received(chunk)
 
     def finish(self):
         self._reading = False
-        self.delegate.finish()
+        self.target.finish()
 
     @property
     def is_reading(self):

@@ -1,5 +1,8 @@
 import cgi
 
+from streaming_form_data.targets import NullTarget
+from streaming_form_data.part import Part
+
 
 crlf = b'\r\n'
 
@@ -50,6 +53,7 @@ class StreamingFormDataParser(object):
 
         self.__leftover_chunk = None
         self.__headers = (b'Content-Disposition', b'Content-Type')
+        self.__default_part = Part('_default', NullTarget())
 
     @property
     def active_part(self):
@@ -77,6 +81,7 @@ class StreamingFormDataParser(object):
         for part in self.expected_parts:
             if part.name == name:
                 return part
+        return self.__default_part
 
     def _is_header(self, line):
         for header in self.__headers:
@@ -89,7 +94,7 @@ class StreamingFormDataParser(object):
             chunk = self.__leftover_chunk + chunk
             self.__leftover_chunk = None
 
-        lines = chunk.split(crlf)
+        lines = chunk.split(self._delimiter)
 
         for line in lines:
             if not line:
