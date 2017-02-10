@@ -23,9 +23,10 @@ class ParserState(enum.Enum):
     ENDING_ALL_HEADERS = 6
 
     READING_BODY = 7
-    ENDING_BODY = 8
+    ENDING_BODY_CR = 8
+    ENDING_BODY_LF = 9
 
-    END = 9
+    END = 10
 
 
 def parse_content_boundary(headers):
@@ -99,7 +100,8 @@ class StreamingFormDataParser(object):
             ParserState.ENDED_HEADER: self._parse_ended_header,
             ParserState.ENDING_ALL_HEADERS: self._parse_ending_all_headers,
             ParserState.READING_BODY: self._parse_reading_body,
-            ParserState.ENDING_BODY: self._parse_ending_body
+            ParserState.ENDING_BODY_CR: self._parse_ending_body_cr,
+            ParserState.ENDING_BODY_LF: self._parse_ending_body_lf,
         }.get
 
         for index in range(len(chunk)):
@@ -123,6 +125,9 @@ class StreamingFormDataParser(object):
         self._state = ParserState.STARTING_BOUNDARY
 
     def _parse_starting_boundary(self, index, chunk):
+        """Called when we see the second byte of the delimiter containing the
+        boundary
+        """
         byte = chunk[index]
 
         if byte != self._hyphen:
@@ -210,25 +215,27 @@ class StreamingFormDataParser(object):
         byte = chunk[index]
 
         if byte == self._cr:
-            self._state = ParserState.ENDING_BODY
+            self._state = ParserState.ENDING_BODY_CR
         self._buffer.append(byte)
 
-    def _parse_ending_body(self, index, chunk):
-        """Called when the body might end, depending on if the next two
-        characters mark the starting of the ender sequence
-        """
+    def _parse_ending_body_cr(self, index, chunk):
         byte = chunk[index]
 
         if byte == self._lf:
-            if index < len(chunk) - 2 \
-                    and chunk[index + 1] == self._hyphen \
-                    and chunk[index + 2] == self._hyphen:
-                self._state = ParserState.START
+            self._state = ParserState.ENDING_BODY_LF
 
-                self._buffer.pop(-1)
-            else:
-                self._state = ParserState.READING_BODY
-                self._buffer.append(byte)
+        self._buffer.append(byte)
+
+    def _parse_ending_body_lf(self, index, chunk):
+        byte = chunk[index]
+
+        if byte == self._hyphen:
+            self._state = ParserState.STARTING_BOUNDARY
+            self._buffer.pop(-1)
+            self._buffer.pop(-1)
+        else:
+            self._state = ParserState.READING_BODY
+            self._buffer.append(byte)
 
         self._flush_buffer()
 

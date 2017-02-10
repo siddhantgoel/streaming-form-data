@@ -18,7 +18,6 @@ def load_file(filename):
 
 
 class StreamingFormDataParserTestCase(TestCase):
-
     def test_smoke(self):
         encoder = MultipartEncoder(fields={'name': 'hello'})
 
