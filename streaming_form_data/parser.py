@@ -26,15 +26,24 @@ def parse_content_boundary(headers):
 
 
 class StreamingFormDataParser(object):
+    """Parse multipart/form-data in chunks, one at a time.
+
+    This code is based off of the `parse_multipart_form_data` function supplied
+    in the `tornado.httputil` module.
+    """
+
     def __init__(self, expected_parts, headers):
         self.expected_parts = expected_parts
         self.headers = headers
 
-        self.__separator = b'--'
+        self._separator = b'--'
         self._boundary = parse_content_boundary(headers)
-        self._delimiter = self.__separator + self._boundary + crlf
+        self._delimiter = self._separator + self._boundary + crlf
         self._ender = \
-            self.__separator + self._boundary + self.__separator + crlf
+            self._separator + self._boundary + self._separator + crlf
+
+        if self._boundary.startswith(b'"') and self._boundary.endswith(b'"'):
+            self._boundary = self._boundary[1:-1]
 
         self._state = None
         self._active_part = None
@@ -77,7 +86,7 @@ class StreamingFormDataParser(object):
 
     def _parse(self, chunk):
         if self.__leftover_chunk:
-            chunk = chunk + self.__leftover_chunk
+            chunk = self.__leftover_chunk + chunk
             self.__leftover_chunk = None
 
         lines = chunk.split(crlf)
@@ -97,8 +106,8 @@ class StreamingFormDataParser(object):
 
                     self._set_active_part(part)
             else:
-                if self.__separator in line:
-                    index = line.index(self.__separator)
+                if self._separator in line:
+                    index = line.index(self._separator)
                     self._active_part.data_received(line[:index])
 
                     self.__leftover_chunk = line[index:]
@@ -106,7 +115,7 @@ class StreamingFormDataParser(object):
                     self._active_part.data_received(line)
 
     def _is_boundary(self, line):
-        return line == self.__separator + self._boundary
+        return line == self._separator + self._boundary
 
     def _is_ender(self, line):
-        return line == self.__separator + self._boundary + self.__separator
+        return line == self._separator + self._boundary + self._separator
