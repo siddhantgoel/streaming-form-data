@@ -15,7 +15,8 @@ class UploadTarget(RequestTarget):
             Part('image', FileTarget(os.path.join('/tmp', 'image.png'))),
         )
 
-        self._parser = StreamingFormDataParser(expected_parts)
+        self._parser = StreamingFormDataParser(expected_parts,
+                                               headers=self.request.headers)
 
     def data_received(self, chunk):
         self._parser.data_received(chunk)
