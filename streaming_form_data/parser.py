@@ -76,7 +76,7 @@ class StreamingFormDataParser(object):
         self._active_part = part
 
     def data_received(self, chunk):
-        if not self.expected_parts:
+        if not self.expected_parts or not chunk:
             return
 
         self._parse(chunk)
@@ -235,9 +235,7 @@ class StreamingFormDataParser(object):
     def _process_boundary(self):
         value = bytes(self._buffer)
 
-        first_and_last = set([value[0], value[1], value[-1], value[-2]])
-
-        if first_and_last == set([self._hyphen]):
+        if all([value[index] == self._hyphen for index in (0, 1, -1, -2)]):
             self._state = ParserState.END
 
     def _reset_buffer(self):

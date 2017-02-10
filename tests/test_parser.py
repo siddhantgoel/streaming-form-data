@@ -6,7 +6,19 @@ from streaming_form_data.targets import ValueTarget
 from streaming_form_data.part import Part
 
 
+def load_file(filename):
+    with open(filename, 'rb') as file_:
+        fields = {
+            'file.txt': ('file.txt', file_, 'text/plain')
+        }
+
+        encoder = MultipartEncoder(fields=fields)
+
+        return (encoder.content_type, encoder.to_string())
+
+
 class StreamingFormDataParserTestCase(TestCase):
+
     def test_smoke(self):
         encoder = MultipartEncoder(fields={'name': 'hello'})
 
@@ -151,3 +163,46 @@ class StreamingFormDataParserTestCase(TestCase):
 
         self.assertEqual(first.value, expected_first_value.encode('utf-8'))
         self.assertEqual(second.value, expected_second_value.encode('utf-8'))
+
+    def test_file_content_single(self):
+        with open('data/file.txt', 'rb') as file_:
+            expected_value = file_.read()
+
+        content_type, body = load_file('data/file.txt')
+
+        txt = ValueTarget()
+
+        expected_parts = (Part('file.txt', txt),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': content_type})
+
+        parser.data_received(body)
+        self.assertEqual(txt.value, expected_value)
+
+    def test_file_content_multiple(self):
+        with open('data/file.txt', 'rb') as file_:
+            expected_value = file_.read()
+
+        content_type, body = load_file('data/file.txt')
+
+        txt = ValueTarget()
+
+        expected_parts = (Part('file.txt', txt),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': content_type})
+
+        size = 50
+        chunks = []
+
+        while body:
+            chunks.append(body[:size])
+            body = body[size:]
+
+        for chunk in chunks:
+            parser.data_received(chunk)
+
+        self.assertEqual(txt.value, expected_value)
