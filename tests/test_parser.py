@@ -205,3 +205,23 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(chunk)
 
         self.assertEqual(txt.value, expected_value)
+
+    def test_varying_chunk_size(self):
+        with open('data/file.txt', 'rb') as file_:
+            expected_value = file_.read()
+
+        content_type, body = load_file('data/file.txt')
+
+        for index in range(len(body)):
+            txt = ValueTarget()
+
+            expected_parts = (Part('file.txt', txt),)
+
+            parser = StreamingFormDataParser(
+                expected_parts=expected_parts,
+                headers={'Content-Type': content_type})
+
+            parser.data_received(body[:index])
+            parser.data_received(body[index:])
+
+            self.assertEqual(txt.value, expected_value)
