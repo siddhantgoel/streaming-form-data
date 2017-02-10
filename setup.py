@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='streaming_form_data',
-    version='0.0.1',
+    version='0.1.0',
     description=readme(),
     author='Siddhant Goel',
     packages=find_packages(exclude=['data', 'examples', 'tests', 'utils']),
