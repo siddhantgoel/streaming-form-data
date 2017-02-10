@@ -5,12 +5,6 @@ from streaming_form_data.targets import NullTarget
 from streaming_form_data.part import Part
 
 
-crlf = b'\r\n'
-
-
-chunk_size = 64
-
-
 class ParseFailedException(Exception):
     pass
 
