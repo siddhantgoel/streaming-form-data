@@ -48,9 +48,6 @@ def parse_content_boundary(headers):
 
 class StreamingFormDataParser(object):
     """Parse multipart/form-data in chunks, one at a time.
-
-    This code is based off of the `parse_multipart_form_data` function supplied
-    in the `tornado.httputil` module.
     """
 
     def __init__(self, expected_parts, headers):
