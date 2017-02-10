@@ -206,7 +206,7 @@ class StreamingFormDataParserTestCase(TestCase):
 
         self.assertEqual(txt.value, expected_value)
 
-    def test_varying_chunk_size(self):
+    def test_file_content_varying_chunk_size(self):
         with open('data/file.txt', 'rb') as file_:
             expected_value = file_.read()
 
@@ -225,3 +225,41 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(body[index:])
 
             self.assertEqual(txt.value, expected_value)
+
+    def test_mixed_content_varying_chunk_size(self):
+        with open('data/file.txt', 'rb') as file_:
+            expected_value = file_.read()
+
+        with open('data/file.txt', 'rb') as file_:
+            fields = {
+                'name': 'hello world',
+                'age': '10',
+                'cv.txt': ('file.txt', file_, 'text/plain')
+            }
+
+            encoder = MultipartEncoder(fields=fields)
+
+            body = encoder.to_string()
+            content_type = encoder.content_type
+
+        for index in range(len(body)):
+            name = ValueTarget()
+            age = ValueTarget()
+            cv = ValueTarget()
+
+            expected_parts = (
+                Part('name', name),
+                Part('age', age),
+                Part('cv.txt', cv),
+            )
+
+            parser = StreamingFormDataParser(
+                expected_parts=expected_parts,
+                headers={'Content-Type': content_type})
+
+            parser.data_received(body[:index])
+            parser.data_received(body[index:])
+
+            self.assertEqual(name.value, b'hello world')
+            self.assertEqual(age.value, b'10')
+            self.assertEqual(cv.value, expected_value)
