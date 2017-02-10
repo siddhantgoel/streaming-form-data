@@ -20,6 +20,8 @@ def main():
 
         fields = {
             'name': 'hello world',
+            'lines': 'first line\r\n\r\nsecond line',
+            'file': (args.filename, file_, content_type)
         }
 
         body = MultipartEncoder(fields=fields).to_string()
