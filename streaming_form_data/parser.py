@@ -10,8 +10,9 @@ class ParseFailedException(Exception):
 
 
 class ParserState(enum.Enum):
-    START = 0
+    START = -1
 
+    STARTING_BOUNDARY = 0
     READING_BOUNDARY = 1
     ENDING_BOUNDARY = 2
 
@@ -90,6 +91,7 @@ class StreamingFormDataParser(object):
     def _parse(self, chunk):
         next_step = {
             ParserState.START: self._parse_start,
+            ParserState.STARTING_BOUNDARY: self._parse_starting_boundary,
             ParserState.READING_BOUNDARY: self._parse_reading_boundary,
             ParserState.ENDING_BOUNDARY: self._parse_ending_boundary,
             ParserState.READING_HEADER: self._parse_reading_header,
@@ -114,7 +116,16 @@ class StreamingFormDataParser(object):
         """
         byte = chunk[index]
 
-        if byte != self._hyphen or chunk[index + 1] != self._hyphen:
+        if byte != self._hyphen:
+            raise ParseFailedException()
+
+        self._buffer.append(byte)
+        self._state = ParserState.STARTING_BOUNDARY
+
+    def _parse_starting_boundary(self, index, chunk):
+        byte = chunk[index]
+
+        if byte != self._hyphen:
             raise ParseFailedException()
 
         self._buffer.append(byte)
