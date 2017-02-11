@@ -231,14 +231,8 @@ class StreamingFormDataParser(object):
 
         index = len(self._buffer) - self._max_buffer_size - 1
 
-        self._active_part.data_received(self._buffer[:index])
+        self._active_part.data_received(bytes(self._buffer[:index]))
         self._buffer = self._buffer[index:]
-
-    def _flush_buffer(self):
-        value = bytes(self._buffer)
-
-        self._active_part.data_received(value)
-        self._buffer = []
 
     def _truncate_buffer(self, suffix):
         if len(self._buffer) <= len(suffix):
