@@ -8,7 +8,7 @@ def readme():
 
 setup(
     name='streaming_form_data',
-    version='0.1.1',
+    version='0.1.2',
     description=readme(),
     author='Siddhant Goel',
     author_email='siddhantgoel@gmail.com',
