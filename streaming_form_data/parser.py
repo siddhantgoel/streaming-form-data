@@ -68,7 +68,8 @@ class StreamingFormDataParser(object):
         self._default_part = Part('_default', NullTarget())
 
         self._buffer = []
-        self._max_buffer_size = len(self._delimiter) + 32
+
+        self._min_size_before_flush = len(self._delimiter) + 32
 
     def _unset_active_part(self):
         if self._active_part:
@@ -226,10 +227,10 @@ class StreamingFormDataParser(object):
         self._buffer = []
 
     def _try_flush_buffer(self):
-        if len(self._buffer) <= self._max_buffer_size:
+        if len(self._buffer) <= self._min_size_before_flush:
             return
 
-        index = len(self._buffer) - self._max_buffer_size - 1
+        index = len(self._buffer) - self._min_size_before_flush - 1
 
         self._active_part.data_received(bytes(self._buffer[:index]))
         self._buffer = self._buffer[index:]
