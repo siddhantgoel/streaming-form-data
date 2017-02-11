@@ -28,14 +28,14 @@ class ValueTarget(BaseTarget):
         pass
 
     def data_received(self, chunk):
-        self._values.append(chunk)
+        self._values.extend(chunk)
 
     def finish(self):
         pass
 
     @property
     def value(self):
-        return b''.join(self._values)
+        return bytes(self._values)
 
 
 class FileTarget(BaseTarget):

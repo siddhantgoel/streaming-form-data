@@ -58,6 +58,12 @@ class StreamingFormDataParser(object):
         self._cr = 13
         self._lf = 10
 
+        self._raw_boundary = parse_content_boundary(headers)
+
+        self._boundary = b'--' + self._raw_boundary
+        self._delimiter = self._boundary + b'\r\n'
+        self._ender = self._boundary + b'--\r\n'
+
         self.state = ParserState.START
         self._active_part = None
 
@@ -97,11 +103,12 @@ class StreamingFormDataParser(object):
             ParserState.ENDED_HEADER: self._parse_ended_header,
             ParserState.ENDING_ALL_HEADERS: self._parse_ending_all_headers,
             ParserState.READING_BODY: self._parse_reading_body,
-            ParserState.ENDING_BODY_CR: self._parse_ending_body_cr,
-            ParserState.ENDING_BODY_LF: self._parse_ending_body_lf,
         }.get
 
         for index in range(len(chunk)):
+            if self.state == ParserState.END:
+                return
+
             function = next_step(self.state)
 
             if not function:
@@ -110,9 +117,6 @@ class StreamingFormDataParser(object):
             function(index, chunk)
 
     def _parse_start(self, index, chunk):
-        """Called when we see the first byte of the delimiter containing the
-        boundary
-        """
         byte = chunk[index]
 
         if byte != self._hyphen:
@@ -122,9 +126,6 @@ class StreamingFormDataParser(object):
         self.state = ParserState.STARTING_BOUNDARY
 
     def _parse_starting_boundary(self, index, chunk):
-        """Called when we see the second byte of the delimiter containing the
-        boundary
-        """
         byte = chunk[index]
 
         if byte != self._hyphen:
@@ -134,8 +135,6 @@ class StreamingFormDataParser(object):
         self.state = ParserState.READING_BOUNDARY
 
     def _parse_reading_boundary(self, index, chunk):
-        """Called on reading the carriage return in the boundary ending
-        """
         byte = chunk[index]
 
         if byte == self._cr:
@@ -144,8 +143,6 @@ class StreamingFormDataParser(object):
         self._buffer.append(byte)
 
     def _parse_ending_boundary(self, index, chunk):
-        """Called on reading the linefeed in the boundary ending
-        """
         byte = chunk[index]
 
         if byte != self._lf:
@@ -158,8 +155,6 @@ class StreamingFormDataParser(object):
         self.state = ParserState.READING_HEADER
 
     def _parse_reading_header(self, index, chunk):
-        """Called on reading the first byte of a header line
-        """
         byte = chunk[index]
 
         if byte == self._cr:
@@ -168,8 +163,6 @@ class StreamingFormDataParser(object):
         self._buffer.append(byte)
 
     def _parse_ending_header(self, index, chunk):
-        """Called on reading the linefeed in the header ending
-        """
         byte = chunk[index]
 
         if byte != self._lf:
@@ -182,10 +175,6 @@ class StreamingFormDataParser(object):
         self.state = ParserState.ENDED_HEADER
 
     def _parse_ended_header(self, index, chunk):
-        """Called after the linefeed has been read in the previous header and
-        we're not sure yet if there's another header or there's a \r\n and then
-        the body is about to start.
-        """
         byte = chunk[index]
 
         if byte == self._cr:
@@ -196,9 +185,6 @@ class StreamingFormDataParser(object):
         self._buffer.append(byte)
 
     def _parse_ending_all_headers(self, index, chunk):
-        """Called after all the headers have been read and the actual body is
-        about to start.
-        """
         byte = chunk[index]
 
         if byte != self._lf:
@@ -208,35 +194,15 @@ class StreamingFormDataParser(object):
         self.state = ParserState.READING_BODY
 
     def _parse_reading_body(self, index, chunk):
-        """Called when the body is being read
-        """
-        byte = chunk[index]
+        self._buffer.append(chunk[index])
 
-        if byte == self._cr:
-            self.state = ParserState.ENDING_BODY_CR
-
-        self._buffer.append(byte)
-
-    def _parse_ending_body_cr(self, index, chunk):
-        byte = chunk[index]
-
-        if byte == self._lf:
-            self.state = ParserState.ENDING_BODY_LF
-
-        self._buffer.append(byte)
-
-    def _parse_ending_body_lf(self, index, chunk):
-        byte = chunk[index]
-
-        if byte == self._hyphen:
-            self.state = ParserState.STARTING_BOUNDARY
-            self._buffer.pop(-1)
-            self._buffer.pop(-1)
-        else:
-            self.state = ParserState.READING_BODY
-            self._buffer.append(byte)
-
-        self._flush_buffer()
+        if self._buffer_ends_with(self._delimiter):
+            self.state = ParserState.READING_HEADER
+            self._truncate_buffer(self._delimiter)
+            self._unset_active_part()
+        elif self._buffer_ends_with(self._ender):
+            self.state = ParserState.END
+            self._truncate_buffer(self._ender)
 
     def _process_header(self):
         header = bytes(self._buffer)
@@ -263,3 +229,26 @@ class StreamingFormDataParser(object):
 
         self._active_part.data_received(value)
         self._buffer = []
+
+    def _truncate_buffer(self, suffix):
+        if len(self._buffer) <= len(suffix):
+            return
+
+        index = len(self._buffer) - len(suffix)
+
+        self._active_part.data_received(self._buffer[:index - 2])
+        self._buffer = []
+
+    def _buffer_ends_with(self, suffix):
+        if len(self._buffer) < len(suffix):
+            return False
+
+        start = -1
+        end = -1 * len(suffix)
+
+        while start >= end:
+            if self._buffer[start] != suffix[start]:
+                return False
+            start -= 1
+
+        return True

@@ -276,3 +276,29 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello\r\nworld')
+
+    def test_parameter_ends_with_crlf(self):
+        target = ValueTarget()
+        expected_parts = (Part('value', target),)
+
+        encoder = MultipartEncoder(fields={'value': 'hello\r\n'})
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': encoder.content_type})
+        parser.data_received(encoder.to_string())
+
+        self.assertEqual(target.value, b'hello\r\n')
+
+    def test_parameter_starts_with_crlf(self):
+        target = ValueTarget()
+        expected_parts = (Part('value', target),)
+
+        encoder = MultipartEncoder(fields={'value': '\r\nworld'})
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': encoder.content_type})
+        parser.data_received(encoder.to_string())
+
+        self.assertEqual(target.value, b'\r\nworld')
