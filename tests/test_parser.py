@@ -1,9 +1,14 @@
+import os.path
 from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
 from streaming_form_data.parser import StreamingFormDataParser, ParserState
 from streaming_form_data.targets import ValueTarget
 from streaming_form_data.part import Part
+
+
+def data_file_path(filename):
+    return os.path.join('tests/data', filename)
 
 
 def load_file(filename):
@@ -169,10 +174,10 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_single(self):
-        with open('data/file.txt', 'rb') as file_:
+        with open(data_file_path('file.txt'), 'rb') as file_:
             expected_value = file_.read()
 
-        content_type, body = load_file('data/file.txt')
+        content_type, body = load_file(data_file_path('file.txt'))
 
         txt = ValueTarget()
 
@@ -188,10 +193,10 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_multiple(self):
-        with open('data/file.txt', 'rb') as file_:
+        with open(data_file_path('file.txt'), 'rb') as file_:
             expected_value = file_.read()
 
-        content_type, body = load_file('data/file.txt')
+        content_type, body = load_file(data_file_path('file.txt'))
 
         txt = ValueTarget()
 
@@ -215,10 +220,10 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_varying_chunk_size(self):
-        with open('data/file.txt', 'rb') as file_:
+        with open(data_file_path('file.txt'), 'rb') as file_:
             expected_value = file_.read()
 
-        content_type, body = load_file('data/file.txt')
+        content_type, body = load_file(data_file_path('file.txt'))
 
         for index in range(len(body)):
             txt = ValueTarget()
@@ -236,10 +241,10 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(parser.state, ParserState.END)
 
     def test_mixed_content_varying_chunk_size(self):
-        with open('data/file.txt', 'rb') as file_:
+        with open(data_file_path('file.txt'), 'rb') as file_:
             expected_value = file_.read()
 
-        with open('data/file.txt', 'rb') as file_:
+        with open(data_file_path('file.txt'), 'rb') as file_:
             fields = {
                 'name': 'hello world',
                 'age': '10',

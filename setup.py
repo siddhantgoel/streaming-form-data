@@ -14,6 +14,6 @@ setup(
     author_email='siddhantgoel@gmail.com',
     license='MIT',
     url='https://github.com/siddhantgoel/streaming-form-data',
-    packages=find_packages(exclude=['data', 'examples', 'tests', 'utils']),
+    packages=find_packages(exclude=['examples', 'tests', 'utils']),
     include_package_data=True
 )
