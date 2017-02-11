@@ -1,5 +1,7 @@
 # Streaming multipart/form-data parser
 
+[![PyPI version](https://badge.fury.io/py/streaming-form-data.svg)](https://badge.fury.io/py/streaming-form-data)
+
 ![Build](https://travis-ci.org/siddhantgoel/streaming-form-data.svg?branch=master)
 
 `streaming_form_data` provides a Python parser for parsing multipart/form-data input chunks. Passing the entire input should also work, when passed as a single chunk. But the use case here is to have the parser parse the values in chunks (of a size determined by the user of the API).
