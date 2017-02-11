@@ -263,3 +263,16 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(name.value, b'hello world')
             self.assertEqual(age.value, b'10')
             self.assertEqual(cv.value, expected_value)
+
+    def test_parameter_contains_crlf(self):
+        target = ValueTarget()
+        expected_parts = (Part('value', target),)
+
+        encoder = MultipartEncoder(fields={'value': 'hello\r\nworld'})
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': encoder.content_type})
+        parser.data_received(encoder.to_string())
+
+        self.assertEqual(target.value, b'hello\r\nworld')

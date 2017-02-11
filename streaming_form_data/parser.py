@@ -164,6 +164,7 @@ class StreamingFormDataParser(object):
 
         if byte == self._cr:
             self.state = ParserState.ENDING_HEADER
+
         self._buffer.append(byte)
 
     def _parse_ending_header(self, index, chunk):
@@ -213,6 +214,7 @@ class StreamingFormDataParser(object):
 
         if byte == self._cr:
             self.state = ParserState.ENDING_BODY_CR
+
         self._buffer.append(byte)
 
     def _parse_ending_body_cr(self, index, chunk):
