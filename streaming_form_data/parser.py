@@ -23,10 +23,8 @@ class ParserState(enum.Enum):
     ENDING_ALL_HEADERS = 6
 
     READING_BODY = 7
-    ENDING_BODY_CR = 8
-    ENDING_BODY_LF = 9
 
-    END = 10
+    END = 8
 
 
 def parse_content_boundary(headers):
