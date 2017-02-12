@@ -1,22 +1,16 @@
 class BaseTarget(object):
     def start(self):
-        raise NotImplementedError()
+        pass
 
     def data_received(self, chunk):
         raise NotImplementedError()
 
     def finish(self):
-        raise NotImplementedError()
+        pass
 
 
 class NullTarget(BaseTarget):
-    def start(self):
-        pass
-
     def data_received(self, chunk):
-        pass
-
-    def finish(self):
         pass
 
 
@@ -24,14 +18,8 @@ class ValueTarget(BaseTarget):
     def __init__(self):
         self._values = []
 
-    def start(self):
-        pass
-
     def data_received(self, chunk):
         self._values.extend(chunk)
-
-    def finish(self):
-        pass
 
     @property
     def value(self):

@@ -342,23 +342,23 @@ class StreamingFormDataParserTestCase(TestCase):
         txt_target = ValueTarget()
         png_target = ValueTarget()
 
-        with open(data_file_path(txt_filename), 'rb') as txt_file:
-            with open(data_file_path(png_filename), 'rb') as png_file:
-                encoder = MultipartEncoder(fields={
-                    txt_filename: (txt_filename, txt_file,
-                                   'application/plain'),
-                    png_filename: (png_filename, png_file, 'image/png')
-                })
+        with open(data_file_path(txt_filename), 'rb') as txt_file, \
+                open(data_file_path(png_filename), 'rb') as png_file:
+            encoder = MultipartEncoder(fields={
+                txt_filename: (txt_filename, txt_file,
+                               'application/plain'),
+                png_filename: (png_filename, png_file, 'image/png')
+            })
 
-                expected_parts = (
-                    Part(txt_filename, txt_target),
-                    Part(png_filename, png_target),
-                )
+            expected_parts = (
+                Part(txt_filename, txt_target),
+                Part(png_filename, png_target),
+            )
 
-                parser = StreamingFormDataParser(
-                    expected_parts=expected_parts,
-                    headers={'Content-Type': encoder.content_type})
-                parser.data_received(encoder.to_string())
+            parser = StreamingFormDataParser(
+                expected_parts=expected_parts,
+                headers={'Content-Type': encoder.content_type})
+            parser.data_received(encoder.to_string())
 
-                self.assertEqual(txt_target.value, expected_txt)
-                self.assertEqual(png_target.value, expected_png)
+            self.assertEqual(txt_target.value, expected_txt)
+            self.assertEqual(png_target.value, expected_png)
