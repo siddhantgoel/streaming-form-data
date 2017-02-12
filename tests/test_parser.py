@@ -11,10 +11,12 @@ def data_file_path(filename):
     return os.path.join('tests/data', filename)
 
 
-def load_file(filename):
-    with open(filename, 'rb') as file_:
+def load_file(path):
+    _, filename = os.path.split(path)
+
+    with open(path, 'rb') as file_:
         fields = {
-            'file.txt': ('file.txt', file_, 'text/plain')
+            filename: (filename, file_, 'text/plain')
         }
 
         encoder = MultipartEncoder(fields=fields)
