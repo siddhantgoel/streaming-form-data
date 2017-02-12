@@ -3,7 +3,7 @@ clean:
 	rm -f dist/*.whl
 
 build:
-	python setup.py bdist_wheel --universal
+	python setup.py bdist_wheel
 
 upload: build
 	twine upload dist/*
