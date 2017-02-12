@@ -7,8 +7,11 @@ from streaming_form_data.targets import ValueTarget
 from streaming_form_data.part import Part
 
 
+DATA_DIR = 'tests/data'
+
+
 def data_file_path(filename):
-    return os.path.join('tests/data', filename)
+    return os.path.join(DATA_DIR, filename)
 
 
 def load_file(path):
@@ -176,23 +179,26 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_single(self):
-        with open(data_file_path('file.txt'), 'rb') as file_:
-            expected_value = file_.read()
+        filenames = os.listdir(DATA_DIR)
 
-        content_type, body = load_file(data_file_path('file.txt'))
+        for filename in filenames:
+            with open(data_file_path(filename), 'rb') as file_:
+                expected_value = file_.read()
 
-        txt = ValueTarget()
+            content_type, body = load_file(data_file_path(filename))
 
-        expected_parts = (Part('file.txt', txt),)
+            value = ValueTarget()
 
-        parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
-            headers={'Content-Type': content_type})
+            expected_parts = (Part(filename, value),)
 
-        parser.data_received(body)
+            parser = StreamingFormDataParser(
+                expected_parts=expected_parts,
+                headers={'Content-Type': content_type})
 
-        self.assertEqual(txt.value, expected_value)
-        self.assertEqual(parser.state, ParserState.END)
+            parser.data_received(body)
+
+            self.assertEqual(value.value, expected_value)
+            self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_multiple(self):
         with open(data_file_path('file.txt'), 'rb') as file_:
@@ -322,3 +328,37 @@ class StreamingFormDataParserTestCase(TestCase):
 
         self.assertEqual(target.value, b'\r\nworld')
         self.assertEqual(parser.state, ParserState.END)
+
+    def test_multiple_files(self):
+        txt_filename = 'file.txt'
+        png_filename = 'image.png'
+
+        with open(data_file_path(txt_filename), 'rb') as file_:
+            expected_txt = file_.read()
+
+        with open(data_file_path(png_filename), 'rb') as file_:
+            expected_png = file_.read()
+
+        txt_target = ValueTarget()
+        png_target = ValueTarget()
+
+        with open(data_file_path(txt_filename), 'rb') as txt_file:
+            with open(data_file_path(png_filename), 'rb') as png_file:
+                encoder = MultipartEncoder(fields={
+                    txt_filename: (txt_filename, txt_file,
+                                   'application/plain'),
+                    png_filename: (png_filename, png_file, 'image/png')
+                })
+
+                expected_parts = (
+                    Part(txt_filename, txt_target),
+                    Part(png_filename, png_target),
+                )
+
+                parser = StreamingFormDataParser(
+                    expected_parts=expected_parts,
+                    headers={'Content-Type': encoder.content_type})
+                parser.data_received(encoder.to_string())
+
+                self.assertEqual(txt_target.value, expected_txt)
+                self.assertEqual(png_target.value, expected_png)
