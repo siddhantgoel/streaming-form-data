@@ -40,4 +40,5 @@ class FileTarget(BaseTarget):
         self._fd.flush()
 
     def finish(self):
+        self._fd.flush()
         self._fd.close()
