@@ -32,4 +32,5 @@ Usage
     >>> from streaming_form_data.targets import ValueTarget
     >>> part = Part('name', ValueTarget())
     >>> parser = StreamingFormDataParser(expected_parts=(part,), headers={'Content-Type': 'multipart/form-data; boundary=boundary'})
+    >>> parser.start()
     >>> parser.data_received(chunk)
