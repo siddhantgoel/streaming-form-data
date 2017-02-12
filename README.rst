@@ -44,7 +44,7 @@ Usage
 
     >>> from streaming_form_data.parser import StreamingFormDataParser
     >>> from streaming_form_data.part import Part
-    >>> from streaming_form_data.targets import ValueTarget
+    >>> from streaming_form_data.targets import ValueTarget, FileTarget
     >>>
     >>> name = Part('name', ValueTarget())
     >>> file_ = Part('file', FileTarget('/tmp/file.txt'))
