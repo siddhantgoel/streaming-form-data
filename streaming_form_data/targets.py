@@ -1,4 +1,9 @@
 class BaseTarget(object):
+    """Targets determine what to do with some input once the parser is done with
+    it. Any new Target should inherit from this class and override
+    data_received.
+    """
+
     def start(self):
         pass
 

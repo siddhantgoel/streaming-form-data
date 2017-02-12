@@ -45,7 +45,7 @@ def parse_content_boundary(headers):
 
 
 class StreamingFormDataParser(object):
-    """Parse multipart/form-data in chunks, one at a time.
+    """Parse multipart/form-data in chunks, one byte at a time.
     """
 
     def __init__(self, expected_parts, headers):

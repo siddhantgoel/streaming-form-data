@@ -1,5 +1,5 @@
 class Part(object):
-    """A part of of multipart/form-data request
+    """One part of a multipart/form-data request
     """
 
     def __init__(self, name, target):
