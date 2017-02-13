@@ -5,6 +5,13 @@ from streaming_form_data.targets import NullTarget
 from streaming_form_data.part import Part
 
 
+HYPHEN = 45
+
+CR = 13
+
+LF = 10
+
+
 class ParseFailedException(Exception):
     pass
 
@@ -52,10 +59,6 @@ class StreamingFormDataParser(object):
         self.expected_parts = expected_parts
         self.headers = headers
 
-        self._hyphen = 45
-        self._cr = 13
-        self._lf = 10
-
         self._raw_boundary = parse_content_boundary(headers)
 
         self._boundary = b'--' + self._raw_boundary
@@ -67,18 +70,32 @@ class StreamingFormDataParser(object):
 
         self._default_part = Part('_default', NullTarget())
 
-        self._buffer = []
+        # current chunk we're parsing
+        self._chunk = None
+
+        # stores the index of the byte we're currently looking at
+        self._index = -1
+
+        # stores the indices where the current buffer starts (inclusive) and
+        # ends (exclusive)
+        self._buffer_start = -1
+        self._buffer_end = -1
 
         self._min_size_before_flush = len(self._delimiter) + 32
 
-    def _unset_active_part(self):
-        if self._active_part:
-            self._active_part.finish()
-        self._active_part = None
+        self._leftover_buffer = None
 
-    def _set_active_part(self, part):
-        self._unset_active_part()
-        self._active_part = part
+    @property
+    def current_byte(self):
+        return self._chunk[self._index]
+
+    @property
+    def buffer_length(self):
+        return self._buffer_end - self._buffer_start
+
+    @property
+    def _buffer(self):
+        return self._chunk[self._buffer_start: self._buffer_end]
 
     def data_received(self, chunk):
         if not self.expected_parts or not chunk:
@@ -86,13 +103,22 @@ class StreamingFormDataParser(object):
 
         self._parse(chunk)
 
-    def _part_for(self, name):
-        for part in self.expected_parts:
-            if part.name == name:
-                return part
-        return self._default_part
-
     def _parse(self, chunk):
+        if self._leftover_buffer:
+            self._chunk = self._leftover_buffer + chunk
+
+            self._index = len(self._leftover_buffer)
+            self._buffer_start = 0
+            self._buffer_end = self._index
+
+            self._leftover_buffer = None
+        else:
+            self._chunk = chunk
+
+            self._index = 0
+            self._buffer_start = 0
+            self._buffer_end = 0
+
         next_step = {
             ParserState.START: self._parse_start,
             ParserState.STARTING_BOUNDARY: self._parse_starting_boundary,
@@ -105,7 +131,7 @@ class StreamingFormDataParser(object):
             ParserState.READING_BODY: self._parse_reading_body,
         }.get
 
-        for index in range(len(chunk)):
+        while self._index < len(self._chunk):
             if self.state == ParserState.END:
                 return
 
@@ -114,87 +140,82 @@ class StreamingFormDataParser(object):
             if not function:
                 raise ParseFailedException()
 
-            function(index, chunk)
+            function()
 
-    def _parse_start(self, index, chunk):
-        byte = chunk[index]
+            self._index += 1
 
-        if byte != self._hyphen:
+        if self.buffer_length > 0:
+            self._leftover_buffer = \
+                self._chunk[self._buffer_start: self._buffer_end]
+
+        self._chunk = None
+
+    def expand_buffer(self):
+        self._buffer_end += 1
+
+    def _parse_start(self):
+        if self.current_byte != HYPHEN:
             raise ParseFailedException()
 
-        self._buffer.append(byte)
+        self.expand_buffer()
         self.state = ParserState.STARTING_BOUNDARY
 
-    def _parse_starting_boundary(self, index, chunk):
-        byte = chunk[index]
-
-        if byte != self._hyphen:
+    def _parse_starting_boundary(self):
+        if self.current_byte != HYPHEN:
             raise ParseFailedException()
 
-        self._buffer.append(byte)
+        self.expand_buffer()
         self.state = ParserState.READING_BOUNDARY
 
-    def _parse_reading_boundary(self, index, chunk):
-        byte = chunk[index]
+    def _parse_reading_boundary(self):
+        self.expand_buffer()
 
-        if byte == self._cr:
+        if self.current_byte == CR:
             self.state = ParserState.ENDING_BOUNDARY
 
-        self._buffer.append(byte)
-
-    def _parse_ending_boundary(self, index, chunk):
-        byte = chunk[index]
-
-        if byte != self._lf:
+    def _parse_ending_boundary(self):
+        if self.current_byte != LF:
             raise ParseFailedException()
 
-        self._buffer.append(byte)
+        self.expand_buffer()
         self._process_boundary()
         self._reset_buffer()
 
         self.state = ParserState.READING_HEADER
 
-    def _parse_reading_header(self, index, chunk):
-        byte = chunk[index]
+    def _parse_reading_header(self):
+        self.expand_buffer()
 
-        if byte == self._cr:
+        if self.current_byte == CR:
             self.state = ParserState.ENDING_HEADER
 
-        self._buffer.append(byte)
-
-    def _parse_ending_header(self, index, chunk):
-        byte = chunk[index]
-
-        if byte != self._lf:
+    def _parse_ending_header(self):
+        if self.current_byte != LF:
             raise ParseFailedException()
 
-        self._buffer.append(byte)
+        self.expand_buffer()
         self._process_header()
         self._reset_buffer()
 
         self.state = ParserState.ENDED_HEADER
 
-    def _parse_ended_header(self, index, chunk):
-        byte = chunk[index]
-
-        if byte == self._cr:
+    def _parse_ended_header(self):
+        if self.current_byte == CR:
             self.state = ParserState.ENDING_ALL_HEADERS
         else:
             self.state = ParserState.READING_HEADER
 
-        self._buffer.append(byte)
+        self.expand_buffer()
 
-    def _parse_ending_all_headers(self, index, chunk):
-        byte = chunk[index]
-
-        if byte != self._lf:
+    def _parse_ending_all_headers(self):
+        if self.current_byte != LF:
             raise ParseFailedException()
 
         self._reset_buffer()
         self.state = ParserState.READING_BODY
 
-    def _parse_reading_body(self, index, chunk):
-        self._buffer.append(chunk[index])
+    def _parse_reading_body(self):
+        self.expand_buffer()
 
         if self._buffer_ends_with(self._delimiter):
             self.state = ParserState.READING_HEADER
@@ -206,8 +227,23 @@ class StreamingFormDataParser(object):
 
         self._try_flush_buffer()
 
+    def _part_for(self, name):
+        for part in self.expected_parts:
+            if part.name == name:
+                return part
+        return self._default_part
+
+    def _set_active_part(self, part):
+        self._unset_active_part()
+        self._active_part = part
+
+    def _unset_active_part(self):
+        if self._active_part:
+            self._active_part.finish()
+        self._active_part = None
+
     def _process_header(self):
-        header = bytes(self._buffer)
+        header = self._chunk[self._buffer_start: self._buffer_end]
 
         value, params = cgi.parse_header(header.decode('utf-8'))
 
@@ -218,42 +254,52 @@ class StreamingFormDataParser(object):
             self._set_active_part(part)
 
     def _process_boundary(self):
-        value = bytes(self._buffer)
+        if self.buffer_length < 4:
+            return False
 
-        if all([value[index] == self._hyphen for index in (0, 1, -1, -2)]):
+        indices = (self._buffer_start, self._buffer_start + 1,
+                   self._buffer_end - 1, self._buffer_end - 2)
+
+        if all([self._chunk[index] == HYPHEN for index in indices]):
             self.state = ParserState.END
 
     def _reset_buffer(self):
-        self._buffer = []
+        self._buffer_start = self._index + 1
+        self._buffer_end = self._index + 1
 
     def _try_flush_buffer(self):
-        if len(self._buffer) <= self._min_size_before_flush:
+        if self.buffer_length <= self._min_size_before_flush:
             return
 
-        index = len(self._buffer) - self._min_size_before_flush - 1
+        index = self._buffer_end - self._min_size_before_flush
 
-        self._active_part.data_received(bytes(self._buffer[:index]))
-        self._buffer = self._buffer[index:]
+        self._active_part.data_received(
+            self._chunk[self._buffer_start: index])
+
+        self._buffer_start = index
 
     def _truncate_buffer(self, suffix):
-        if len(self._buffer) <= len(suffix):
+        if self.buffer_length <= len(suffix):
             return
 
-        index = len(self._buffer) - len(suffix)
+        index = self._buffer_end - len(suffix)
 
-        self._active_part.data_received(self._buffer[:index - 2])
-        self._buffer = []
+        self._active_part.data_received(
+            self._chunk[self._buffer_start: index - 2])
+
+        self._reset_buffer()
 
     def _buffer_ends_with(self, suffix):
-        if len(self._buffer) < len(suffix):
+        if self.buffer_length < len(suffix):
             return False
 
-        start = -1
-        end = -1 * len(suffix)
+        chunk_index, suffix_index = self._buffer_end - 1, len(suffix) - 1
 
-        while start >= end:
-            if self._buffer[start] != suffix[start]:
+        while chunk_index >= self._buffer_start and suffix_index >= 0:
+            if self._chunk[chunk_index] != suffix[suffix_index]:
                 return False
-            start -= 1
+
+            chunk_index -= 1
+            suffix_index -= 1
 
         return True

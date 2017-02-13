@@ -77,7 +77,7 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(parser.state, ParserState.END)
 
     def test_chunked_single(self):
-        expected_value = 'hello' * 5000
+        expected_value = 'hello world'
 
         target = ValueTarget()
         expected_parts = (Part('value', target),)
@@ -90,23 +90,18 @@ class StreamingFormDataParserTestCase(TestCase):
             expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
 
-        chunks = []
-        size = 500
+        index = body.index(b'world')
 
-        while len(body):
-            chunks.append(body[:size])
-            body = body[size:]
-
-        for chunk in chunks:
-            parser.data_received(chunk)
+        parser.data_received(body[:index])
+        parser.data_received(body[index:])
 
         self.assertEqual(target.value, expected_value.encode('utf-8'))
         self.assertEqual(parser.state, ParserState.END)
 
     def test_chunked_multiple(self):
-        expected_first_value = 'foo' * 5000
-        expected_second_value = 'bar' * 5000
-        expected_third_value = 'baz' * 5000
+        expected_first_value = 'foo' * 1000
+        expected_second_value = 'bar' * 1000
+        expected_third_value = 'baz' * 1000
 
         first = ValueTarget()
         second = ValueTarget()
@@ -131,7 +126,7 @@ class StreamingFormDataParserTestCase(TestCase):
             headers={'Content-Type': encoder.content_type})
 
         chunks = []
-        size = 500
+        size = 100
 
         while len(body):
             chunks.append(body[:size])
