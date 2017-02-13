@@ -90,10 +90,6 @@ class StreamingFormDataParser(object):
         self._ender_finder = Finder(self._ender)
 
     @property
-    def current_byte(self):
-        return self._chunk[self._index]
-
-    @property
     def buffer_length(self):
         return self._buffer_end - self._buffer_start
 
@@ -144,7 +140,7 @@ class StreamingFormDataParser(object):
             if not function:
                 raise ParseFailedException()
 
-            function()
+            function(self._chunk[self._index])
 
             self._index += 1
 
@@ -157,28 +153,28 @@ class StreamingFormDataParser(object):
     def expand_buffer(self):
         self._buffer_end += 1
 
-    def _parse_start(self):
-        if self.current_byte != HYPHEN:
+    def _parse_start(self, byte):
+        if byte != HYPHEN:
             raise ParseFailedException()
 
         self.expand_buffer()
         self.state = ParserState.STARTING_BOUNDARY
 
-    def _parse_starting_boundary(self):
-        if self.current_byte != HYPHEN:
+    def _parse_starting_boundary(self, byte):
+        if byte != HYPHEN:
             raise ParseFailedException()
 
         self.expand_buffer()
         self.state = ParserState.READING_BOUNDARY
 
-    def _parse_reading_boundary(self):
+    def _parse_reading_boundary(self, byte):
         self.expand_buffer()
 
-        if self.current_byte == CR:
+        if byte == CR:
             self.state = ParserState.ENDING_BOUNDARY
 
-    def _parse_ending_boundary(self):
-        if self.current_byte != LF:
+    def _parse_ending_boundary(self, byte):
+        if byte != LF:
             raise ParseFailedException()
 
         self.expand_buffer()
@@ -187,14 +183,14 @@ class StreamingFormDataParser(object):
 
         self.state = ParserState.READING_HEADER
 
-    def _parse_reading_header(self):
+    def _parse_reading_header(self, byte):
         self.expand_buffer()
 
-        if self.current_byte == CR:
+        if byte == CR:
             self.state = ParserState.ENDING_HEADER
 
-    def _parse_ending_header(self):
-        if self.current_byte != LF:
+    def _parse_ending_header(self, byte):
+        if byte != LF:
             raise ParseFailedException()
 
         self.expand_buffer()
@@ -203,26 +199,26 @@ class StreamingFormDataParser(object):
 
         self.state = ParserState.ENDED_HEADER
 
-    def _parse_ended_header(self):
-        if self.current_byte == CR:
+    def _parse_ended_header(self, byte):
+        if byte == CR:
             self.state = ParserState.ENDING_ALL_HEADERS
         else:
             self.state = ParserState.READING_HEADER
 
         self.expand_buffer()
 
-    def _parse_ending_all_headers(self):
-        if self.current_byte != LF:
+    def _parse_ending_all_headers(self, byte):
+        if byte != LF:
             raise ParseFailedException()
 
         self._reset_buffer()
         self.state = ParserState.READING_BODY
 
-    def _parse_reading_body(self):
+    def _parse_reading_body(self, byte):
         self.expand_buffer()
 
-        self._delimiter_finder.feed(self.current_byte)
-        self._ender_finder.feed(self.current_byte)
+        self._delimiter_finder.feed(byte)
+        self._ender_finder.feed(byte)
 
         if self._delimiter_finder.found:
             self.state = ParserState.READING_HEADER
