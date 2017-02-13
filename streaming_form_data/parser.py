@@ -1,6 +1,7 @@
 import cgi
 import enum
 
+from streaming_form_data.common import Finder
 from streaming_form_data.targets import NullTarget
 from streaming_form_data.part import Part
 
@@ -81,9 +82,12 @@ class StreamingFormDataParser(object):
         self._buffer_start = -1
         self._buffer_end = -1
 
-        self._min_size_before_flush = len(self._delimiter) + 32
+        self._max_buffer_size = 1024
 
         self._leftover_buffer = None
+
+        self._delimiter_finder = Finder(self._delimiter)
+        self._ender_finder = Finder(self._ender)
 
     @property
     def current_byte(self):
@@ -217,15 +221,22 @@ class StreamingFormDataParser(object):
     def _parse_reading_body(self):
         self.expand_buffer()
 
-        if self._buffer_ends_with(self._delimiter):
+        self._delimiter_finder.feed(self.current_byte)
+        self._ender_finder.feed(self.current_byte)
+
+        if self._delimiter_finder.found:
             self.state = ParserState.READING_HEADER
             self._truncate_buffer(self._delimiter)
             self._unset_active_part()
-        elif self._buffer_ends_with(self._ender):
+            self._delimiter_finder.reset()
+        elif self._ender_finder.found:
             self.state = ParserState.END
             self._truncate_buffer(self._ender)
-
-        self._try_flush_buffer()
+            self._ender_finder.reset()
+        else:
+            if not self._ender_finder.finding and \
+                    not self._delimiter_finder.finding:
+                self._try_flush_buffer()
 
     def _part_for(self, name):
         for part in self.expected_parts:
@@ -268,10 +279,10 @@ class StreamingFormDataParser(object):
         self._buffer_end = self._index + 1
 
     def _try_flush_buffer(self):
-        if self.buffer_length <= self._min_size_before_flush:
+        if self.buffer_length <= self._max_buffer_size:
             return
 
-        index = self._buffer_end - self._min_size_before_flush
+        index = self._buffer_end - 1
 
         self._active_part.data_received(
             self._chunk[self._buffer_start: index])
@@ -288,18 +299,3 @@ class StreamingFormDataParser(object):
             self._chunk[self._buffer_start: index - 2])
 
         self._reset_buffer()
-
-    def _buffer_ends_with(self, suffix):
-        if self.buffer_length < len(suffix):
-            return False
-
-        chunk_index, suffix_index = self._buffer_end - 1, len(suffix) - 1
-
-        while chunk_index >= self._buffer_start and suffix_index >= 0:
-            if self._chunk[chunk_index] != suffix[suffix_index]:
-                return False
-
-            chunk_index -= 1
-            suffix_index -= 1
-
-        return True
