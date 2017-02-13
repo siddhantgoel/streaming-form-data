@@ -53,6 +53,4 @@ Usage
     >>> expected_parts = (name, file_)
     >>>
     >>> parser = StreamingFormDataParser(expected_parts=expected_parts, headers=headers)
-    >>> parser.start()
-    >>>
     >>> parser.data_received(chunk)
