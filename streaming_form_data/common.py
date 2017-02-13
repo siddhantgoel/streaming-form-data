@@ -17,7 +17,7 @@ def c_profile(sort_by='cumulative'):
 
             stream = StringIO()
             stats = pstats.Stats(profiler, stream=stream).sort_stats(sort_by)
-            stats.print_stats()
+            stats.print_stats(25)
 
             print(stream.getvalue())
 
