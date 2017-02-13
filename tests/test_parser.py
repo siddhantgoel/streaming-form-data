@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
 from streaming_form_data.parser import StreamingFormDataParser, ParserState
-from streaming_form_data.targets import ValueTarget, NullTarget
+from streaming_form_data.targets import ValueTarget
 from streaming_form_data.part import Part
 
 
@@ -357,20 +357,3 @@ class StreamingFormDataParserTestCase(TestCase):
 
             self.assertEqual(txt_target.value, expected_txt)
             self.assertEqual(png_target.value, expected_png)
-
-    def test_large_file(self):
-        filename = 'image-high-res.jpg'
-
-        content_type, body = load_file(data_file_path(filename))
-
-        target = NullTarget()
-
-        expected_parts = (Part(filename, target),)
-
-        parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
-            headers={'Content-Type': content_type})
-
-        parser.data_received(body)
-
-        self.assertEqual(parser.state, ParserState.END)
