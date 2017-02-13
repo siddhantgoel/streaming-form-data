@@ -179,7 +179,7 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_single(self):
-        filenames = os.listdir(DATA_DIR)
+        filenames = ('file.txt', 'image-600x400.png', 'image-2560x1600.png')
 
         for filename in filenames:
             with open(data_file_path(filename), 'rb') as file_:
