@@ -331,7 +331,7 @@ class StreamingFormDataParserTestCase(TestCase):
 
     def test_multiple_files(self):
         txt_filename = 'file.txt'
-        png_filename = 'image.png'
+        png_filename = 'image-600x400.png'
 
         with open(data_file_path(txt_filename), 'rb') as file_:
             expected_txt = file_.read()
