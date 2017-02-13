@@ -1,15 +1,13 @@
 class Finder(object):
     def __init__(self, target):
         self.target = target
+        self.length = len(self.target)
         self.index = -1
 
     def feed(self, char):
-        if not self.target:
-            return
-
         self.index += 1
 
-        if self.index >= len(self.target):
+        if self.index >= self.length:
             return
 
         if self.target[self.index] != char:
@@ -22,8 +20,8 @@ class Finder(object):
 
     @property
     def finding(self):
-        return self.index > -1 and self.index < len(self.target) - 1
+        return self.index > -1 and self.index < self.length - 1
 
     @property
     def found(self):
-        return self.index == len(self.target) - 1
+        return self.index == self.length - 1
