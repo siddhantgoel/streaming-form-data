@@ -1,3 +1,6 @@
+import hashlib
+
+
 class BaseTarget(object):
     """Targets determine what to do with some input once the parser is done with
     it. Any new Target should inherit from this class and override
@@ -47,3 +50,15 @@ class FileTarget(BaseTarget):
     def finish(self):
         self._fd.flush()
         self._fd.close()
+
+
+class SHA256Target(BaseTarget):
+    def __init__(self):
+        self._hash = hashlib.sha256()
+
+    def data_received(self, chunk):
+        self._hash.update(chunk)
+
+    @property
+    def value(self):
+        return self._hash.hexdigest()
