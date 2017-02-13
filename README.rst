@@ -34,8 +34,9 @@ inherit :code:`streaming_form_data.targets.BaseTarget` and define a
 :code:`data_received` function.
 
 This library is currently under development. There are quite a few tests in the
-:code:`tests/` directory, but it hasn't been battle tested, and the API is not
-completely stable, hence production usage is not recomended (yet).
+:code:`tests/` directory that test for correctness. But the parser hasn't been
+battle tested yet, and is currently slow for large files, hence production usage
+is not recommended (yet).
 
 Usage
 -----
