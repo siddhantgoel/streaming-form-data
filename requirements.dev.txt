@@ -7,6 +7,7 @@
 appdirs==1.4.0            # via setuptools
 args==0.1.0               # via clint
 clint==0.5.1              # via twine
+Cython==0.25.2
 flake8==3.3.0
 mccabe==0.6.1             # via flake8
 packaging==16.8           # via setuptools
