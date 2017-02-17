@@ -94,6 +94,3 @@ ENV/
 .ropeproject
 
 # End of https://www.gitignore.io/api/python
-
-# Project specific
-streaming_form_data/finder.c

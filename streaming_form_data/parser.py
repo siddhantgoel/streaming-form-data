@@ -1,9 +1,9 @@
 import cgi
 import enum
 
-from .finder import Finder
-from .targets import NullTarget
-from .part import Part
+from streaming_form_data.finder import Finder
+from streaming_form_data.targets import NullTarget
+from streaming_form_data.part import Part
 
 
 HYPHEN = 45
