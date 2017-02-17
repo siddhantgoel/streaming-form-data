@@ -19,4 +19,4 @@ test: clean
 style:
 	flake8
 
-.PHONY: clean build upload deps-compile
+.PHONY: clean build upload deps-compile test
