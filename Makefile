@@ -16,4 +16,7 @@ test: clean
 	python setup.py build install
 	py.test tests/
 
+style:
+	flake8
+
 .PHONY: clean build upload deps-compile
