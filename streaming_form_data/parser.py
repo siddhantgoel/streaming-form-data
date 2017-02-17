@@ -1,7 +1,7 @@
 import cgi
 import enum
 
-from .common import Finder
+from .finder import Finder
 from .targets import NullTarget
 from .part import Part
 
@@ -230,8 +230,7 @@ class StreamingFormDataParser(object):
             self._truncate_buffer(self._ender)
             self._ender_finder.reset()
         else:
-            if not self._ender_finder.finding and \
-                    not self._delimiter_finder.finding:
+            if self._ender_finder.inactive and self._delimiter_finder.inactive:
                 self._try_flush_buffer()
 
     def _part_for(self, name):
