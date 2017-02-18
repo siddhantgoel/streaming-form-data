@@ -1,5 +1,4 @@
-from setuptools import setup, Extension, find_packages
-import sys
+from setuptools import setup, Extension
 
 
 with open('README.rst') as f:
@@ -31,6 +30,6 @@ setup(
     author_email='siddhantgoel@gmail.com',
     license='MIT',
     url='https://github.com/siddhantgoel/streaming-form-data',
-    packages=find_packages(exclude=['examples', 'tests', 'utils']),
+    packages=['streaming_form_data'],
     ext_modules=extensions
 )

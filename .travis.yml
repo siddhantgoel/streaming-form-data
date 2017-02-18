@@ -4,8 +4,7 @@ python:
     - "3.6"
 install:
     - pip install -r requirements.dev.txt
-    - python setup.py bdist_wheel
-    - pip install dist/*.whl
+    - python setup.py build_ext --inplace
 script:
     - py.test tests/
     - flake8
