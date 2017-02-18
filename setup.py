@@ -1,12 +1,11 @@
 from setuptools import setup, Extension
 import sys
+import warnings
 
 
 with open('README.rst') as f:
     description = f.read()
 
-
-using_cython = False
 
 cythonize = None
 
@@ -14,17 +13,15 @@ cythonize = None
 try:
     sys.argv.remove('--using-cython')
 except ValueError:
-    using_cython = False
+    pass
 else:
     try:
         from Cython.Build import cythonize
     except ImportError:
-        using_cython = False
-    else:
-        using_cython = True
+        warnings.warn('Cython not installed')
 
 
-if using_cython:
+if cythonize:
     extensions = cythonize('streaming_form_data/finder.pyx')
 else:
     extensions = [Extension('streaming_form_data.finder',
