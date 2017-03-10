@@ -1,9 +1,6 @@
 Streaming multipart/form-data parser
 ====================================
 
-.. image:: https://badge.fury.io/py/streaming-form-data.svg
-    :target: https://pypi.python.org/pypi/streaming-form-data
-
 .. image:: https://travis-ci.org/siddhantgoel/streaming-form-data.svg?branch=master
     :target: https://travis-ci.org/siddhantgoel/streaming-form-data
 
