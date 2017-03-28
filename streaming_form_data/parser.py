@@ -119,28 +119,31 @@ class StreamingFormDataParser(object):
             self._buffer_start = 0
             self._buffer_end = 0
 
-        next_step = {
-            ParserState.START: self._parse_start,
-            ParserState.STARTING_BOUNDARY: self._parse_starting_boundary,
-            ParserState.READING_BOUNDARY: self._parse_reading_boundary,
-            ParserState.ENDING_BOUNDARY: self._parse_ending_boundary,
-            ParserState.READING_HEADER: self._parse_reading_header,
-            ParserState.ENDING_HEADER: self._parse_ending_header,
-            ParserState.ENDED_HEADER: self._parse_ended_header,
-            ParserState.ENDING_ALL_HEADERS: self._parse_ending_all_headers,
-            ParserState.READING_BODY: self._parse_reading_body,
-        }.get
-
         while self._index < len(self._chunk):
-            if self.state == ParserState.END:
+            byte = self._chunk[self._index]
+
+            if self.state == ParserState.START:
+                self._parse_start(byte)
+            elif self.state == ParserState.STARTING_BOUNDARY:
+                self._parse_starting_boundary(byte)
+            elif self.state == ParserState.READING_BOUNDARY:
+                self._parse_reading_boundary(byte)
+            elif self.state == ParserState.ENDING_BOUNDARY:
+                self._parse_ending_boundary(byte)
+            elif self.state == ParserState.READING_HEADER:
+                self._parse_reading_header(byte)
+            elif self.state == ParserState.ENDING_HEADER:
+                self._parse_ending_header(byte)
+            elif self.state == ParserState.ENDED_HEADER:
+                self._parse_ended_header(byte)
+            elif self.state == ParserState.ENDING_ALL_HEADERS:
+                self._parse_ending_all_headers(byte)
+            elif self.state == ParserState.READING_BODY:
+                self._parse_reading_body(byte)
+            elif self.state == ParserState.END:
                 return
-
-            function = next_step(self.state)
-
-            if not function:
+            else:
                 raise ParseFailedException()
-
-            function(self._chunk[self._index])
 
             self._index += 1
 
