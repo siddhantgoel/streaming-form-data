@@ -1,3 +1,4 @@
+from collections import namedtuple
 import cgi
 import enum
 
@@ -52,6 +53,9 @@ def parse_content_boundary(headers):
     return boundary.encode('utf-8')
 
 
+Position = namedtuple('Position', ['buffer_start', 'buffer_end'])
+
+
 class StreamingFormDataParser(object):
     """Parse multipart/form-data in chunks, one byte at a time.
     """
@@ -71,9 +75,6 @@ class StreamingFormDataParser(object):
 
         self._default_part = Part('_default', NullTarget())
 
-        # current chunk we're parsing
-        self._chunk = None
-
         # stores the index of the byte we're currently looking at
         self._index = -1
 
@@ -89,152 +90,168 @@ class StreamingFormDataParser(object):
         self._delimiter_finder = Finder(self._delimiter)
         self._ender_finder = Finder(self._ender)
 
-    @property
-    def buffer_length(self):
-        return self._buffer_end - self._buffer_start
-
-    @property
-    def _buffer(self):
-        return self._chunk[self._buffer_start: self._buffer_end]
-
-    def data_received(self, chunk):
-        if not self.expected_parts or not chunk:
+    def data_received(self, data):
+        if not self.expected_parts or not data:
             return
 
-        self._parse(chunk)
-
-    def _parse(self, chunk):
         if self._leftover_buffer:
-            self._chunk = self._leftover_buffer + chunk
+            chunk = self._leftover_buffer + data
 
-            self._index = len(self._leftover_buffer)
-            self._buffer_start = 0
-            self._buffer_end = self._index
+            index = len(self._leftover_buffer)
+            buffer_start = 0
+            buffer_end = index
 
             self._leftover_buffer = None
         else:
-            self._chunk = chunk
+            chunk = data
 
-            self._index = 0
-            self._buffer_start = 0
-            self._buffer_end = 0
+            index = 0
+            buffer_start = 0
+            buffer_end = 0
 
-        while self._index < len(self._chunk):
-            byte = self._chunk[self._index]
+        self._parse(chunk, index, buffer_start, buffer_end)
+
+    def _parse(self, chunk, index, buffer_start, buffer_end):
+        position = Position(buffer_start, buffer_end)
+
+        def expand_buffer():
+            return position._replace(buffer_end=position.buffer_end+1)
+
+        def buffer_length():
+            return position.buffer_end - position.buffer_start
+
+        def reset_buffer():
+            return position._replace(buffer_start=index+1,
+                                     buffer_end=index+1)
+
+        def truncate_buffer(suffix):
+            if buffer_length() <= len(suffix):
+                return position
+
+            index = position.buffer_end - len(suffix)
+
+            self._active_part.data_received(
+                chunk[position.buffer_start: index - 2])
+
+            return reset_buffer()
+
+        def try_flush_buffer():
+            if buffer_length() <= self._max_buffer_size:
+                return position
+
+            index = position.buffer_end - 1
+
+            self._active_part.data_received(
+                chunk[position.buffer_start: index])
+
+            return position._replace(buffer_start=index)
+
+        while index < len(chunk):
+            byte = chunk[index]
 
             if self.state == ParserState.START:
-                self._parse_start(byte)
+                if byte != HYPHEN:
+                    raise ParseFailedException()
+
+                position = expand_buffer()
+                self.state = ParserState.STARTING_BOUNDARY
             elif self.state == ParserState.STARTING_BOUNDARY:
-                self._parse_starting_boundary(byte)
+                if byte != HYPHEN:
+                    raise ParseFailedException()
+
+                position = expand_buffer()
+                self.state = ParserState.READING_BOUNDARY
             elif self.state == ParserState.READING_BOUNDARY:
-                self._parse_reading_boundary(byte)
+                position = expand_buffer()
+
+                if byte == CR:
+                    self.state = ParserState.ENDING_BOUNDARY
             elif self.state == ParserState.ENDING_BOUNDARY:
-                self._parse_ending_boundary(byte)
+                if byte != LF:
+                    raise ParseFailedException()
+
+                position = expand_buffer()
+
+                if buffer_length() < 4:
+                    return False
+
+                indices = (position.buffer_start,
+                           position.buffer_start + 1,
+                           position.buffer_end - 1,
+                           position.buffer_end - 2)
+
+                if all([chunk[idx] == HYPHEN for idx in indices]):
+                    self.state = ParserState.END
+
+                position = reset_buffer()
+
+                self.state = ParserState.READING_HEADER
             elif self.state == ParserState.READING_HEADER:
-                self._parse_reading_header(byte)
+                position = expand_buffer()
+
+                if byte == CR:
+                    self.state = ParserState.ENDING_HEADER
             elif self.state == ParserState.ENDING_HEADER:
-                self._parse_ending_header(byte)
+                if byte != LF:
+                    raise ParseFailedException()
+
+                position = expand_buffer()
+
+                header = chunk[position.buffer_start: position.buffer_end]
+
+                value, params = cgi.parse_header(header.decode('utf-8'))
+
+                if value.startswith('Content-Disposition'):
+                    part = self._part_for(params['name'])
+                    part.start()
+
+                    self._set_active_part(part)
+
+                position = reset_buffer()
+
+                self.state = ParserState.ENDED_HEADER
             elif self.state == ParserState.ENDED_HEADER:
-                self._parse_ended_header(byte)
+                if byte == CR:
+                    self.state = ParserState.ENDING_ALL_HEADERS
+                else:
+                    self.state = ParserState.READING_HEADER
+
+                position = expand_buffer()
             elif self.state == ParserState.ENDING_ALL_HEADERS:
-                self._parse_ending_all_headers(byte)
+                if byte != LF:
+                    raise ParseFailedException()
+
+                position = reset_buffer()
+                self.state = ParserState.READING_BODY
             elif self.state == ParserState.READING_BODY:
-                self._parse_reading_body(byte)
+                position = expand_buffer()
+
+                self._delimiter_finder.feed(byte)
+                self._ender_finder.feed(byte)
+
+                if self._delimiter_finder.found:
+                    self.state = ParserState.READING_HEADER
+                    position = truncate_buffer(self._delimiter)
+                    self._unset_active_part()
+                    self._delimiter_finder.reset()
+                elif self._ender_finder.found:
+                    self.state = ParserState.END
+                    position = truncate_buffer(self._ender)
+                    self._ender_finder.reset()
+                else:
+                    if self._ender_finder.inactive and \
+                            self._delimiter_finder.inactive:
+                        position = try_flush_buffer()
             elif self.state == ParserState.END:
                 return
             else:
                 raise ParseFailedException()
 
-            self._index += 1
+            index += 1
 
-        if self.buffer_length > 0:
+        if buffer_length() > 0:
             self._leftover_buffer = \
-                self._chunk[self._buffer_start: self._buffer_end]
-
-        self._chunk = None
-
-    def expand_buffer(self):
-        self._buffer_end += 1
-
-    def _parse_start(self, byte):
-        if byte != HYPHEN:
-            raise ParseFailedException()
-
-        self.expand_buffer()
-        self.state = ParserState.STARTING_BOUNDARY
-
-    def _parse_starting_boundary(self, byte):
-        if byte != HYPHEN:
-            raise ParseFailedException()
-
-        self.expand_buffer()
-        self.state = ParserState.READING_BOUNDARY
-
-    def _parse_reading_boundary(self, byte):
-        self.expand_buffer()
-
-        if byte == CR:
-            self.state = ParserState.ENDING_BOUNDARY
-
-    def _parse_ending_boundary(self, byte):
-        if byte != LF:
-            raise ParseFailedException()
-
-        self.expand_buffer()
-        self._process_boundary()
-        self._reset_buffer()
-
-        self.state = ParserState.READING_HEADER
-
-    def _parse_reading_header(self, byte):
-        self.expand_buffer()
-
-        if byte == CR:
-            self.state = ParserState.ENDING_HEADER
-
-    def _parse_ending_header(self, byte):
-        if byte != LF:
-            raise ParseFailedException()
-
-        self.expand_buffer()
-        self._process_header()
-        self._reset_buffer()
-
-        self.state = ParserState.ENDED_HEADER
-
-    def _parse_ended_header(self, byte):
-        if byte == CR:
-            self.state = ParserState.ENDING_ALL_HEADERS
-        else:
-            self.state = ParserState.READING_HEADER
-
-        self.expand_buffer()
-
-    def _parse_ending_all_headers(self, byte):
-        if byte != LF:
-            raise ParseFailedException()
-
-        self._reset_buffer()
-        self.state = ParserState.READING_BODY
-
-    def _parse_reading_body(self, byte):
-        self.expand_buffer()
-
-        self._delimiter_finder.feed(byte)
-        self._ender_finder.feed(byte)
-
-        if self._delimiter_finder.found:
-            self.state = ParserState.READING_HEADER
-            self._truncate_buffer(self._delimiter)
-            self._unset_active_part()
-            self._delimiter_finder.reset()
-        elif self._ender_finder.found:
-            self.state = ParserState.END
-            self._truncate_buffer(self._ender)
-            self._ender_finder.reset()
-        else:
-            if self._ender_finder.inactive and self._delimiter_finder.inactive:
-                self._try_flush_buffer()
+                chunk[position.buffer_start: position.buffer_end]
 
     def _part_for(self, name):
         for part in self.expected_parts:
@@ -250,50 +267,3 @@ class StreamingFormDataParser(object):
         if self._active_part:
             self._active_part.finish()
         self._active_part = None
-
-    def _process_header(self):
-        header = self._chunk[self._buffer_start: self._buffer_end]
-
-        value, params = cgi.parse_header(header.decode('utf-8'))
-
-        if value.startswith('Content-Disposition'):
-            part = self._part_for(params['name'])
-            part.start()
-
-            self._set_active_part(part)
-
-    def _process_boundary(self):
-        if self.buffer_length < 4:
-            return False
-
-        indices = (self._buffer_start, self._buffer_start + 1,
-                   self._buffer_end - 1, self._buffer_end - 2)
-
-        if all([self._chunk[index] == HYPHEN for index in indices]):
-            self.state = ParserState.END
-
-    def _reset_buffer(self):
-        self._buffer_start = self._index + 1
-        self._buffer_end = self._index + 1
-
-    def _try_flush_buffer(self):
-        if self.buffer_length <= self._max_buffer_size:
-            return
-
-        index = self._buffer_end - 1
-
-        self._active_part.data_received(
-            self._chunk[self._buffer_start: index])
-
-        self._buffer_start = index
-
-    def _truncate_buffer(self, suffix):
-        if self.buffer_length <= len(suffix):
-            return
-
-        index = self._buffer_end - len(suffix)
-
-        self._active_part.data_received(
-            self._chunk[self._buffer_start: index - 2])
-
-        self._reset_buffer()
