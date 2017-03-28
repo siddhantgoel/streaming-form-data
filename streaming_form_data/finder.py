@@ -1,23 +1,25 @@
-cdef enum FinderState:
+from enum import Enum
+
+
+class FinderState(Enum):
     START = -1
     WORKING = 0
     END = 1
 
 
-cdef class Finder(object):
-    cdef public bytes target
-    cdef long index
-    cdef FinderState state
-
-    def __init__(self, bytes target):
+class Finder(object):
+    def __init__(self, target):
         if len(target) < 1:
             raise ValueError('Empty values not allowed')
+
+        if not isinstance(target, bytes):
+            raise TypeError('Only bytes allowed')
 
         self.target = target
         self.index = 0
         self.state = FinderState.START
 
-    cpdef feed(self, long byte):
+    def feed(self, byte):
         if byte != self.target[self.index]:
             self.state = FinderState.START
             self.index = 0
@@ -28,7 +30,7 @@ cdef class Finder(object):
             if self.index == len(self.target):
                 self.state = FinderState.END
 
-    cpdef reset(self):
+    def reset(self):
         self.state = FinderState.START
         self.index = 0
 

@@ -1,24 +1,8 @@
-from setuptools import setup, Extension
+from setuptools import setup, find_packages
 
 
 with open('README.rst') as f:
     long_description = f.read()
-
-
-cythonize = None
-
-
-try:
-    from Cython.Build import cythonize
-except ImportError:
-    pass
-
-
-if cythonize:
-    extensions = cythonize('streaming_form_data/core/finder.pyx')
-else:
-    extensions = [Extension('streaming_form_data.core.finder',
-                            ['streaming_form_data/core/finder.c'])]
 
 
 setup(
@@ -30,6 +14,5 @@ setup(
     author_email='siddhantgoel@gmail.com',
     license='MIT',
     url='https://github.com/siddhantgoel/streaming-form-data',
-    packages=['streaming_form_data'],
-    ext_modules=extensions
+    packages=find_packages(exclude=['examples', 'tests', 'utils']),
 )

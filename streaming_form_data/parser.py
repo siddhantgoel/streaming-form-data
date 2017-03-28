@@ -1,7 +1,7 @@
 import cgi
 import enum
 
-from streaming_form_data.core.finder import Finder
+from streaming_form_data.finder import Finder
 from streaming_form_data.targets import NullTarget
 from streaming_form_data.part import Part
 
