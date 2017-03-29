@@ -128,10 +128,10 @@ class StreamingFormDataParser(object):
             if buffer_length() <= len(suffix):
                 return position
 
-            index = position.buffer_end - len(suffix)
+            idx = position.buffer_end - len(suffix)
 
             self._active_part.data_received(
-                chunk[position.buffer_start: index - 2])
+                chunk[position.buffer_start: idx - 2])
 
             return reset_buffer()
 
