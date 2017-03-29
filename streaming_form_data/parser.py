@@ -12,6 +12,8 @@ CR = 13
 
 LF = 10
 
+MAX_BUFFER_SIZE = 1024
+
 
 class ParseFailedException(Exception):
     pass
@@ -70,16 +72,6 @@ class StreamingFormDataParser(object):
         self._active_part = None
 
         self._default_part = Part('_default', NullTarget())
-
-        # stores the index of the byte we're currently looking at
-        self._index = -1
-
-        # stores the indices where the current buffer starts (inclusive) and
-        # ends (exclusive)
-        self._buffer_start = -1
-        self._buffer_end = -1
-
-        self._max_buffer_size = 1024
 
         self._leftover_buffer = None
 
@@ -222,7 +214,7 @@ class StreamingFormDataParser(object):
                 else:
                     if self._ender_finder.inactive and \
                             self._delimiter_finder.inactive and \
-                            buffer_length() > self._max_buffer_size:
+                            buffer_length() > MAX_BUFFER_SIZE:
                         idx = buffer_end - 1
 
                         self._active_part.data_received(
