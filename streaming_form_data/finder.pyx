@@ -33,6 +33,10 @@ cdef class Finder(object):
         self.index = 0
 
     @property
+    def target(self):
+        return self.target
+
+    @property
     def inactive(self):
         return self.state == FinderState.START
 
