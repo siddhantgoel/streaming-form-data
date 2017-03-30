@@ -93,4 +93,7 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# streaming-form-data
+streaming_form_data/_parser.c
+
 # End of https://www.gitignore.io/api/python
