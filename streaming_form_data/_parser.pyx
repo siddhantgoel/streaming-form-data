@@ -1,6 +1,3 @@
-import cgi
-
-
 cdef enum Constants:
     Hyphen = 45
     CR = 13
