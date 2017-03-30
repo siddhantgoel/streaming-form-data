@@ -9,10 +9,10 @@ except ImportError:
     pass
 
 if cythonize:
-    extensions = cythonize('streaming_form_data/finder.pyx')
+    extensions = cythonize('streaming_form_data/_parser.pyx')
 else:
-    extensions = [Extension('streaming_form_data.finder',
-                            ['streaming_form_data/finder.c'])]
+    extensions = [Extension('streaming_form_data._parser',
+                            ['streaming_form_data/_parser.c'])]
 
 
 with open('README.rst') as f:

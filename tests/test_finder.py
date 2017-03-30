@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from streaming_form_data.finder import Finder
+from streaming_form_data._parser import Finder
 
 
 class FinderTestCase(TestCase):

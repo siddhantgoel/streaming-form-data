@@ -2,7 +2,7 @@ import os.path
 from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
-from streaming_form_data.parser import StreamingFormDataParser, ParserState
+from streaming_form_data.parser import StreamingFormDataParser
 from streaming_form_data.targets import ValueTarget
 from streaming_form_data.part import Part
 
@@ -47,7 +47,6 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello world')
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_basic_multiple(self):
         first = ValueTarget()
@@ -74,7 +73,6 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(first.value, b'foo')
         self.assertEqual(second.value, b'bar')
         self.assertEqual(third.value, b'baz')
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_chunked_single(self):
         expected_value = 'hello world'
@@ -96,7 +94,6 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(body[index:])
 
         self.assertEqual(target.value, expected_value.encode('utf-8'))
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_chunked_multiple(self):
         expected_first_value = 'foo' * 1000
@@ -138,7 +135,6 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(first.value, expected_first_value.encode('utf-8'))
         self.assertEqual(second.value, expected_second_value.encode('utf-8'))
         self.assertEqual(third.value, expected_third_value.encode('utf-8'))
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_break_chunk_at_boundary(self):
         expected_first_value = 'hello' * 500
@@ -171,7 +167,6 @@ class StreamingFormDataParserTestCase(TestCase):
 
         self.assertEqual(first.value, expected_first_value.encode('utf-8'))
         self.assertEqual(second.value, expected_second_value.encode('utf-8'))
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_single(self):
         filenames = ('file.txt', 'image-600x400.png', 'image-2560x1600.png')
@@ -193,7 +188,6 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(body)
 
             self.assertEqual(value.value, expected_value)
-            self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_multiple(self):
         with open(data_file_path('file.txt'), 'rb') as file_:
@@ -220,7 +214,6 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(chunk)
 
         self.assertEqual(txt.value, expected_value)
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_file_content_varying_chunk_size(self):
         with open(data_file_path('file.txt'), 'rb') as file_:
@@ -241,7 +234,6 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(body[index:])
 
             self.assertEqual(txt.value, expected_value)
-            self.assertEqual(parser.state, ParserState.END)
 
     def test_mixed_content_varying_chunk_size(self):
         with open(data_file_path('file.txt'), 'rb') as file_:
@@ -280,7 +272,6 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(name.value, b'hello world')
             self.assertEqual(age.value, b'10')
             self.assertEqual(cv.value, expected_value)
-            self.assertEqual(parser.state, ParserState.END)
 
     def test_parameter_contains_crlf(self):
         target = ValueTarget()
@@ -294,7 +285,6 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello\r\nworld')
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_parameter_ends_with_crlf(self):
         target = ValueTarget()
@@ -308,7 +298,6 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello\r\n')
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_parameter_starts_with_crlf(self):
         target = ValueTarget()
@@ -322,7 +311,6 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'\r\nworld')
-        self.assertEqual(parser.state, ParserState.END)
 
     def test_multiple_files(self):
         txt_filename = 'file.txt'
@@ -377,4 +365,3 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(body)
 
         self.assertEqual(value.value, expected_value)
-        self.assertEqual(parser.state, ParserState.END)
