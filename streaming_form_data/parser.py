@@ -61,10 +61,15 @@ class StreamingFormDataParser(object):
         def on_header(header):
             value, params = cgi.parse_header(header.decode('utf-8'))
 
-            if not value.startswith('Content-Disposition'):
+            if not value.startswith('Content-Disposition') or \
+                    not value.endswith('form-data'):
                 return
 
-            part = part_for(params['name']) or Part('_default', NullTarget())
+            name = params.get('name')
+            if not name:
+                return
+
+            part = part_for(name) or Part('_default', NullTarget())
             part.start()
 
             context.set_active_part(part)

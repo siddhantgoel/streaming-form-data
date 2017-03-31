@@ -33,6 +33,7 @@ class StreamingFormDataParserTestCase(TestCase):
 
         parser = StreamingFormDataParser(
             expected_parts=(), headers={'Content-Type': encoder.content_type})
+
         parser.data_received(encoder.to_string())
 
     def test_basic_single(self):
@@ -365,3 +366,112 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(body)
 
             self.assertEqual(value.value, expected_value)
+
+    # The following tests have been added from tornado's
+    # MultipartFormDataTestCase
+    # https://github.com/tornadoweb/tornado/blob/master/tornado/test/httputil_test.py
+
+    def test_unquoted_names(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name=files; filename=ab.txt
+
+Foo
+--1234--
+'''.replace(b"\n", b"\r\n")
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'Foo')
+
+    def test_special_filenames(self):
+        filenames = ['a;b.txt',
+                     'a"b.txt',
+                     'a";b.txt',
+                     'a;"b.txt',
+                     'a";";.txt',
+                     'a\\"b.txt',
+                     'a\\b.txt']
+
+        for filename in filenames:
+            data = '''\
+--1234
+Content-Disposition: form-data; name=files; filename={}
+
+Foo
+--1234--
+'''.format(filename).replace('\n', '\r\n').encode('utf-8')
+
+            target = ValueTarget()
+            expected_parts = (Part('files', target),)
+
+            parser = StreamingFormDataParser(
+                expected_parts=expected_parts,
+                headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+            parser.data_received(data)
+
+            self.assertEqual(target.value, b'Foo')
+
+    def test_missing_headers(self):
+        data = '''\
+--1234
+
+Foo
+--1234--'''.replace('\n', '\r\n').encode('utf-8')
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'')
+
+    def test_invalid_content_disposition(self):
+        data = b'''\
+--1234
+Content-Disposition: invalid; name="files"; filename="ab.txt"
+
+Foo
+--1234--'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'')
+
+    def test_without_name_parameter(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; filename="ab.txt"
+
+Foo
+--1234--'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'')
