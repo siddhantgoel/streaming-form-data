@@ -347,21 +347,21 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(png_target.value, expected_png)
 
     def test_large_file(self):
-        filename = 'image-500k.png'
+        for filename in ['image-500k.png', 'image-2560x1600.png',
+                         'image-600x400.png', 'image-high-res.jpg']:
+            with open(data_file_path(filename), 'rb') as file_:
+                expected_value = file_.read()
 
-        with open(data_file_path(filename), 'rb') as file_:
-            expected_value = file_.read()
+            content_type, body = load_file(data_file_path(filename))
 
-        content_type, body = load_file(data_file_path(filename))
+            value = ValueTarget()
 
-        value = ValueTarget()
+            expected_parts = (Part(filename, value),)
 
-        expected_parts = (Part(filename, value),)
+            parser = StreamingFormDataParser(
+                expected_parts=expected_parts,
+                headers={'Content-Type': content_type})
 
-        parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
-            headers={'Content-Type': content_type})
+            parser.data_received(body)
 
-        parser.data_received(body)
-
-        self.assertEqual(value.value, expected_value)
+            self.assertEqual(value.value, expected_value)
