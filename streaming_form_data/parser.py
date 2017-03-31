@@ -53,23 +53,21 @@ class StreamingFormDataParser(object):
 
         context = Context()
 
+        def part_for(name):
+            for part in expected_parts:
+                if part.name == name:
+                    return part
+
         def on_header(header):
             value, params = cgi.parse_header(header.decode('utf-8'))
 
             if not value.startswith('Content-Disposition'):
                 return
 
-            target = None
+            part = part_for(params['name']) or Part('_default', NullTarget())
+            part.start()
 
-            for part in expected_parts:
-                if part.name == params['name']:
-                    target = part
-                    break
-
-            target = target or Part('_default', NullTarget())
-
-            target.start()
-            context.set_active_part(target)
+            context.set_active_part(part)
 
         def on_body(value):
             part = context.get_active_part()
