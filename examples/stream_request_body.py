@@ -1,4 +1,4 @@
-from tornado.web import stream_request_body, RequestTarget
+from tornado.web import stream_request_body, RequestHandler
 
 from streaming_form_data.targets import ValueTarget, FileTarget
 from streaming_form_data.parser import StreamingFormDataParser
@@ -6,7 +6,7 @@ from streaming_form_data.part import Part
 
 
 @stream_request_body
-class UploadTarget(RequestTarget):
+class UploadTarget(RequestHandler):
     def prepare(self):
         self.value = ValueTarget()
         self.file_ = FileTarget('/tmp/image.png')
