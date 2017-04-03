@@ -24,16 +24,15 @@ decides what to do with it. At any point of time, only one part of the
 :code:`expected_parts` is active. In case there's a part that we don't need,
 this input is simply discarded using a :code:`NullTarget` object.
 
-Currently two targets are included with this library - :code:`ValueTarget` and
-:code:`FileTarget`. :code:`ValueTarget` stores the input in memory, and
-:code:`FileTarget` pipes the input to a file on disk. Any new targets should
-inherit :code:`streaming_form_data.targets.BaseTarget` and define a
-:code:`data_received` function.
+Currently three targets are included with this library - :code:`ValueTarget`,
+:code:`FileTarget`, and :code:`SHA256Target`. :code:`ValueTarget` stores the
+input in memory, and :code:`FileTarget` pipes the input to a file on disk. Any
+new targets should inherit :code:`streaming_form_data.targets.BaseTarget` and
+define a :code:`data_received` function.
 
 This library is currently under development. There are quite a few tests in the
 :code:`tests/` directory that test for correctness. But the parser hasn't been
-battle tested yet, and is currently slow for large files, hence production usage
-is not recommended (yet).
+battle tested yet, hence production usage is not recommended.
 
 Usage
 -----
