@@ -4,7 +4,7 @@ clean:
 	rm -rf build
 
 build:
-	python setup.py bdist_wheel
+	python setup.py sdist
 
 upload: build
 	twine upload dist/*
