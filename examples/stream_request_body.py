@@ -1,8 +1,7 @@
 from tornado.web import stream_request_body, RequestHandler
 
+from streaming_form_data import StreamingFormDataParser, Part
 from streaming_form_data.targets import ValueTarget, FileTarget
-from streaming_form_data.parser import StreamingFormDataParser
-from streaming_form_data.part import Part
 
 
 @stream_request_body

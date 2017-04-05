@@ -2,9 +2,9 @@ import os.path
 from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
-from streaming_form_data.parser import StreamingFormDataParser
+
+from streaming_form_data import StreamingFormDataParser, Part
 from streaming_form_data.targets import ValueTarget
-from streaming_form_data.part import Part
 
 
 DATA_DIR = 'tests/data'

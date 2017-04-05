@@ -1,8 +1,8 @@
 import cgi
 
 from streaming_form_data._parser import _Parser, _Failed
-from streaming_form_data.targets import NullTarget
 from streaming_form_data.part import Part
+from streaming_form_data.targets import NullTarget
 
 
 class ParseFailedException(Exception):
