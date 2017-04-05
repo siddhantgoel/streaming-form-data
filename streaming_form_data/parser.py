@@ -34,6 +34,8 @@ class Context(object):
         self._part = part
 
     def unset_active_part(self):
+        if self._part:
+            self._part.finish()
         self.set_active_part(None)
 
     def get_active_part(self):
