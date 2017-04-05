@@ -49,7 +49,7 @@ class StreamingFormDataParser(object):
 
         boundary = b'--' + raw_boundary
         delimiter = boundary + b'\r\n'
-        ender = boundary + b'--\r\n'
+        ender = boundary + b'--'
 
         context = Context()
 

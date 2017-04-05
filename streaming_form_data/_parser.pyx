@@ -216,7 +216,11 @@ cdef class _Parser(object):
                     if buffer_length() > len(self.ender):
                         idx = buffer_end - len(self.ender)
 
-                        self.on_body(chunk[buffer_start: idx - 2])
+                        if chunk[idx - 1] == Constants.LF and \
+                                chunk[idx - 2] == Constants.CR:
+                            self.on_body(chunk[buffer_start: idx - 2])
+                        else:
+                            self.on_body(chunk[buffer_start: idx])
 
                         buffer_start = buffer_end = index + 1
 

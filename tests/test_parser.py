@@ -371,14 +371,32 @@ class StreamingFormDataParserTestCase(TestCase):
     # MultipartFormDataTestCase
     # https://github.com/tornadoweb/tornado/blob/master/tornado/test/httputil_test.py
 
+    def test_file_upload(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'Foo')
+
     def test_unquoted_names(self):
         data = b'''\
 --1234
 Content-Disposition: form-data; name=files; filename=ab.txt
 
 Foo
---1234--
-'''.replace(b"\n", b"\r\n")
+--1234--'''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
         expected_parts = (Part('files', target),)
@@ -406,8 +424,7 @@ Foo
 Content-Disposition: form-data; name=files; filename={}
 
 Foo
---1234--
-'''.format(filename).replace('\n', '\r\n').encode('utf-8')
+--1234--'''.format(filename).replace('\n', '\r\n').encode('utf-8')
 
             target = ValueTarget()
             expected_parts = (Part('files', target),)
@@ -419,6 +436,25 @@ Foo
             parser.data_received(data)
 
             self.assertEqual(target.value, b'Foo')
+
+    def test_boundary_starts_and_ends_with_quotes(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary="1234"'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'Foo')
 
     def test_missing_headers(self):
         data = '''\
@@ -457,6 +493,23 @@ Foo
 
         self.assertEqual(target.value, b'')
 
+    def test_line_does_not_end_with_correct_linebreak(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo--1234--'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+
+        parser = StreamingFormDataParser(
+            expected_parts=(Part('files', target),),
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'Foo')
+
     def test_without_name_parameter(self):
         data = b'''\
 --1234
@@ -475,3 +528,23 @@ Foo
         parser.data_received(data)
 
         self.assertEqual(target.value, b'')
+
+    def test_data_after_final_boundary(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--
+'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+        expected_parts = (Part('files', target),)
+
+        parser = StreamingFormDataParser(
+            expected_parts=expected_parts,
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'Foo')
