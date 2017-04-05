@@ -35,15 +35,14 @@ define a :code:`data_received` function.
 
 This library is currently under development. There are quite a few tests in the
 :code:`tests/` directory that test for correctness. But the parser hasn't been
-battle tested yet, hence production usage is not recommended.
+battle tested yet, hence user discretion is advised.
 
 Usage
 -----
 
 .. code-block:: python
 
-    >>> from streaming_form_data.parser import StreamingFormDataParser
-    >>> from streaming_form_data.part import Part
+    >>> from streaming_form_data import StreamingFormDataParser, Part
     >>> from streaming_form_data.targets import ValueTarget, FileTarget
     >>>
     >>> name = Part('name', ValueTarget())
