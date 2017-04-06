@@ -224,6 +224,7 @@ cdef class _Parser(object):
 
                         buffer_start = buffer_end = index + 1
 
+                    self.unset_active_part()
                     self.ender_finder.reset()
                 else:
                     if self.ender_finder.inactive and \
