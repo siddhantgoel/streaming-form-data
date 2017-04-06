@@ -26,10 +26,8 @@ class UploadHandler(RequestHandler):
         self._parser.data_received(chunk)
 
     def post(self):
-        print('name: {}'.format(self.value.value))
-        print('file: {}'.format(self.file_.filename))
-
-        self.finish()
+        self.render('upload.html', name=self.value.value,
+                    filename=self.file_.filename)
 
 
 class IndexHandler(RequestHandler):
