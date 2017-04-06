@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Upload something!</title>
+    </head>
+    <body>
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            {% module xsrf_form_html() %}
+
+            <input type="text" name="name">
+            <input type="file" name="file">
+
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>
