@@ -33,10 +33,6 @@ input in memory, and :code:`FileTarget` pipes the input to a file on disk. Any
 new targets should inherit :code:`streaming_form_data.targets.BaseTarget` and
 define a :code:`data_received` function.
 
-This library is currently under development. There are quite a few tests in the
-:code:`tests/` directory that test for correctness. But the parser hasn't been
-battle tested yet, hence user discretion is advised.
-
 Usage
 -----
 
