@@ -9,4 +9,8 @@ build:
 upload: build
 	twine upload dist/*
 
+test:
+	py.test
+	flake8
+
 .PHONY: clean build upload

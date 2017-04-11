@@ -9,5 +9,4 @@ install:
     - pip install -r requirements.dev.txt
     - python setup.py build_ext -i
 script:
-    - py.test
-    - flake8
+    - make test
