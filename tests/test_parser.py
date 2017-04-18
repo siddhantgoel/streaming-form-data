@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
 
-from streaming_form_data import StreamingFormDataParser
+from streaming_form_data import StreamingFormDataParser, ParseFailedException
 from streaming_form_data.targets import ValueTarget
 
 
@@ -517,3 +517,13 @@ Foo
         parser.data_received(data)
 
         self.assertEqual(target.value, b'Foo')
+
+    def test_register_after_data_received(self):
+        encoder = MultipartEncoder(fields={'name': 'hello'})
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': encoder.content_type})
+        parser.data_received(encoder.to_string())
+
+        self.assertRaises(ParseFailedException, parser.register,
+                          'name', ValueTarget())

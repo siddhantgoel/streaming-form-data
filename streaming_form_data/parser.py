@@ -109,7 +109,13 @@ class StreamingFormDataParser(object):
         self._parser = _Parser(delimiter, ender,
                                on_header, on_body, unset_active_part)
 
+        self._running = False
+
     def register(self, name, target):
+        if self._running:
+            raise ParseFailedException(
+                'Registering parts not allowed when parser is running')
+
         part = self._part_for(name)
 
         if not part:
@@ -121,6 +127,9 @@ class StreamingFormDataParser(object):
                 return part
 
     def data_received(self, data):
+        if not self._running:
+            self._running = True
+
         try:
             self._parser.data_received(data)
         except _Failed:
