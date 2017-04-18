@@ -4,7 +4,7 @@ from time import time
 from tornado.web import Application, RequestHandler, stream_request_body
 from tornado.ioloop import IOLoop
 
-from streaming_form_data import StreamingFormDataParser, Part
+from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import ValueTarget, FileTarget
 
 
@@ -14,13 +14,10 @@ class UploadHandler(RequestHandler):
         self.value = ValueTarget()
         self.file_ = FileTarget('/tmp/file-{}.dat'.format(int(time())))
 
-        expected_parts = (
-            Part('name', self.value),
-            Part('file', self.file_),
-        )
+        self._parser = StreamingFormDataParser(headers=self.request.headers)
 
-        self._parser = StreamingFormDataParser(
-            expected_parts, headers=self.request.headers)
+        self._parser.register('name', self.value)
+        self._parser.register('file', self.file_)
 
     def data_received(self, chunk):
         self._parser.data_received(chunk)
