@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
 
-from streaming_form_data import StreamingFormDataParser, Part
+from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import ValueTarget
 
 
@@ -32,19 +32,19 @@ class StreamingFormDataParserTestCase(TestCase):
         encoder = MultipartEncoder(fields={'name': 'hello'})
 
         parser = StreamingFormDataParser(
-            expected_parts=(), headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type})
 
         parser.data_received(encoder.to_string())
 
     def test_basic_single(self):
         target = ValueTarget()
-        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': 'hello world'})
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+        parser.register('value', target)
+
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello world')
@@ -54,12 +54,6 @@ class StreamingFormDataParserTestCase(TestCase):
         second = ValueTarget()
         third = ValueTarget()
 
-        expected_parts = (
-            Part('first', first),
-            Part('second', second),
-            Part('third', third),
-        )
-
         encoder = MultipartEncoder(fields={
             'first': 'foo',
             'second': 'bar',
@@ -67,8 +61,12 @@ class StreamingFormDataParserTestCase(TestCase):
         })
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+
+        parser.register('first', first)
+        parser.register('second', second)
+        parser.register('third', third)
+
         parser.data_received(encoder.to_string())
 
         self.assertEqual(first.value, b'foo')
@@ -79,15 +77,14 @@ class StreamingFormDataParserTestCase(TestCase):
         expected_value = 'hello world'
 
         target = ValueTarget()
-        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': expected_value})
 
         body = encoder.to_string()
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+        parser.register('value', target)
 
         index = body.index(b'world')
 
@@ -105,12 +102,6 @@ class StreamingFormDataParserTestCase(TestCase):
         second = ValueTarget()
         third = ValueTarget()
 
-        expected_parts = (
-            Part('first', first),
-            Part('second', second),
-            Part('third', third),
-        )
-
         encoder = MultipartEncoder(fields={
             'first': expected_first_value,
             'second': expected_second_value,
@@ -120,8 +111,11 @@ class StreamingFormDataParserTestCase(TestCase):
         body = encoder.to_string()
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+
+        parser.register('first', first)
+        parser.register('second', second)
+        parser.register('third', third)
 
         chunks = []
         size = 100
@@ -144,11 +138,6 @@ class StreamingFormDataParserTestCase(TestCase):
         first = ValueTarget()
         second = ValueTarget()
 
-        expected_parts = (
-            Part('first', first),
-            Part('second', second),
-        )
-
         encoder = MultipartEncoder(fields={
             'first': 'hello' * 500,
             'second': 'hello' * 500
@@ -158,8 +147,10 @@ class StreamingFormDataParserTestCase(TestCase):
         boundary = encoder.boundary.encode('utf-8')
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+
+        parser.register('first', first)
+        parser.register('second', second)
 
         index = body[50:].index(boundary) + 5
 
@@ -180,11 +171,9 @@ class StreamingFormDataParserTestCase(TestCase):
 
             value = ValueTarget()
 
-            expected_parts = (Part(filename, value),)
-
             parser = StreamingFormDataParser(
-                expected_parts=expected_parts,
                 headers={'Content-Type': content_type})
+            parser.register(filename, value)
 
             parser.data_received(body)
 
@@ -198,11 +187,9 @@ class StreamingFormDataParserTestCase(TestCase):
 
         txt = ValueTarget()
 
-        expected_parts = (Part('file.txt', txt),)
-
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': content_type})
+        parser.register('file.txt', txt)
 
         size = 50
         chunks = []
@@ -225,11 +212,9 @@ class StreamingFormDataParserTestCase(TestCase):
         for index in range(len(body)):
             txt = ValueTarget()
 
-            expected_parts = (Part('file.txt', txt),)
-
             parser = StreamingFormDataParser(
-                expected_parts=expected_parts,
                 headers={'Content-Type': content_type})
+            parser.register('file.txt', txt)
 
             parser.data_received(body[:index])
             parser.data_received(body[index:])
@@ -257,15 +242,12 @@ class StreamingFormDataParserTestCase(TestCase):
             age = ValueTarget()
             cv = ValueTarget()
 
-            expected_parts = (
-                Part('name', name),
-                Part('age', age),
-                Part('cv.txt', cv),
-            )
-
             parser = StreamingFormDataParser(
-                expected_parts=expected_parts,
                 headers={'Content-Type': content_type})
+
+            parser.register('name', name)
+            parser.register('age', age)
+            parser.register('cv.txt', cv)
 
             parser.data_received(body[:index])
             parser.data_received(body[index:])
@@ -276,39 +258,38 @@ class StreamingFormDataParserTestCase(TestCase):
 
     def test_parameter_contains_crlf(self):
         target = ValueTarget()
-        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': 'hello\r\nworld'})
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+        parser.register('value', target)
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello\r\nworld')
 
     def test_parameter_ends_with_crlf(self):
         target = ValueTarget()
-        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': 'hello\r\n'})
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+        parser.register('value', target)
+
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello\r\n')
 
     def test_parameter_starts_with_crlf(self):
         target = ValueTarget()
-        expected_parts = (Part('value', target),)
 
         encoder = MultipartEncoder(fields={'value': '\r\nworld'})
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+        parser.register('value', target)
+
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'\r\nworld')
@@ -334,14 +315,12 @@ class StreamingFormDataParserTestCase(TestCase):
                 png_filename: (png_filename, png_file, 'image/png')
             })
 
-            expected_parts = (
-                Part(txt_filename, txt_target),
-                Part(png_filename, png_target),
-            )
-
             parser = StreamingFormDataParser(
-                expected_parts=expected_parts,
                 headers={'Content-Type': encoder.content_type})
+
+            parser.register(txt_filename, txt_target)
+            parser.register(png_filename, png_target)
+
             parser.data_received(encoder.to_string())
 
             self.assertEqual(txt_target.value, expected_txt)
@@ -357,11 +336,9 @@ class StreamingFormDataParserTestCase(TestCase):
 
             value = ValueTarget()
 
-            expected_parts = (Part(filename, value),)
-
             parser = StreamingFormDataParser(
-                expected_parts=expected_parts,
                 headers={'Content-Type': content_type})
+            parser.register(filename, value)
 
             parser.data_received(body)
 
@@ -380,11 +357,10 @@ Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -399,11 +375,10 @@ Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -427,11 +402,10 @@ Foo
 --1234--'''.format(filename).replace('\n', '\r\n').encode('utf-8')
 
             target = ValueTarget()
-            expected_parts = (Part('files', target),)
 
             parser = StreamingFormDataParser(
-                expected_parts=expected_parts,
                 headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            parser.register('files', target)
 
             parser.data_received(data)
 
@@ -446,11 +420,10 @@ Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary="1234"'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -464,11 +437,10 @@ Foo
 --1234--'''.replace('\n', '\r\n').encode('utf-8')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -483,11 +455,10 @@ Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -503,8 +474,8 @@ Foo--1234--'''.replace(b'\n', b'\r\n')
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            expected_parts=(Part('files', target),),
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -519,11 +490,10 @@ Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 
@@ -539,11 +509,10 @@ Foo
 '''.replace(b'\n', b'\r\n')
 
         target = ValueTarget()
-        expected_parts = (Part('files', target),)
 
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
 
         parser.data_received(data)
 

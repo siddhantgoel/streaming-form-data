@@ -1,7 +1,6 @@
 import cgi
 
 from streaming_form_data._parser import _Parser, _Failed
-from streaming_form_data.part import Part
 from streaming_form_data.targets import NullTarget
 
 
@@ -42,9 +41,35 @@ class Context(object):
         return self._part
 
 
+class Part(object):
+    """One part of a multipart/form-data request
+    """
+
+    def __init__(self, name, target):
+        self.name = name
+        self.target = target
+
+        self._reading = False
+
+    def start(self):
+        self._reading = True
+        self.target.start()
+
+    def data_received(self, chunk):
+        self.target.data_received(chunk)
+
+    def finish(self):
+        self._reading = False
+        self.target.finish()
+
+    @property
+    def is_reading(self):
+        return self._reading
+
+
 class StreamingFormDataParser(object):
-    def __init__(self, expected_parts, headers):
-        self.expected_parts = expected_parts
+    def __init__(self, headers):
+        self.expected_parts = []
         self.headers = headers
 
         raw_boundary = parse_content_boundary(headers)
@@ -54,11 +79,6 @@ class StreamingFormDataParser(object):
         ender = boundary + b'--'
 
         context = Context()
-
-        def part_for(name):
-            for part in expected_parts:
-                if part.name == name:
-                    return part
 
         def on_header(header):
             value, params = cgi.parse_header(header.decode('utf-8'))
@@ -71,7 +91,7 @@ class StreamingFormDataParser(object):
             if not name:
                 return
 
-            part = part_for(name) or Part('_default', NullTarget())
+            part = self._part_for(name) or Part('_default', NullTarget())
             part.start()
 
             context.set_active_part(part)
@@ -88,6 +108,17 @@ class StreamingFormDataParser(object):
 
         self._parser = _Parser(delimiter, ender,
                                on_header, on_body, unset_active_part)
+
+    def register(self, name, target):
+        part = self._part_for(name)
+
+        if not part:
+            self.expected_parts.append(Part(name, target))
+
+    def _part_for(self, name):
+        for part in self.expected_parts:
+            if part.name == name:
+                return part
 
     def data_received(self, data):
         try:

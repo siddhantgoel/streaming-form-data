@@ -15,17 +15,13 @@ works byte-by-byte. Although, this also means that passing the entire input as a
 single chunk should also work.
 
 The main entry point is the :code:`StreamingFormDataParser` class, which expects
-a list of :code:`expected_parts`, and a dictionary of request :code:`headers`.
-Each element in the :code:`expected_parts` list represents a single part of the
-complete multipart input, and should be an instance of the :code:`Part` class.
+a dictionary of request :code:`headers`.
 
 The parser is fed chunks of (byte) input, and takes action depending on what the
-current byte is. In case it notices input that's expected (determined by
-:code:`expected_parts`), it passes on the input to :code:`Part.data_received`,
-which in turn calls :code:`Target.data_received` with the input, which then
-decides what to do with it. At any point of time, only one part of the
-:code:`expected_parts` is active. In case there's a part that we don't need,
-this input is simply discarded using a :code:`NullTarget` object.
+current byte is. In case it notices input that's expected, it passes on the
+input to the configured :code:`Target`, which then decides what to do with it.
+In case there's a part that we don't need, this input is simply discarded using
+a :code:`NullTarget` object.
 
 Currently three targets are included with this library - :code:`ValueTarget`,
 :code:`FileTarget`, and :code:`SHA256Target`. :code:`ValueTarget` stores the
@@ -38,14 +34,14 @@ Usage
 
 .. code-block:: python
 
-    >>> from streaming_form_data import StreamingFormDataParser, Part
+    >>> from streaming_form_data import StreamingFormDataParser
     >>> from streaming_form_data.targets import ValueTarget, FileTarget
-    >>>
-    >>> name = Part('name', ValueTarget())
-    >>> file_ = Part('file', FileTarget('/tmp/file.txt'))
     >>>
     >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
     >>> expected_parts = (name, file_)
     >>>
     >>> parser = StreamingFormDataParser(expected_parts=expected_parts, headers=headers)
+    >>> parser.register('name', ValueTarget())
+    >>> parser.register('file', FileTarget('/tmp/file.txt'))
+    >>>
     >>> parser.data_received(chunk)
