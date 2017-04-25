@@ -38,9 +38,9 @@ Usage
     >>> from streaming_form_data.targets import ValueTarget, FileTarget
     >>>
     >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
-    >>> expected_parts = (name, file_)
     >>>
-    >>> parser = StreamingFormDataParser(expected_parts=expected_parts, headers=headers)
+    >>> parser = StreamingFormDataParser(headers=headers)
+    >>>
     >>> parser.register('name', ValueTarget())
     >>> parser.register('file', FileTarget('/tmp/file.txt'))
     >>>
