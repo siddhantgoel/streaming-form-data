@@ -7,6 +7,9 @@ Streaming multipart/form-data parser
 .. image:: https://badge.fury.io/py/streaming-form-data.svg
     :target: https://pypi.python.org/pypi/streaming-form-data
 
+.. image:: https://readthedocs.org/projects/streaming-form-data/badge/?version=latest
+    :target: https://streaming-form-data.readthedocs.io/en/latest/
+
 
 :code:`streaming_form_data` provides a Python parser for parsing
 multipart/form-data input chunks. Chunk size is determined by the API user, but
