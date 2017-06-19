@@ -127,8 +127,11 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'streaming-form-data.tex', 'streaming-form-data Documentation',
-     'Siddhant Goel', 'manual'),
+    (master_doc,
+     'streaming-form-data.tex',
+     'streaming-form-data Documentation',
+     'Siddhant Goel',
+     'manual'),
 ]
 
 
@@ -152,6 +155,3 @@ texinfo_documents = [
      author, 'streaming-form-data', 'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
