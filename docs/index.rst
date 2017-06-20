@@ -25,6 +25,20 @@ Please note, that this library has only been tested with Python 3 (specifically,
 versions 3.3, 3.4, 3.5, and 3.6). Python 2.7 is not supported yet, but pull
 requests are always welcome.
 
+Installation
+------------
+
+The core parser is written in :code:`Cython`, which is a superset of Python but
+compiles the input down to a C extension which can then be imported in normal
+Python code.
+
+The compiled C parser code is included in the PyPI package, hence the
+installation requires a working C compiler.
+
+.. code-block:: bash
+
+    $ pip install streaming_form_data
+
 Usage
 -----
 
