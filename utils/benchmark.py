@@ -62,8 +62,10 @@ except ImportError:
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('-c', '--content-type', type=str, required=True)
-    parser.add_argument('-f', '--filename', type=str, required=True)
+    parser.add_argument('-c', '--content-type', type=str, required=True,
+                        help='Content Type of the input file')
+    parser.add_argument('-f', '--filename', type=str, required=True,
+                        help='File to be uploaded')
     return parser.parse_args()
 
 
