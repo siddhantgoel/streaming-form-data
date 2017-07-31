@@ -6,7 +6,6 @@ import pstats
 
 from requests_toolbelt import MultipartEncoder
 from streaming_form_data.parser import StreamingFormDataParser
-from streaming_form_data.part import Part
 from streaming_form_data.targets import ValueTarget
 
 
@@ -77,11 +76,10 @@ def main():
             'file': ('file', fd, args.content_type)
         })
 
-        expected_parts = (Part('file', ValueTarget()),)
-
         parser = StreamingFormDataParser(
-            expected_parts=expected_parts,
             headers={'Content-Type': encoder.content_type})
+        parser.register('file', ValueTarget())
+
         parser.data_received(encoder.to_string())
 
 
