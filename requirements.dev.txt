@@ -4,5 +4,6 @@ line_profiler==2.0
 pytest==3.0.6
 requests-toolbelt==0.7.0
 sphinx-autobuild==0.6.0
+sphinx-rtd-theme==0.2.4
 sphinxcontrib-websupport==1.0.1
 twine==1.8.1
