@@ -57,10 +57,10 @@ Development
 -----------
 
 To work on this package, please make sure you have a working Python 3
-installation on your system, as well as virtualenv_ and virtualenvwrapper_
-installed.
+installation on your system.
 
-1. Create a virtualenv - :code:`mkvirtualenv sfd && workon sfd`.
+1. Create a virtualenv -
+   :code:`python -m venv venv && source venv/bin/activate`.
 
 2. Git clone the repository -
    :code:`git clone https://github.com/siddhantgoel/streaming-form-data`
@@ -71,6 +71,3 @@ installed.
 4. Install this package - :code:`pip install .`.
 
 5. You should now be able to run the test suite - :code:`py.test tests/`.
-
-.. _virtualenv: https://virtualenv.pypa.io/en/stable/
-.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
