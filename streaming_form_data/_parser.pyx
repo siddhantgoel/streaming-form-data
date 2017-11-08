@@ -14,7 +14,7 @@ cdef enum FinderState:
     FS_START, FS_WORKING, FS_END
 
 
-cdef class Finder(object):
+cdef class Finder:
     cdef bytes target
     cdef long index
     cdef FinderState state
@@ -63,7 +63,7 @@ class _Failed(Exception):
     pass
 
 
-class Part(object):
+class Part:
     """One part of a multipart/form-data request
     """
 
@@ -101,7 +101,7 @@ cdef enum ParserState:
     PS_END
 
 
-cdef class _Parser(object):
+cdef class _Parser:
     cdef bytes delimiter, ender
     cdef ParserState state
     cdef Finder delimiter_finder, ender_finder

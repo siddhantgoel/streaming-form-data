@@ -1,7 +1,7 @@
 import hashlib
 
 
-class BaseTarget(object):
+class BaseTarget:
     """Targets determine what to do with some input once the parser is done with
     it. Any new Target should inherit from this class and override
     data_received.

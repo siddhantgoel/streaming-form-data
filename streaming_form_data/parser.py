@@ -24,7 +24,7 @@ def parse_content_boundary(headers):
     return boundary.encode('utf-8')
 
 
-class StreamingFormDataParser(object):
+class StreamingFormDataParser:
     def __init__(self, headers):
         self.headers = headers
 
