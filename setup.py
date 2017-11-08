@@ -21,7 +21,7 @@ with open('README.rst') as f:
 
 setup(
     name='streaming_form_data',
-    version='0.4.0',
+    version='0.4.1',
     description='Streaming parser for multipart/form-data',
     long_description=long_description,
     author='Siddhant Goel',
