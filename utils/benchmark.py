@@ -9,7 +9,7 @@ from streaming_form_data.parser import StreamingFormDataParser
 from streaming_form_data.targets import ValueTarget
 
 
-def c_profile(sort_by='cumulative'):
+def c_profile(sort_by='tottime'):
     def decorator(func):
         @wraps(func)
         def wrapped(*args, **kwargs):
