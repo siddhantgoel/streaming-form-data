@@ -173,9 +173,6 @@ cdef class _Parser:
 
     cdef _parse(self, bytes chunk, long index,
                 long buffer_start, long buffer_end):
-        def buffer_length():
-            return buffer_end - buffer_start
-
         while index < len(chunk):
             byte = chunk[index]
 
@@ -202,7 +199,7 @@ cdef class _Parser:
 
                 buffer_end += 1
 
-                if buffer_length() < 4:
+                if buffer_end - buffer_start < 4:
                     return False
 
                 indices = (buffer_start,
@@ -264,7 +261,7 @@ cdef class _Parser:
                 if self.delimiter_finder.found:
                     self.state = ParserState.PS_READING_HEADER
 
-                    if buffer_length() > len(self.delimiter):
+                    if buffer_end - buffer_start > len(self.delimiter):
                         idx = buffer_end - len(self.delimiter)
 
                         self.on_body(chunk[buffer_start: idx - 2])
@@ -276,7 +273,7 @@ cdef class _Parser:
                 elif self.ender_finder.found:
                     self.state = ParserState.PS_END
 
-                    if buffer_length() > len(self.ender):
+                    if buffer_end - buffer_start > len(self.ender):
                         idx = buffer_end - len(self.ender)
 
                         if chunk[idx - 1] == Constants.LF and \
@@ -292,7 +289,7 @@ cdef class _Parser:
                 else:
                     if self.ender_finder.inactive and \
                             self.delimiter_finder.inactive and \
-                            buffer_length() > Constants.MaxBufferSize:
+                            buffer_end - buffer_start > Constants.MaxBufferSize:
                         idx = buffer_end - 1
 
                         self.on_body(chunk[buffer_start: idx])
@@ -305,5 +302,5 @@ cdef class _Parser:
 
             index += 1
 
-        if buffer_length() > 0:
+        if buffer_end - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: buffer_end]
