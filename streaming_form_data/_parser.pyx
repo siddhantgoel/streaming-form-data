@@ -98,6 +98,7 @@ cdef class _Parser:
     cdef bytes delimiter, ender
     cdef ParserState state
     cdef Finder delimiter_finder, ender_finder
+    cdef long delimiter_length, ender_length
     cdef object expected_parts
     cdef object active_part, default_part
 
@@ -109,6 +110,9 @@ cdef class _Parser:
 
         self.delimiter_finder = Finder(delimiter)
         self.ender_finder = Finder(ender)
+
+        self.delimiter_length = len(delimiter)
+        self.ender_length = len(ender)
 
         self.state = ParserState.PS_START
 
@@ -256,8 +260,8 @@ cdef class _Parser:
                 if self.delimiter_finder.found():
                     self.state = ParserState.PS_READING_HEADER
 
-                    if buffer_end - buffer_start > len(self.delimiter):
-                        _idx = buffer_end - len(self.delimiter)
+                    if buffer_end - buffer_start > self.delimiter_length:
+                        _idx = buffer_end - self.delimiter_length
 
                         self.on_body(chunk[buffer_start: _idx - 2])
 
@@ -268,8 +272,8 @@ cdef class _Parser:
                 elif self.ender_finder.found():
                     self.state = ParserState.PS_END
 
-                    if buffer_end - buffer_start > len(self.ender):
-                        _idx = buffer_end - len(self.ender)
+                    if buffer_end - buffer_start > self.ender_length:
+                        _idx = buffer_end - self.ender_length
 
                         if chunk[_idx - 1] == Constants.LF and \
                                 chunk[_idx - 2] == Constants.CR:
