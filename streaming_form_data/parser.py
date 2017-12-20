@@ -1,6 +1,6 @@
 import cgi
 
-from streaming_form_data._parser import _Parser, _Failed
+from streaming_form_data._parser import _Parser
 
 
 class ParseFailedException(Exception):
@@ -49,7 +49,5 @@ class StreamingFormDataParser:
         if not self._running:
             self._running = True
 
-        try:
-            self._parser.data_received(data)
-        except _Failed:
+        if self._parser.data_received(data) > 0:
             raise ParseFailedException()

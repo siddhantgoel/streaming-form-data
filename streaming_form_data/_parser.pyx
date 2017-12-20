@@ -59,10 +59,6 @@ cdef class Finder:
         return self.state == FinderState.FS_END
 
 
-class _Failed(Exception):
-    pass
-
-
 class Part:
     """One part of a multipart/form-data request
     """
@@ -149,7 +145,7 @@ cdef class _Parser:
 
     cpdef data_received(self, bytes data):
         if not data:
-            return
+            return 0
 
         cdef bytes chunk
         cdef long index, buffer_start, buffer_end
@@ -169,7 +165,7 @@ cdef class _Parser:
             buffer_start = 0
             buffer_end = 0
 
-        self._parse(chunk, index, buffer_start, buffer_end)
+        return self._parse(chunk, index, buffer_start, buffer_end)
 
     cdef _parse(self, bytes chunk, long index,
                 long buffer_start, long buffer_end):
@@ -180,13 +176,13 @@ cdef class _Parser:
 
             if self.state == ParserState.PS_START:
                 if byte != Constants.Hyphen:
-                    raise _Failed()
+                    return 1
 
                 buffer_end += 1
                 self.state = ParserState.PS_STARTING_BOUNDARY
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != Constants.Hyphen:
-                    raise _Failed()
+                    return 1
 
                 buffer_end += 1
                 self.state = ParserState.PS_READING_BOUNDARY
@@ -197,12 +193,12 @@ cdef class _Parser:
                     self.state = ParserState.PS_ENDING_BOUNDARY
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != Constants.LF:
-                    raise _Failed()
+                    return 1
 
                 buffer_end += 1
 
                 if buffer_end - buffer_start < 4:
-                    return False
+                    return 1
 
                 indices = (buffer_start,
                            buffer_start + 1,
@@ -222,7 +218,7 @@ cdef class _Parser:
                     self.state = ParserState.PS_ENDING_HEADER
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != Constants.LF:
-                    raise _Failed()
+                    return 1
 
                 buffer_end += 1
 
@@ -250,7 +246,7 @@ cdef class _Parser:
                 buffer_end += 1
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != Constants.LF:
-                    raise _Failed()
+                    return 1
 
                 buffer_start = buffer_end = idx + 1
                 self.state = ParserState.PS_READING_BODY
@@ -298,9 +294,11 @@ cdef class _Parser:
 
                         buffer_start = idx
             elif self.state == ParserState.PS_END:
-                return
+                return 0
             else:
-                raise _Failed()
+                return 1
 
         if buffer_end - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: buffer_end]
+
+        return 0
