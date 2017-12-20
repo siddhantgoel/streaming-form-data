@@ -173,8 +173,10 @@ cdef class _Parser:
 
     cdef _parse(self, bytes chunk, long index,
                 long buffer_start, long buffer_end):
-        while index < len(chunk):
-            byte = chunk[index]
+        cdef long idx
+
+        for idx in range(index, len(chunk)):
+            byte = chunk[idx]
 
             if self.state == ParserState.PS_START:
                 if byte != Constants.Hyphen:
@@ -207,10 +209,10 @@ cdef class _Parser:
                            buffer_end - 1,
                            buffer_end - 2)
 
-                if all([chunk[idx] == Constants.Hyphen for idx in indices]):
+                if all([chunk[_idx] == Constants.Hyphen for _idx in indices]):
                     self.state = ParserState.PS_END
 
-                buffer_start = buffer_end = index + 1
+                buffer_start = buffer_end = idx + 1
 
                 self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
@@ -236,7 +238,7 @@ cdef class _Parser:
 
                         self.set_active_part(part)
 
-                buffer_start = buffer_end = index + 1
+                buffer_start = buffer_end = idx + 1
 
                 self.state = ParserState.PS_ENDED_HEADER
             elif self.state == ParserState.PS_ENDED_HEADER:
@@ -250,7 +252,7 @@ cdef class _Parser:
                 if byte != Constants.LF:
                     raise _Failed()
 
-                buffer_start = buffer_end = index + 1
+                buffer_start = buffer_end = idx + 1
                 self.state = ParserState.PS_READING_BODY
             elif self.state == ParserState.PS_READING_BODY:
                 buffer_end += 1
@@ -262,11 +264,11 @@ cdef class _Parser:
                     self.state = ParserState.PS_READING_HEADER
 
                     if buffer_end - buffer_start > len(self.delimiter):
-                        idx = buffer_end - len(self.delimiter)
+                        _idx = buffer_end - len(self.delimiter)
 
-                        self.on_body(chunk[buffer_start: idx - 2])
+                        self.on_body(chunk[buffer_start: _idx - 2])
 
-                        buffer_start = buffer_end = index + 1
+                        buffer_start = buffer_end = idx + 1
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
@@ -274,15 +276,15 @@ cdef class _Parser:
                     self.state = ParserState.PS_END
 
                     if buffer_end - buffer_start > len(self.ender):
-                        idx = buffer_end - len(self.ender)
+                        _idx = buffer_end - len(self.ender)
 
-                        if chunk[idx - 1] == Constants.LF and \
-                                chunk[idx - 2] == Constants.CR:
-                            self.on_body(chunk[buffer_start: idx - 2])
+                        if chunk[_idx - 1] == Constants.LF and \
+                                chunk[_idx - 2] == Constants.CR:
+                            self.on_body(chunk[buffer_start: _idx - 2])
                         else:
-                            self.on_body(chunk[buffer_start: idx])
+                            self.on_body(chunk[buffer_start: _idx])
 
-                        buffer_start = buffer_end = index + 1
+                        buffer_start = buffer_end = idx + 1
 
                     self.unset_active_part()
                     self.ender_finder.reset()
@@ -290,17 +292,15 @@ cdef class _Parser:
                     if self.ender_finder.inactive and \
                             self.delimiter_finder.inactive and \
                             buffer_end - buffer_start > Constants.MaxBufferSize:
-                        idx = buffer_end - 1
+                        _idx = buffer_end - 1
 
-                        self.on_body(chunk[buffer_start: idx])
+                        self.on_body(chunk[buffer_start: _idx])
 
-                        buffer_start = index
+                        buffer_start = idx
             elif self.state == ParserState.PS_END:
                 return
             else:
                 raise _Failed()
-
-            index += 1
 
         if buffer_end - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: buffer_end]
