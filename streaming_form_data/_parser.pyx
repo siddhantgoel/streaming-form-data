@@ -170,7 +170,7 @@ cdef class _Parser:
 
     cdef _parse(self, bytes chunk, long index,
                 long buffer_start, long buffer_end):
-        cdef long idx
+        cdef long idx, byte
 
         for idx in range(index, len(chunk)):
             byte = chunk[idx]
