@@ -46,16 +46,13 @@ cdef class Finder:
     def target(self):
         return self.target
 
-    @property
-    def inactive(self):
+    cpdef inactive(self):
         return self.state == FinderState.FS_START
 
-    @property
-    def active(self):
+    cpdef active(self):
         return self.state == FinderState.FS_WORKING
 
-    @property
-    def found(self):
+    cpdef found(self):
         return self.state == FinderState.FS_END
 
 
@@ -256,7 +253,7 @@ cdef class _Parser:
                 self.delimiter_finder.feed(byte)
                 self.ender_finder.feed(byte)
 
-                if self.delimiter_finder.found:
+                if self.delimiter_finder.found():
                     self.state = ParserState.PS_READING_HEADER
 
                     if buffer_end - buffer_start > len(self.delimiter):
@@ -268,7 +265,7 @@ cdef class _Parser:
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
-                elif self.ender_finder.found:
+                elif self.ender_finder.found():
                     self.state = ParserState.PS_END
 
                     if buffer_end - buffer_start > len(self.ender):
@@ -285,8 +282,8 @@ cdef class _Parser:
                     self.unset_active_part()
                     self.ender_finder.reset()
                 else:
-                    if self.ender_finder.inactive and \
-                            self.delimiter_finder.inactive and \
+                    if self.ender_finder.inactive() and \
+                            self.delimiter_finder.inactive() and \
                             buffer_end - buffer_start > Constants.MaxBufferSize:
                         _idx = buffer_end - 1
 

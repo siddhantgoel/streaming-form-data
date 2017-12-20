@@ -18,39 +18,39 @@ class FinderTestCase(TestCase):
         finder = Finder(b'hello')
 
         self.assertEqual(finder.target, b'hello')
-        self.assertTrue(finder.inactive)
-        self.assertFalse(finder.found)
+        self.assertTrue(finder.inactive())
+        self.assertFalse(finder.found())
 
     def test_single_byte(self):
         finder = Finder(b'-')
 
-        self.assertTrue(finder.inactive)
+        self.assertTrue(finder.inactive())
 
         finder.feed(45)
-        self.assertTrue(finder.found)
+        self.assertTrue(finder.found())
 
     def test_normal(self):
         finder = Finder(b'hello')
 
-        self.assertTrue(finder.inactive)
+        self.assertTrue(finder.inactive())
 
         for byte in [104, 101, 108, 108]:
             finder.feed(byte)
 
-            self.assertTrue(finder.active)
-            self.assertFalse(finder.found)
+            self.assertTrue(finder.active())
+            self.assertFalse(finder.found())
 
         finder.feed(111)
 
-        self.assertFalse(finder.active)
-        self.assertTrue(finder.found)
+        self.assertFalse(finder.active())
+        self.assertTrue(finder.found())
 
     def test_wrong_byte(self):
         finder = Finder(b'hello')
-        self.assertTrue(finder.inactive)
+        self.assertTrue(finder.inactive())
 
         finder.feed(104)
-        self.assertTrue(finder.active)
+        self.assertTrue(finder.active())
 
         finder.feed(42)
-        self.assertTrue(finder.inactive)
+        self.assertTrue(finder.inactive())
