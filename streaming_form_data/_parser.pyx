@@ -201,12 +201,10 @@ cdef class _Parser:
                 if buffer_end - buffer_start < 4:
                     return 1
 
-                indices = (buffer_start,
-                           buffer_start + 1,
-                           buffer_end - 1,
-                           buffer_end - 2)
-
-                if all([chunk[_idx] == Constants.Hyphen for _idx in indices]):
+                if chunk[buffer_start] == Constants.Hyphen and \
+                        chunk[buffer_start + 1] == Constants.Hyphen and \
+                        chunk[buffer_end - 1] == Constants.Hyphen and \
+                        chunk[buffer_end - 2] == Constants.Hyphen:
                     self.state = ParserState.PS_END
 
                 buffer_start = buffer_end = idx + 1
