@@ -427,9 +427,9 @@ body.cython { font-family: courier; font-size: 12; }
 struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder {
   PyObject *(*feed)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, long, int __pyx_skip_dispatch);
   PyObject *(*reset)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
-  PyObject *(*inactive)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
-  PyObject *(*active)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
-  PyObject *(*found)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
+  int (*inactive)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
+  int (*active)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
+  int (*found)(struct __pyx_obj_19streaming_form_data_7_parser_Finder *, int __pyx_skip_dispatch);
 };
 static struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *__pyx_vtabptr_19streaming_form_data_7_parser_Finder;
 
@@ -838,10 +838,10 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_6target___get__
   __pyx_r = __pyx_v_self-&gt;target;
   goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">048</span>: </pre>
-<pre class="cython line score-32" onclick='toggleDiv(this)'>+<span class="">049</span>:     <span class="k">cpdef</span> <span class="nf">inactive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
-<pre class='cython code score-32 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_6Finder_7inactive(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_inactive(struct __pyx_obj_19streaming_form_data_7_parser_Finder *__pyx_v_self, int __pyx_skip_dispatch) {
-  PyObject *__pyx_r = NULL;
+<pre class="cython line score-41" onclick='toggleDiv(this)'>+<span class="">049</span>:     <span class="k">cpdef</span> <span class="kt">bint</span> <span class="nf">inactive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre class='cython code score-41 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_6Finder_7inactive(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static int __pyx_f_19streaming_form_data_7_parser_6Finder_inactive(struct __pyx_obj_19streaming_form_data_7_parser_Finder *__pyx_v_self, int __pyx_skip_dispatch) {
+  int __pyx_r;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("inactive", 0);
   /* Check if called by wrapper */
@@ -851,7 +851,6 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_inactive(struct 
     __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_inactive); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
     <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_19streaming_form_data_7_parser_6Finder_7inactive)) {
-      <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
       <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
       __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
       if (CYTHON_UNPACK_METHODS &amp;&amp; unlikely(<span class='py_c_api'>PyMethod_Check</span>(__pyx_t_3))) {
@@ -871,8 +870,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_inactive(struct 
       }
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_r = __pyx_t_2;
-      __pyx_t_2 = 0;
+      __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) __PYX_ERR(0, 49, __pyx_L1_error)
+      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_r = __pyx_t_5;
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
     }
@@ -885,10 +885,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_inactive(struct 
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_2);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("streaming_form_data._parser.Finder.inactive", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_WriteUnraisable</span>("streaming_form_data._parser.Finder.inactive", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
   __pyx_r = 0;
   __pyx_L0:;
-  <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
@@ -911,7 +910,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_6inactive(struc
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("inactive", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __pyx_f_19streaming_form_data_7_parser_6Finder_inactive(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
+  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyBool_FromLong</span>(__pyx_f_19streaming_form_data_7_parser_6Finder_inactive(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 49, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -927,18 +926,14 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_6inactive(struc
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">050</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">FinderState</span><span class="o">.</span><span class="n">FS_START</span></pre>
-<pre class='cython code score-3 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyBool_FromLong</span>((__pyx_v_self-&gt;state == __pyx_e_19streaming_form_data_7_parser_FS_START)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 50, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">050</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">FinderState</span><span class="o">.</span><span class="n">FS_START</span></pre>
+<pre class='cython code score-0 '>  __pyx_r = (__pyx_v_self-&gt;state == __pyx_e_19streaming_form_data_7_parser_FS_START);
   goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">051</span>: </pre>
-<pre class="cython line score-32" onclick='toggleDiv(this)'>+<span class="">052</span>:     <span class="k">cpdef</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
-<pre class='cython code score-32 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_6Finder_9active(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_active(struct __pyx_obj_19streaming_form_data_7_parser_Finder *__pyx_v_self, int __pyx_skip_dispatch) {
-  PyObject *__pyx_r = NULL;
+<pre class="cython line score-41" onclick='toggleDiv(this)'>+<span class="">052</span>:     <span class="k">cpdef</span> <span class="kt">bint</span> <span class="nf">active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre class='cython code score-41 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_6Finder_9active(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static int __pyx_f_19streaming_form_data_7_parser_6Finder_active(struct __pyx_obj_19streaming_form_data_7_parser_Finder *__pyx_v_self, int __pyx_skip_dispatch) {
+  int __pyx_r;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("active", 0);
   /* Check if called by wrapper */
@@ -948,7 +943,6 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_active(struct __
     __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_active); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
     <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_19streaming_form_data_7_parser_6Finder_9active)) {
-      <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
       <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
       __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
       if (CYTHON_UNPACK_METHODS &amp;&amp; unlikely(<span class='py_c_api'>PyMethod_Check</span>(__pyx_t_3))) {
@@ -968,8 +962,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_active(struct __
       }
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_r = __pyx_t_2;
-      __pyx_t_2 = 0;
+      __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) __PYX_ERR(0, 52, __pyx_L1_error)
+      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_r = __pyx_t_5;
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
     }
@@ -982,10 +977,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_active(struct __
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_2);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("streaming_form_data._parser.Finder.active", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_WriteUnraisable</span>("streaming_form_data._parser.Finder.active", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
   __pyx_r = 0;
   __pyx_L0:;
-  <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
@@ -1008,7 +1002,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_8active(struct 
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("active", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __pyx_f_19streaming_form_data_7_parser_6Finder_active(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyBool_FromLong</span>(__pyx_f_19streaming_form_data_7_parser_6Finder_active(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 52, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1024,18 +1018,14 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_8active(struct 
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">053</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">FinderState</span><span class="o">.</span><span class="n">FS_WORKING</span></pre>
-<pre class='cython code score-3 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyBool_FromLong</span>((__pyx_v_self-&gt;state == __pyx_e_19streaming_form_data_7_parser_FS_WORKING)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 53, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">053</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">FinderState</span><span class="o">.</span><span class="n">FS_WORKING</span></pre>
+<pre class='cython code score-0 '>  __pyx_r = (__pyx_v_self-&gt;state == __pyx_e_19streaming_form_data_7_parser_FS_WORKING);
   goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">054</span>: </pre>
-<pre class="cython line score-32" onclick='toggleDiv(this)'>+<span class="">055</span>:     <span class="k">cpdef</span> <span class="nf">found</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
-<pre class='cython code score-32 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_6Finder_11found(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
-static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_found(struct __pyx_obj_19streaming_form_data_7_parser_Finder *__pyx_v_self, int __pyx_skip_dispatch) {
-  PyObject *__pyx_r = NULL;
+<pre class="cython line score-41" onclick='toggleDiv(this)'>+<span class="">055</span>:     <span class="k">cpdef</span> <span class="kt">bint</span> <span class="nf">found</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre class='cython code score-41 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_6Finder_11found(PyObject *__pyx_v_self, CYTHON_UNUSED PyObject *unused); /*proto*/
+static int __pyx_f_19streaming_form_data_7_parser_6Finder_found(struct __pyx_obj_19streaming_form_data_7_parser_Finder *__pyx_v_self, int __pyx_skip_dispatch) {
+  int __pyx_r;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("found", 0);
   /* Check if called by wrapper */
@@ -1045,7 +1035,6 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_found(struct __p
     __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_found); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
     <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_19streaming_form_data_7_parser_6Finder_11found)) {
-      <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
       <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
       __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
       if (CYTHON_UNPACK_METHODS &amp;&amp; unlikely(<span class='py_c_api'>PyMethod_Check</span>(__pyx_t_3))) {
@@ -1065,8 +1054,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_found(struct __p
       }
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_2);
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_r = __pyx_t_2;
-      __pyx_t_2 = 0;
+      __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_2); if (unlikely((__pyx_t_5 == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) __PYX_ERR(0, 55, __pyx_L1_error)
+      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_r = __pyx_t_5;
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
     }
@@ -1079,10 +1069,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_6Finder_found(struct __p
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_2);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("streaming_form_data._parser.Finder.found", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_WriteUnraisable</span>("streaming_form_data._parser.Finder.found", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
   __pyx_r = 0;
   __pyx_L0:;
-  <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
@@ -1105,7 +1094,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_10found(struct 
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("found", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __pyx_f_19streaming_form_data_7_parser_6Finder_found(__pyx_v_self, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyBool_FromLong</span>(__pyx_f_19streaming_form_data_7_parser_6Finder_found(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1121,12 +1110,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_6Finder_10found(struct 
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">056</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">FinderState</span><span class="o">.</span><span class="n">FS_END</span></pre>
-<pre class='cython code score-3 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyBool_FromLong</span>((__pyx_v_self-&gt;state == __pyx_e_19streaming_form_data_7_parser_FS_END)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">056</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">FinderState</span><span class="o">.</span><span class="n">FS_END</span></pre>
+<pre class='cython code score-0 '>  __pyx_r = (__pyx_v_self-&gt;state == __pyx_e_19streaming_form_data_7_parser_FS_END);
   goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">057</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">058</span>: </pre>
@@ -1634,8 +1619,8 @@ struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser {
   PyObject *(*unset_active_part)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *);
   PyObject *(*on_body)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *, PyObject *);
   PyObject *(*_part_for)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *, PyObject *);
-  PyObject *(*data_received)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *, PyObject *, int __pyx_skip_dispatch);
-  PyObject *(*_parse)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *, PyObject *, long, long, long);
+  int (*data_received)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *, PyObject *, int __pyx_skip_dispatch);
+  int (*_parse)(struct __pyx_obj_19streaming_form_data_7_parser__Parser *, PyObject *, long, long, long);
 };
 static struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *__pyx_vtabptr_19streaming_form_data_7_parser__Parser;
 </pre><pre class="cython line score-0">&#xA0;<span class="">098</span>:     <span class="k">cdef</span> <span class="kt">bytes</span> <span class="nf">delimiter</span><span class="p">,</span> <span class="nf">ender</span></pre>
@@ -2340,14 +2325,14 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_2register(stru
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">146</span>: </pre>
-<pre class="cython line score-57" onclick='toggleDiv(this)'>+<span class="">147</span>:     <span class="k">cpdef</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span> <span class="n">data</span><span class="p">):</span></pre>
-<pre class='cython code score-57 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_7_Parser_5data_received(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
-static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(struct __pyx_obj_19streaming_form_data_7_parser__Parser *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch) {
+<pre class="cython line score-66" onclick='toggleDiv(this)'>+<span class="">147</span>:     <span class="k">cpdef</span> <span class="kt">int</span> <span class="nf">data_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span> <span class="n">data</span><span class="p">):</span></pre>
+<pre class='cython code score-66 '>static PyObject *__pyx_pw_19streaming_form_data_7_parser_7_Parser_5data_received(PyObject *__pyx_v_self, PyObject *__pyx_v_data); /*proto*/
+static int __pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(struct __pyx_obj_19streaming_form_data_7_parser__Parser *__pyx_v_self, PyObject *__pyx_v_data, int __pyx_skip_dispatch) {
   PyObject *__pyx_v_chunk = 0;
   long __pyx_v_index;
   long __pyx_v_buffer_start;
   long __pyx_v_buffer_end;
-  PyObject *__pyx_r = NULL;
+  int __pyx_r;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("data_received", 0);
   /* Check if called by wrapper */
@@ -2357,7 +2342,6 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(s
     __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyObject_GetAttrStr</span>(((PyObject *)__pyx_v_self), __pyx_n_s_data_received); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
     <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
     if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)__pyx_pw_19streaming_form_data_7_parser_7_Parser_5data_received)) {
-      <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
       <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_t_1);
       __pyx_t_3 = __pyx_t_1; __pyx_t_4 = NULL;
       if (CYTHON_UNPACK_METHODS &amp;&amp; unlikely(<span class='py_c_api'>PyMethod_Check</span>(__pyx_t_3))) {
@@ -2402,8 +2386,9 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(s
         }
       }
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-      __pyx_r = __pyx_t_2;
-      __pyx_t_2 = 0;
+      __pyx_t_6 = <span class='pyx_c_api'>__Pyx_PyInt_As_int</span>(__pyx_t_2); if (unlikely((__pyx_t_6 == (int)-1) &amp;&amp; <span class='py_c_api'>PyErr_Occurred</span>())) __PYX_ERR(0, 147, __pyx_L1_error)
+      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_2); __pyx_t_2 = 0;
+      __pyx_r = __pyx_t_6;
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
       goto __pyx_L0;
     }
@@ -2417,11 +2402,10 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(s
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_3);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_4);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_5);
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("streaming_form_data._parser._Parser.data_received", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_WriteUnraisable</span>("streaming_form_data._parser._Parser.data_received", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
   __pyx_r = 0;
   __pyx_L0:;
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_v_chunk);
-  <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
@@ -2449,7 +2433,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("data_received", 0);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = __pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(__pyx_v_self, __pyx_v_data, 1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+  __pyx_t_1 = <span class='pyx_c_api'>__Pyx_PyInt_From_int</span>(__pyx_f_19streaming_form_data_7_parser_7_Parser_data_received(__pyx_v_self, __pyx_v_data, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
   <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -2466,23 +2450,21 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
   return __pyx_r;
 }
 </pre><pre class="cython line score-1" onclick='toggleDiv(this)'>+<span class="">148</span>:         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span></pre>
-<pre class='cython code score-1 '>  __pyx_t_6 = (__pyx_v_data != Py_None) &amp;&amp; (<span class='py_macro_api'>PyBytes_GET_SIZE</span>(__pyx_v_data) != 0);
-  __pyx_t_7 = ((!__pyx_t_6) != 0);
-  if (__pyx_t_7) {
+<pre class='cython code score-1 '>  __pyx_t_7 = (__pyx_v_data != Py_None) &amp;&amp; (<span class='py_macro_api'>PyBytes_GET_SIZE</span>(__pyx_v_data) != 0);
+  __pyx_t_8 = ((!__pyx_t_7) != 0);
+  if (__pyx_t_8) {
 /* … */
   }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">149</span>:             <span class="k">return</span> <span class="mf">0</span></pre>
-<pre class='cython code score-2 '>    <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-    <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_0);
-    __pyx_r = __pyx_int_0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">149</span>:             <span class="k">return</span> <span class="mf">0</span></pre>
+<pre class='cython code score-0 '>    __pyx_r = 0;
     goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">150</span>: </pre>
 <pre class="cython line score-0">&#xA0;<span class="">151</span>:         <span class="k">cdef</span> <span class="kt">bytes</span> <span class="nf">chunk</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">152</span>:         <span class="k">cdef</span> <span class="kt">long</span> <span class="nf">index</span><span class="p">,</span> <span class="nf">buffer_start</span><span class="p">,</span> <span class="nf">buffer_end</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">153</span>: </pre>
 <pre class="cython line score-1" onclick='toggleDiv(this)'>+<span class="">154</span>:         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_leftover_buffer</span><span class="p">:</span></pre>
-<pre class='cython code score-1 '>  __pyx_t_7 = (__pyx_v_self-&gt;_leftover_buffer != Py_None) &amp;&amp; (<span class='py_macro_api'>PyBytes_GET_SIZE</span>(__pyx_v_self-&gt;_leftover_buffer) != 0);
-  if (__pyx_t_7) {
+<pre class='cython code score-1 '>  __pyx_t_8 = (__pyx_v_self-&gt;_leftover_buffer != Py_None) &amp;&amp; (<span class='py_macro_api'>PyBytes_GET_SIZE</span>(__pyx_v_self-&gt;_leftover_buffer) != 0);
+  if (__pyx_t_8) {
 /* … */
     goto __pyx_L4;
   }
@@ -2499,9 +2481,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       <span class='py_c_api'>PyErr_SetString</span>(PyExc_TypeError, "object of type 'NoneType' has no len()");
       __PYX_ERR(0, 157, __pyx_L1_error)
     }
-    __pyx_t_8 = <span class='py_macro_api'>PyBytes_GET_SIZE</span>(__pyx_t_1); if (unlikely(__pyx_t_8 == -1)) __PYX_ERR(0, 157, __pyx_L1_error)
+    __pyx_t_9 = <span class='py_macro_api'>PyBytes_GET_SIZE</span>(__pyx_t_1); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(0, 157, __pyx_L1_error)
     <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_v_index = __pyx_t_8;
+    __pyx_v_index = __pyx_t_9;
 </pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">158</span>:             <span class="n">buffer_start</span> <span class="o">=</span> <span class="mf">0</span></pre>
 <pre class='cython code score-0 '>    __pyx_v_buffer_start = 0;
 </pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">159</span>:             <span class="n">buffer_end</span> <span class="o">=</span> <span class="n">index</span></pre>
@@ -2528,16 +2510,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
   }
   __pyx_L4:;
 </pre><pre class="cython line score-0">&#xA0;<span class="">168</span>: </pre>
-<pre class="cython line score-1" onclick='toggleDiv(this)'>+<span class="">169</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">buffer_start</span><span class="p">,</span> <span class="n">buffer_end</span><span class="p">)</span></pre>
-<pre class='cython code score-1 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  __pyx_t_1 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_parse(__pyx_v_self, __pyx_v_chunk, __pyx_v_index, __pyx_v_buffer_start, __pyx_v_buffer_end); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 169, __pyx_L1_error)
-  <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_1);
-  __pyx_r = __pyx_t_1;
-  __pyx_t_1 = 0;
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">169</span>:         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">buffer_start</span><span class="p">,</span> <span class="n">buffer_end</span><span class="p">)</span></pre>
+<pre class='cython code score-0 '>  __pyx_r = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self-&gt;__pyx_vtab)-&gt;_parse(__pyx_v_self, __pyx_v_chunk, __pyx_v_index, __pyx_v_buffer_start, __pyx_v_buffer_end);
   goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">170</span>: </pre>
-<pre class="cython line score-12" onclick='toggleDiv(this)'>+<span class="">171</span>:     <span class="k">cdef</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span> <span class="n">chunk</span><span class="p">,</span> <span class="nb">long</span> <span class="n">index</span><span class="p">,</span></pre>
-<pre class='cython code score-12 '>static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser__parse(struct __pyx_obj_19streaming_form_data_7_parser__Parser *__pyx_v_self, PyObject *__pyx_v_chunk, long __pyx_v_index, long __pyx_v_buffer_start, long __pyx_v_buffer_end) {
+<pre class="cython line score-12" onclick='toggleDiv(this)'>+<span class="">171</span>:     <span class="k">cdef</span> <span class="kt">int</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span> <span class="n">chunk</span><span class="p">,</span> <span class="nb">long</span> <span class="n">index</span><span class="p">,</span></pre>
+<pre class='cython code score-12 '>static int __pyx_f_19streaming_form_data_7_parser_7_Parser__parse(struct __pyx_obj_19streaming_form_data_7_parser__Parser *__pyx_v_self, PyObject *__pyx_v_chunk, long __pyx_v_index, long __pyx_v_buffer_start, long __pyx_v_buffer_end) {
   long __pyx_v_idx;
   long __pyx_v_byte;
   PyObject *__pyx_v_value = NULL;
@@ -2545,7 +2523,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
   PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_part = NULL;
   PyObject *__pyx_v__idx = NULL;
-  PyObject *__pyx_r = NULL;
+  int __pyx_r;
   <span class='refnanny'>__Pyx_RefNannyDeclarations</span>
   <span class='refnanny'>__Pyx_RefNannySetupContext</span>("_parse", 0);
 /* … */
@@ -2556,7 +2534,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_7);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_9);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_t_10);
-  <span class='pyx_c_api'>__Pyx_AddTraceback</span>("streaming_form_data._parser._Parser._parse", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  <span class='pyx_c_api'>__Pyx_WriteUnraisable</span>("streaming_form_data._parser._Parser._parse", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
   __pyx_r = 0;
   __pyx_L0:;
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_v_value);
@@ -2564,11 +2542,10 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_v_name);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_v_part);
   <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_v__idx);
-  <span class='refnanny'>__Pyx_XGIVEREF</span>(__pyx_r);
   <span class='refnanny'>__Pyx_RefNannyFinishContext</span>();
   return __pyx_r;
 }
-</pre><pre class="cython line score-0">&#xA0;<span class="">172</span>:                 <span class="nb">long</span> <span class="n">buffer_start</span><span class="p">,</span> <span class="nb">long</span> <span class="n">buffer_end</span><span class="p">):</span></pre>
+</pre><pre class="cython line score-0">&#xA0;<span class="">172</span>:                     <span class="nb">long</span> <span class="n">buffer_start</span><span class="p">,</span> <span class="nb">long</span> <span class="n">buffer_end</span><span class="p">):</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">173</span>:         <span class="k">cdef</span> <span class="kt">long</span> <span class="nf">idx</span><span class="p">,</span> <span class="nf">byte</span></pre>
 <pre class="cython line score-0">&#xA0;<span class="">174</span>: </pre>
 <pre class="cython line score-6" onclick='toggleDiv(this)'>+<span class="">175</span>:         <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">chunk</span><span class="p">)):</span></pre>
@@ -2596,10 +2573,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       if (__pyx_t_5) {
 /* … */
       }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">180</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>        <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-        <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-        __pyx_r = __pyx_int_1;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">180</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_r = 1;
         goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">181</span>: </pre>
 <pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">182</span>:                 <span class="n">buffer_end</span> <span class="o">+=</span> <span class="mf">1</span></pre>
@@ -2615,10 +2590,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       if (__pyx_t_5) {
 /* … */
       }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">186</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>        <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-        <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-        __pyx_r = __pyx_int_1;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">186</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_r = 1;
         goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">187</span>: </pre>
 <pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">188</span>:                 <span class="n">buffer_end</span> <span class="o">+=</span> <span class="mf">1</span></pre>
@@ -2648,10 +2621,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       if (__pyx_t_5) {
 /* … */
       }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">197</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>        <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-        <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-        __pyx_r = __pyx_int_1;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">197</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_r = 1;
         goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">198</span>: </pre>
 <pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">199</span>:                 <span class="n">buffer_end</span> <span class="o">+=</span> <span class="mf">1</span></pre>
@@ -2662,10 +2633,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       if (__pyx_t_5) {
 /* … */
       }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">202</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>        <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-        <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-        __pyx_r = __pyx_int_1;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">202</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_r = 1;
         goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">203</span>: </pre>
 <pre class="cython line score-12" onclick='toggleDiv(this)'>+<span class="">204</span>:                 <span class="k">if</span> <span class="n">chunk</span><span class="p">[</span><span class="n">buffer_start</span><span class="p">]</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">Hyphen</span> <span class="ow">and</span> \</pre>
@@ -2765,10 +2734,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       if (__pyx_t_5) {
 /* … */
       }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">220</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>        <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-        <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-        __pyx_r = __pyx_int_1;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">220</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_r = 1;
         goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">221</span>: </pre>
 <pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">222</span>:                 <span class="n">buffer_end</span> <span class="o">+=</span> <span class="mf">1</span></pre>
@@ -3023,10 +2990,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       if (__pyx_t_5) {
 /* … */
       }
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">248</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>        <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-        <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-        __pyx_r = __pyx_int_1;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">248</span>:                     <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>        __pyx_r = 1;
         goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">249</span>: </pre>
 <pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">250</span>:                 <span class="n">buffer_start</span> <span class="o">=</span> <span class="n">buffer_end</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">+</span> <span class="mf">1</span></pre>
@@ -3051,11 +3016,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
       <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_10);
       <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_10); __pyx_t_10 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">257</span>: </pre>
-<pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">258</span>:                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter_finder</span><span class="o">.</span><span class="n">found</span><span class="p">():</span></pre>
-<pre class='cython code score-3 '>      __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;delimiter_finder-&gt;__pyx_vtab)-&gt;found(__pyx_v_self-&gt;delimiter_finder, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 258, __pyx_L1_error)
-      <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_10);
-      __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_10); if (unlikely(__pyx_t_5 &lt; 0)) __PYX_ERR(0, 258, __pyx_L1_error)
-      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_10); __pyx_t_10 = 0;
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">258</span>:                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">delimiter_finder</span><span class="o">.</span><span class="n">found</span><span class="p">():</span></pre>
+<pre class='cython code score-0 '>      __pyx_t_5 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;delimiter_finder-&gt;__pyx_vtab)-&gt;found(__pyx_v_self-&gt;delimiter_finder, 0) != 0);
       if (__pyx_t_5) {
 /* … */
         goto __pyx_L27;
@@ -3103,11 +3065,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
 <pre class='cython code score-1 '>        __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;delimiter_finder-&gt;__pyx_vtab)-&gt;reset(__pyx_v_self-&gt;delimiter_finder, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 269, __pyx_L1_error)
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
-</pre><pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">270</span>:                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ender_finder</span><span class="o">.</span><span class="n">found</span><span class="p">():</span></pre>
-<pre class='cython code score-3 '>      __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;ender_finder-&gt;__pyx_vtab)-&gt;found(__pyx_v_self-&gt;ender_finder, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 270, __pyx_L1_error)
-      <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_3);
-      __pyx_t_5 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_3); if (unlikely(__pyx_t_5 &lt; 0)) __PYX_ERR(0, 270, __pyx_L1_error)
-      <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_3); __pyx_t_3 = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">270</span>:                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ender_finder</span><span class="o">.</span><span class="n">found</span><span class="p">():</span></pre>
+<pre class='cython code score-0 '>      __pyx_t_5 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;ender_finder-&gt;__pyx_vtab)-&gt;found(__pyx_v_self-&gt;ender_finder, 0) != 0);
       if (__pyx_t_5) {
 /* … */
         goto __pyx_L27;
@@ -3210,12 +3169,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
         <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_10);
         <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_10); __pyx_t_10 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">286</span>:                 <span class="k">else</span><span class="p">:</span></pre>
-<pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">287</span>:                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ender_finder</span><span class="o">.</span><span class="n">inactive</span><span class="p">()</span> <span class="ow">and</span> \</pre>
-<pre class='cython code score-3 '>      /*else*/ {
-        __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;ender_finder-&gt;__pyx_vtab)-&gt;inactive(__pyx_v_self-&gt;ender_finder, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 287, __pyx_L1_error)
-        <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_10);
-        __pyx_t_8 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_10); if (unlikely(__pyx_t_8 &lt; 0)) __PYX_ERR(0, 287, __pyx_L1_error)
-        <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_10); __pyx_t_10 = 0;
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">287</span>:                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ender_finder</span><span class="o">.</span><span class="n">inactive</span><span class="p">()</span> <span class="ow">and</span> \</pre>
+<pre class='cython code score-0 '>      /*else*/ {
+        __pyx_t_8 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;ender_finder-&gt;__pyx_vtab)-&gt;inactive(__pyx_v_self-&gt;ender_finder, 0) != 0);
         if (__pyx_t_8) {
         } else {
           __pyx_t_5 = __pyx_t_8;
@@ -3227,11 +3183,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
         }
       }
       __pyx_L27:;
-</pre><pre class="cython line score-3" onclick='toggleDiv(this)'>+<span class="">288</span>:                             <span class="bp">self</span><span class="o">.</span><span class="n">delimiter_finder</span><span class="o">.</span><span class="n">inactive</span><span class="p">()</span> <span class="ow">and</span> \</pre>
-<pre class='cython code score-3 '>        __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;delimiter_finder-&gt;__pyx_vtab)-&gt;inactive(__pyx_v_self-&gt;delimiter_finder, 0); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 288, __pyx_L1_error)
-        <span class='refnanny'>__Pyx_GOTREF</span>(__pyx_t_10);
-        __pyx_t_8 = <span class='pyx_c_api'>__Pyx_PyObject_IsTrue</span>(__pyx_t_10); if (unlikely(__pyx_t_8 &lt; 0)) __PYX_ERR(0, 288, __pyx_L1_error)
-        <span class='pyx_macro_api'>__Pyx_DECREF</span>(__pyx_t_10); __pyx_t_10 = 0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">288</span>:                             <span class="bp">self</span><span class="o">.</span><span class="n">delimiter_finder</span><span class="o">.</span><span class="n">inactive</span><span class="p">()</span> <span class="ow">and</span> \</pre>
+<pre class='cython code score-0 '>        __pyx_t_8 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self-&gt;delimiter_finder-&gt;__pyx_vtab)-&gt;inactive(__pyx_v_self-&gt;delimiter_finder, 0) != 0);
         if (__pyx_t_8) {
         } else {
           __pyx_t_5 = __pyx_t_8;
@@ -3267,16 +3220,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
 /* … */
       break;
       default:
-</pre><pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">296</span>:                 <span class="k">return</span> <span class="mf">0</span></pre>
-<pre class='cython code score-2 '>      <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-      <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_0);
-      __pyx_r = __pyx_int_0;
+</pre><pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">296</span>:                 <span class="k">return</span> <span class="mf">0</span></pre>
+<pre class='cython code score-0 '>      __pyx_r = 0;
       goto __pyx_L0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">297</span>:             <span class="k">else</span><span class="p">:</span></pre>
-<pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">298</span>:                 <span class="k">return</span> <span class="mf">1</span></pre>
-<pre class='cython code score-2 '>      <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-      <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_1);
-      __pyx_r = __pyx_int_1;
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">298</span>:                 <span class="k">return</span> <span class="mf">1</span></pre>
+<pre class='cython code score-0 '>      __pyx_r = 1;
       goto __pyx_L0;
       break;
     }
@@ -3300,9 +3249,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_4data_received
     __pyx_v_self-&gt;_leftover_buffer = ((PyObject*)__pyx_t_7);
     __pyx_t_7 = 0;
 </pre><pre class="cython line score-0">&#xA0;<span class="">302</span>: </pre>
-<pre class="cython line score-2" onclick='toggleDiv(this)'>+<span class="">303</span>:         <span class="k">return</span> <span class="mf">0</span></pre>
-<pre class='cython code score-2 '>  <span class='pyx_macro_api'>__Pyx_XDECREF</span>(__pyx_r);
-  <span class='pyx_macro_api'>__Pyx_INCREF</span>(__pyx_int_0);
-  __pyx_r = __pyx_int_0;
+<pre class="cython line score-0" onclick='toggleDiv(this)'>+<span class="">303</span>:         <span class="k">return</span> <span class="mf">0</span></pre>
+<pre class='cython code score-0 '>  __pyx_r = 0;
   goto __pyx_L0;
 </pre></div></body></html>

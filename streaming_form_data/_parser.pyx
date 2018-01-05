@@ -46,13 +46,13 @@ cdef class Finder:
     def target(self):
         return self.target
 
-    cpdef inactive(self):
+    cpdef bint inactive(self):
         return self.state == FinderState.FS_START
 
-    cpdef active(self):
+    cpdef bint active(self):
         return self.state == FinderState.FS_WORKING
 
-    cpdef found(self):
+    cpdef bint found(self):
         return self.state == FinderState.FS_END
 
 
@@ -144,7 +144,7 @@ cdef class _Parser:
             if part.name == name:
                 return part
 
-    cpdef data_received(self, bytes data):
+    cpdef int data_received(self, bytes data):
         if not data:
             return 0
 
@@ -168,8 +168,8 @@ cdef class _Parser:
 
         return self._parse(chunk, index, buffer_start, buffer_end)
 
-    cdef _parse(self, bytes chunk, long index,
-                long buffer_start, long buffer_end):
+    cdef int _parse(self, bytes chunk, long index,
+                    long buffer_start, long buffer_end):
         cdef long idx, byte
 
         for idx in range(index, len(chunk)):
