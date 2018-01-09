@@ -1,6 +1,6 @@
 Cython==0.25.2
 flake8==3.3.0
-line_profiler==2.0
+line_profiler==2.1.2
 pytest==3.0.6
 requests-toolbelt==0.7.0
 sphinx-autobuild==0.6.0
