@@ -8,7 +8,12 @@ class ParseFailedException(Exception):
 
 
 def parse_content_boundary(headers):
-    content_type = headers.get('Content-Type')
+    content_type_header = 'Content-Type'
+
+    content_type = headers.get(content_type_header) or \
+        headers.get(content_type_header.lower()) or \
+        headers.get(content_type_header.upper())
+
     if not content_type:
         raise ParseFailedException()
 

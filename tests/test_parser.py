@@ -49,6 +49,24 @@ class StreamingFormDataParserTestCase(TestCase):
 
         self.assertEqual(target.value, b'hello world')
 
+    def test_case_insensitive_content_type(self):
+        content_type_header = 'Content-Type'
+
+        for header_key in (content_type_header,
+                           content_type_header.lower(),
+                           content_type_header.upper()):
+            target = ValueTarget()
+
+            encoder = MultipartEncoder(fields={'value': 'hello world'})
+
+            parser = StreamingFormDataParser(
+                headers={header_key: encoder.content_type})
+            parser.register('value', target)
+
+            parser.data_received(encoder.to_string())
+
+            self.assertEqual(target.value, b'hello world')
+
     def test_basic_multiple(self):
         first = ValueTarget()
         second = ValueTarget()
