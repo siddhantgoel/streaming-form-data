@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v0.4.5
+------
+- Make :code:`Content-Type` header lookups case-insensitive
+
 v0.4.4
 ------
 
