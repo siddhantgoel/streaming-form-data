@@ -45,10 +45,8 @@ class FileTarget(BaseTarget):
 
     def data_received(self, chunk):
         self._fd.write(chunk)
-        self._fd.flush()
 
     def finish(self):
-        self._fd.flush()
         self._fd.close()
 
 
