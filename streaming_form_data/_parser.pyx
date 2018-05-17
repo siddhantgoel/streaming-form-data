@@ -2,6 +2,8 @@ import cgi
 
 from streaming_form_data.targets import NullTarget
 
+ctypedef unsigned char Byte
+ctypedef size_t Index
 
 cdef enum Constants:
     Hyphen = 45
@@ -16,7 +18,7 @@ cdef enum FinderState:
 
 cdef class Finder:
     cdef bytes target
-    cdef long index
+    cdef Index index
     cdef FinderState state
 
     def __init__(self, target):
@@ -27,7 +29,7 @@ cdef class Finder:
         self.index = 0
         self.state = FinderState.FS_START
 
-    cpdef feed(self, long byte):
+    cpdef feed(self, Byte byte):
         if byte != self.target[self.index]:
             self.state = FinderState.FS_START
             self.index = 0
@@ -103,7 +105,7 @@ cdef class _Parser:
     cdef bytes delimiter, ender
     cdef ParserState state
     cdef Finder delimiter_finder, ender_finder
-    cdef long delimiter_length, ender_length
+    cdef Index delimiter_length, ender_length
     cdef object expected_parts
     cdef object active_part, default_part
 
@@ -154,7 +156,7 @@ cdef class _Parser:
             return 0
 
         cdef bytes chunk
-        cdef long index, buffer_start, buffer_end
+        cdef Index index, buffer_start, buffer_end
 
         if self._leftover_buffer:
             chunk = self._leftover_buffer + data
@@ -173,9 +175,10 @@ cdef class _Parser:
 
         return self._parse(chunk, index, buffer_start, buffer_end)
 
-    cdef int _parse(self, bytes chunk, long index,
-                    long buffer_start, long buffer_end):
-        cdef long idx, byte
+    cdef int _parse(self, bytes chunk, Index index,
+                    Index buffer_start, Index buffer_end):
+        cdef Index idx
+        cdef Byte byte
 
         for idx in range(index, len(chunk)):
             byte = chunk[idx]
