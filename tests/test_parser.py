@@ -54,7 +54,8 @@ class StreamingFormDataParserTestCase(TestCase):
 
         for header_key in (content_type_header,
                            content_type_header.lower(),
-                           content_type_header.upper()):
+                           content_type_header.upper(),
+                           'cOnTeNt-tYPe'):
             target = ValueTarget()
 
             encoder = MultipartEncoder(fields={'value': 'hello world'})
@@ -66,6 +67,27 @@ class StreamingFormDataParserTestCase(TestCase):
             parser.data_received(encoder.to_string())
 
             self.assertEqual(target.value, b'hello world')
+
+    def test_missing_content_type(self):
+        self.assertRaises(ParseFailedException,
+                          StreamingFormDataParser, {})
+
+        headers = {'someheader': 'somevalue'}
+        self.assertRaises(ParseFailedException,
+                          StreamingFormDataParser, headers)
+
+    def test_incorrect_content_type(self):
+        headers = {'Content-Type': 'multipart/mixed; boundary=1234'}
+        self.assertRaises(ParseFailedException,
+                          StreamingFormDataParser, headers)
+
+        headers = {'Content-Type': 'multipart/form-data'}
+        self.assertRaises(ParseFailedException,
+                          StreamingFormDataParser, headers)
+
+        headers = {'Content-Type': 'multipart/form-data; delimiter=1234'}
+        self.assertRaises(ParseFailedException,
+                          StreamingFormDataParser, headers)
 
     def test_basic_multiple(self):
         first = ValueTarget()
