@@ -19,7 +19,8 @@ cdef enum FinderState:
 # Knuth-Morris-Pratt algorithm
 cdef class Finder:
     cdef bytes target
-    cdef Index index
+    cdef const Byte *target_ptr
+    cdef Index target_len, index
     cdef FinderState state
 
     def __init__(self, target):
@@ -27,18 +28,20 @@ cdef class Finder:
             raise ValueError('Empty values not allowed')
 
         self.target = target
+        self.target_ptr = self.target
+        self.target_len = len(self.target)
         self.index = 0
         self.state = FinderState.FS_START
 
     cpdef feed(self, Byte byte):
-        if byte != self.target[self.index]:
+        if byte != self.target_ptr[self.index]:
             self.state = FinderState.FS_START
             self.index = 0
         else:
             self.state = FinderState.FS_WORKING
             self.index += 1
 
-            if self.index == len(self.target):
+            if self.index == self.target_len:
                 self.state = FinderState.FS_END
 
     cpdef reset(self):
@@ -173,12 +176,14 @@ cdef class _Parser:
         return self._parse(chunk, index)
 
     cdef int _parse(self, bytes chunk, Index index):
-        cdef Index idx, buffer_start
+        cdef Index idx, buffer_start, _idx
         cdef Byte byte
+        cdef const Byte *chunk_ptr
+        chunk_ptr = chunk
         buffer_start = 0
 
-        for idx in range(index, len(chunk)):
-            byte = chunk[idx]
+        for idx in xrange(index, len(chunk)):
+            byte = chunk_ptr[idx]
 
             if self.state == ParserState.PS_START:
                 if byte != Constants.Hyphen:
@@ -265,8 +270,8 @@ cdef class _Parser:
                     _idx = idx - self.ender_length
 
                     if _idx > buffer_start:
-                        if chunk[_idx] == Constants.LF and \
-                                chunk[_idx - 1] == Constants.CR:
+                        if chunk_ptr[_idx] == Constants.LF and \
+                                chunk_ptr[_idx - 1] == Constants.CR:
                             self.on_body(chunk[buffer_start: _idx - 1])
                         else:
                             self.on_body(chunk[buffer_start: _idx + 1])
