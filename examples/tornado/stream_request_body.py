@@ -13,8 +13,8 @@ from streaming_form_data.targets import ValueTarget, FileTarget
 class UploadHandler(RequestHandler):
     def prepare(self):
         self.value = ValueTarget()
-        self.file_ = FileTarget(os.path.join(tempfile.gettempdir(),
-                                'file-{}.dat'.format(int(time()))))
+        name = 'uploaded-file-tornado-{}.dat'.format(int(time()))
+        self.file_ = FileTarget(os.path.join(tempfile.gettempdir(), name))
 
         self._parser = StreamingFormDataParser(headers=self.request.headers)
 
@@ -46,11 +46,11 @@ def main():
     )
 
     app = Application(handlers, **settings)
-    app.listen(9999)
+    app.listen(9999, address='localhost')
 
     IOLoop().current().start()
 
 
 if __name__ == '__main__':
-    print('Listening on port 9999')
+    print('Listening on localhost:9999')
     main()
