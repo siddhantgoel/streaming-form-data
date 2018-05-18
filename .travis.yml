@@ -10,8 +10,7 @@ python:
 
 install:
     - pip install --upgrade pip setuptools
-    - pip install -r requirements.dev.txt
-    - python setup.py build_ext -i
+    - make install_local
 
 script:
     - make test
