@@ -1,4 +1,5 @@
 import os.path
+import tempfile
 from time import time
 
 from tornado.web import Application, RequestHandler, stream_request_body
@@ -12,7 +13,8 @@ from streaming_form_data.targets import ValueTarget, FileTarget
 class UploadHandler(RequestHandler):
     def prepare(self):
         self.value = ValueTarget()
-        self.file_ = FileTarget('/tmp/file-{}.dat'.format(int(time())))
+        self.file_ = FileTarget(os.path.join(tempfile.gettempdir(),
+                                'file-{}.dat'.format(int(time()))))
 
         self._parser = StreamingFormDataParser(headers=self.request.headers)
 
