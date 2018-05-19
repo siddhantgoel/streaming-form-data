@@ -9,7 +9,7 @@ cdef enum Constants:
     Hyphen = 45
     CR = 13
     LF = 10
-    MaxBufferSize = 1024
+    MinFileBodyChunkSize = 1024
 
 
 cdef enum FinderState:
@@ -57,6 +57,9 @@ cdef class Finder:
 
     cpdef bint found(self):
         return self.state == FinderState.FS_END
+
+    cpdef Index matched_length(self):
+        return self.index
 
 
 class Part:
@@ -274,18 +277,19 @@ cdef class _Parser:
 
                     self.unset_active_part()
                     self.ender_finder.reset()
-                else:
-                    if self.ender_finder.inactive() and \
-                            self.delimiter_finder.inactive() and \
-                            idx + 1 - buffer_start > Constants.MaxBufferSize:
-
-                        self.on_body(chunk[buffer_start: idx - 2])
-
-                        buffer_start = idx - 2
             elif self.state == ParserState.PS_END:
                 return 0
             else:
                 return 1
+
+
+        if self.state == ParserState.PS_READING_BODY:
+            matched_length = max(self.delimiter_finder.matched_length(),
+                                 self.ender_finder.matched_length())
+            _idx = idx + 1 - matched_length
+            if _idx - buffer_start >= Constants.MinFileBodyChunkSize:
+                self.on_body(chunk[buffer_start: _idx])
+                buffer_start = _idx
 
         if idx + 1 - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: idx + 1]
