@@ -1,12 +1,16 @@
 language: python
+
 python:
     - "3.3"
     - "3.4"
     - "3.5"
     - "3.6"
+
 install:
     - pip install --upgrade pip setuptools
     - pip install -r requirements.dev.txt
-    - pip install .
+    - python setup.py build_ext -i
+    - python setup.py install
+
 script:
     - make test
