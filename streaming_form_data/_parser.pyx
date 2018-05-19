@@ -244,28 +244,33 @@ cdef class _Parser:
                 if self.delimiter_finder.found():
                     self.state = ParserState.PS_READING_HEADER
 
-                    if idx + 1 - buffer_start > self.delimiter_length:
-                        _idx = idx + 1 - self.delimiter_length
+                    _idx = idx - self.delimiter_length
 
-                        self.on_body(chunk[buffer_start: _idx - 2])
+                    if _idx > buffer_start:
+                        self.on_body(chunk[buffer_start: _idx - 1])
 
                         buffer_start = idx + 1
+                    else:
+                        return 1
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
+
                 elif self.ender_finder.found():
                     self.state = ParserState.PS_END
 
-                    if idx + 1 - buffer_start > self.ender_length:
-                        _idx = idx + 1 - self.ender_length
+                    _idx = idx - self.ender_length
 
-                        if chunk[_idx - 1] == Constants.LF and \
-                                chunk[_idx - 2] == Constants.CR:
-                            self.on_body(chunk[buffer_start: _idx - 2])
+                    if _idx > buffer_start:
+                        if chunk[_idx] == Constants.LF and \
+                                chunk[_idx - 1] == Constants.CR:
+                            self.on_body(chunk[buffer_start: _idx - 1])
                         else:
-                            self.on_body(chunk[buffer_start: _idx])
+                            self.on_body(chunk[buffer_start: _idx + 1])
+                    else:
+                        return 1
 
-                        buffer_start = idx + 1
+                    buffer_start = idx + 1
 
                     self.unset_active_part()
                     self.ender_finder.reset()
