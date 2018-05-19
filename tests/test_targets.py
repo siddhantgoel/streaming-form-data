@@ -1,4 +1,5 @@
 import os.path
+import tempfile
 from unittest import TestCase
 
 from streaming_form_data.targets import ValueTarget, FileTarget
@@ -21,7 +22,7 @@ class ValueTargetTestCase(TestCase):
 
 class FileTargetTestCase(TestCase):
     def test_basic(self):
-        filename = '/tmp/file.txt'
+        filename = os.path.join(tempfile.gettempdir(), 'file.txt')
 
         target = FileTarget(filename)
 
