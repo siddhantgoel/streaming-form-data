@@ -10,7 +10,7 @@ upload: build
 	twine upload dist/*
 
 test:
-	py.test
+	PYTHONPATH=. py.test
 	flake8
 
 .PHONY: clean build upload
