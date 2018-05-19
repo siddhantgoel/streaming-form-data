@@ -1,4 +1,5 @@
-import os.path
+from io import BytesIO
+from numpy import random
 from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
@@ -7,11 +8,25 @@ from streaming_form_data import StreamingFormDataParser, ParseFailedException
 from streaming_form_data.targets import ValueTarget
 
 
-DATA_DIR = 'tests/data'
+def get_random_bytes(size, seed):
+    random.seed(seed)
+    return random.bytes(size)
 
 
 def open_dataset(filename):
-    return open(os.path.join(DATA_DIR, filename), 'rb')
+    if filename == 'file.txt':
+        filedata = b'this is a txt file\r\n' * 10
+    elif filename == 'image-600x400.png':
+        filedata = get_random_bytes(1780, 600)
+    elif filename == 'image-2560x1600.png':
+        filedata = get_random_bytes(11742, 2560)
+    elif filename == 'image-500k.png':
+        filedata = get_random_bytes(437814, 500)
+    elif filename == 'image-high-res.jpg':
+        filedata = get_random_bytes(9450866, 945)
+    else:
+        raise Exception('Unknown file name: ' + filename)
+    return BytesIO(filedata)
 
 
 def encoded_dataset(filename):
