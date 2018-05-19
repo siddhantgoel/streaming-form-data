@@ -157,29 +157,22 @@ cdef class _Parser:
             return 0
 
         cdef bytes chunk
-        cdef Index index, buffer_start, buffer_end
+        cdef Index index
 
         if self._leftover_buffer:
             chunk = self._leftover_buffer + data
-
             index = len(self._leftover_buffer)
-            buffer_start = 0
-            buffer_end = index
-
             self._leftover_buffer = None
         else:
             chunk = data
-
             index = 0
-            buffer_start = 0
-            buffer_end = 0
 
-        return self._parse(chunk, index, buffer_start, buffer_end)
+        return self._parse(chunk, index)
 
-    cdef int _parse(self, bytes chunk, Index index,
-                    Index buffer_start, Index buffer_end):
-        cdef Index idx
+    cdef int _parse(self, bytes chunk, Index index):
+        cdef Index idx, buffer_start
         cdef Byte byte
+        buffer_start = 0
 
         for idx in range(index, len(chunk)):
             byte = chunk[idx]
@@ -188,42 +181,33 @@ cdef class _Parser:
                 if byte != Constants.Hyphen:
                     return 1
 
-                buffer_end += 1
                 self.state = ParserState.PS_STARTING_BOUNDARY
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != Constants.Hyphen:
                     return 1
 
-                buffer_end += 1
                 self.state = ParserState.PS_READING_BOUNDARY
             elif self.state == ParserState.PS_READING_BOUNDARY:
-                buffer_end += 1
-
                 if byte == Constants.CR:
                     self.state = ParserState.PS_ENDING_BOUNDARY
+
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != Constants.LF:
                     return 1
 
-                buffer_end += 1
-
                 buffer_start = idx + 1
-                buffer_end = buffer_start
 
                 self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
-                buffer_end += 1
-
                 if byte == Constants.CR:
                     self.state = ParserState.PS_ENDING_HEADER
+
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != Constants.LF:
                     return 1
 
-                buffer_end += 1
-
                 value, params = cgi.parse_header(
-                    chunk[buffer_start: buffer_end].decode('utf-8'))
+                    chunk[buffer_start: idx + 1].decode('utf-8'))
 
                 if value.startswith('Content-Disposition') and \
                         value.endswith('form-data'):
@@ -236,7 +220,7 @@ cdef class _Parser:
 
                         self.set_active_part(part)
 
-                buffer_start = buffer_end = idx + 1
+                buffer_start = idx + 1
 
                 self.state = ParserState.PS_ENDED_HEADER
             elif self.state == ParserState.PS_ENDED_HEADER:
@@ -245,15 +229,14 @@ cdef class _Parser:
                 else:
                     self.state = ParserState.PS_READING_HEADER
 
-                buffer_end += 1
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != Constants.LF:
                     return 1
 
-                buffer_start = buffer_end = idx + 1
+                buffer_start = idx + 1
+
                 self.state = ParserState.PS_READING_BODY
             elif self.state == ParserState.PS_READING_BODY:
-                buffer_end += 1
 
                 self.delimiter_finder.feed(byte)
                 self.ender_finder.feed(byte)
@@ -261,20 +244,20 @@ cdef class _Parser:
                 if self.delimiter_finder.found():
                     self.state = ParserState.PS_READING_HEADER
 
-                    if buffer_end - buffer_start > self.delimiter_length:
-                        _idx = buffer_end - self.delimiter_length
+                    if idx + 1 - buffer_start > self.delimiter_length:
+                        _idx = idx + 1 - self.delimiter_length
 
                         self.on_body(chunk[buffer_start: _idx - 2])
 
-                        buffer_start = buffer_end = idx + 1
+                        buffer_start = idx + 1
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
                 elif self.ender_finder.found():
                     self.state = ParserState.PS_END
 
-                    if buffer_end - buffer_start > self.ender_length:
-                        _idx = buffer_end - self.ender_length
+                    if idx + 1 - buffer_start > self.ender_length:
+                        _idx = idx + 1 - self.ender_length
 
                         if chunk[_idx - 1] == Constants.LF and \
                                 chunk[_idx - 2] == Constants.CR:
@@ -282,17 +265,16 @@ cdef class _Parser:
                         else:
                             self.on_body(chunk[buffer_start: _idx])
 
-                        buffer_start = buffer_end = idx + 1
+                        buffer_start = idx + 1
 
                     self.unset_active_part()
                     self.ender_finder.reset()
                 else:
                     if self.ender_finder.inactive() and \
                             self.delimiter_finder.inactive() and \
-                            buffer_end - buffer_start > Constants.MaxBufferSize:
-                        _idx = buffer_end - 3
+                            idx + 1 - buffer_start > Constants.MaxBufferSize:
 
-                        self.on_body(chunk[buffer_start: _idx])
+                        self.on_body(chunk[buffer_start: idx - 2])
 
                         buffer_start = idx - 2
             elif self.state == ParserState.PS_END:
@@ -300,7 +282,7 @@ cdef class _Parser:
             else:
                 return 1
 
-        if buffer_end - buffer_start > 0:
-            self._leftover_buffer = chunk[buffer_start: buffer_end]
+        if idx + 1 - buffer_start > 0:
+            self._leftover_buffer = chunk[buffer_start: idx + 1]
 
         return 0
