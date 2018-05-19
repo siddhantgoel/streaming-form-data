@@ -176,13 +176,15 @@ cdef class _Parser:
         return self._parse(chunk, index)
 
     cdef int _parse(self, bytes chunk, Index index):
-        cdef Index idx, buffer_start, _idx
+        cdef Index idx, buffer_start, chunk_len, _idx
         cdef Byte byte
         cdef const Byte *chunk_ptr
         chunk_ptr = chunk
+        chunk_len = len(chunk)
         buffer_start = 0
 
-        for idx in xrange(index, len(chunk)):
+        idx = index
+        while idx < chunk_len:
             byte = chunk_ptr[idx]
 
             if self.state == ParserState.PS_START:
@@ -287,16 +289,17 @@ cdef class _Parser:
             else:
                 return 1
 
+            idx += 1
 
         if self.state == ParserState.PS_READING_BODY:
             matched_length = max(self.delimiter_finder.matched_length(),
                                  self.ender_finder.matched_length())
-            _idx = idx + 1 - matched_length
+            _idx = idx - matched_length
             if _idx - buffer_start >= Constants.MinFileBodyChunkSize:
                 self.on_body(chunk[buffer_start: _idx])
                 buffer_start = _idx
 
-        if idx + 1 - buffer_start > 0:
-            self._leftover_buffer = chunk[buffer_start: idx + 1]
+        if idx - buffer_start > 0:
+            self._leftover_buffer = chunk[buffer_start: idx]
 
         return 0
