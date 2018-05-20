@@ -7,3 +7,4 @@ sphinx-autobuild==0.6.0
 sphinx-rtd-theme==0.2.4
 sphinxcontrib-websupport==1.0.1
 twine==1.8.1
+numpy==1.11.3
