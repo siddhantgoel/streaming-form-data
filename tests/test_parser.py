@@ -1,4 +1,5 @@
-import os.path
+from io import BytesIO
+from numpy import random
 from unittest import TestCase
 
 from requests_toolbelt import MultipartEncoder
@@ -7,19 +8,31 @@ from streaming_form_data import StreamingFormDataParser, ParseFailedException
 from streaming_form_data.targets import ValueTarget
 
 
-DATA_DIR = 'tests/data'
+def get_random_bytes(size, seed):
+    random.seed(seed)
+    return random.bytes(size)
 
 
-def data_file_path(filename):
-    return os.path.join(DATA_DIR, filename)
+def open_dataset(filename):
+    if filename == 'file.txt':
+        filedata = b'this is a txt file\r\n' * 10
+    elif filename == 'image-600x400.png':
+        filedata = get_random_bytes(1780, 600)
+    elif filename == 'image-2560x1600.png':
+        filedata = get_random_bytes(11742, 2560)
+    elif filename == 'image-500k.png':
+        filedata = get_random_bytes(437814, 500)
+    elif filename == 'image-high-res.jpg':
+        filedata = get_random_bytes(9450866, 945)
+    else:
+        raise Exception('Unknown file name: ' + filename)
+    return BytesIO(filedata)
 
 
-def load_file(path):
-    _, filename = os.path.split(path)
-
-    with open(path, 'rb') as file_:
+def encoded_dataset(filename):
+    with open_dataset(filename) as dataset_:
         fields = {
-            filename: (filename, file_, 'text/plain')
+            filename: (filename, dataset_, 'text/plain')
         }
 
         encoder = MultipartEncoder(fields=fields)
@@ -204,10 +217,10 @@ class StreamingFormDataParserTestCase(TestCase):
         filenames = ('file.txt', 'image-600x400.png', 'image-2560x1600.png')
 
         for filename in filenames:
-            with open(data_file_path(filename), 'rb') as file_:
-                expected_value = file_.read()
+            with open_dataset(filename) as dataset_:
+                expected_value = dataset_.read()
 
-            content_type, body = load_file(data_file_path(filename))
+            content_type, body = encoded_dataset(filename)
 
             value = ValueTarget()
 
@@ -220,10 +233,10 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(value.value, expected_value)
 
     def test_file_content_multiple(self):
-        with open(data_file_path('file.txt'), 'rb') as file_:
-            expected_value = file_.read()
+        with open_dataset('file.txt') as dataset_:
+            expected_value = dataset_.read()
 
-        content_type, body = load_file(data_file_path('file.txt'))
+        content_type, body = encoded_dataset('file.txt')
 
         txt = ValueTarget()
 
@@ -244,10 +257,10 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(txt.value, expected_value)
 
     def test_file_content_varying_chunk_size(self):
-        with open(data_file_path('file.txt'), 'rb') as file_:
-            expected_value = file_.read()
+        with open_dataset('file.txt') as dataset_:
+            expected_value = dataset_.read()
 
-        content_type, body = load_file(data_file_path('file.txt'))
+        content_type, body = encoded_dataset('file.txt')
 
         for index in range(len(body)):
             txt = ValueTarget()
@@ -262,14 +275,14 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(txt.value, expected_value)
 
     def test_mixed_content_varying_chunk_size(self):
-        with open(data_file_path('file.txt'), 'rb') as file_:
-            expected_value = file_.read()
+        with open_dataset('file.txt') as dataset_:
+            expected_value = dataset_.read()
 
-        with open(data_file_path('file.txt'), 'rb') as file_:
+        with open_dataset('file.txt') as dataset_:
             fields = {
                 'name': 'hello world',
                 'age': '10',
-                'cv.txt': ('file.txt', file_, 'text/plain')
+                'cv.txt': ('file.txt', dataset_, 'text/plain')
             }
 
             encoder = MultipartEncoder(fields=fields)
@@ -338,17 +351,17 @@ class StreamingFormDataParserTestCase(TestCase):
         txt_filename = 'file.txt'
         png_filename = 'image-600x400.png'
 
-        with open(data_file_path(txt_filename), 'rb') as file_:
-            expected_txt = file_.read()
+        with open_dataset(txt_filename) as dataset_:
+            expected_txt = dataset_.read()
 
-        with open(data_file_path(png_filename), 'rb') as file_:
-            expected_png = file_.read()
+        with open_dataset(png_filename) as dataset_:
+            expected_png = dataset_.read()
 
         txt_target = ValueTarget()
         png_target = ValueTarget()
 
-        with open(data_file_path(txt_filename), 'rb') as txt_file, \
-                open(data_file_path(png_filename), 'rb') as png_file:
+        with open_dataset(txt_filename) as txt_file, \
+                open_dataset(png_filename) as png_file:
             encoder = MultipartEncoder(fields={
                 txt_filename: (txt_filename, txt_file,
                                'application/plain'),
@@ -369,10 +382,10 @@ class StreamingFormDataParserTestCase(TestCase):
     def test_large_file(self):
         for filename in ['image-500k.png', 'image-2560x1600.png',
                          'image-600x400.png', 'image-high-res.jpg']:
-            with open(data_file_path(filename), 'rb') as file_:
-                expected_value = file_.read()
+            with open_dataset(filename) as dataset_:
+                expected_value = dataset_.read()
 
-            content_type, body = load_file(data_file_path(filename))
+            content_type, body = encoded_dataset(filename)
 
             value = ValueTarget()
 
