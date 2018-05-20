@@ -8,19 +8,20 @@ class ParseFailedException(Exception):
 
 
 def parse_content_boundary(headers):
-    content_type_header = 'Content-Type'
+    content_type = None
 
-    content_type = headers.get(content_type_header) or \
-        headers.get(content_type_header.lower()) or \
-        headers.get(content_type_header.upper())
+    for key in headers:
+        if key.lower() == 'content-type':
+            content_type = headers.get(key)
+            break
 
     if not content_type:
-        raise ParseFailedException()
+        raise ParseFailedException('Missing Content-Type header')
 
     value, params = cgi.parse_header(content_type)
 
     if not value or value.lower() != 'multipart/form-data':
-        raise ParseFailedException('Content-Type not multipart/form-data')
+        raise ParseFailedException('Content-Type is not multipart/form-data')
 
     boundary = params.get('boundary')
     if not boundary:
