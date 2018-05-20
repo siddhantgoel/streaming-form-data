@@ -40,6 +40,7 @@ Installation
 ------------
 
 .. code-block:: bash
+
     $ pip install streaming-form-data
 
 In case you prefer cloning the Github repository and installing manually, please
