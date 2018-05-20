@@ -36,6 +36,16 @@ Please note, that this library has only been tested with Python 3 (specifically,
 versions 3.3, 3.4, 3.5, and 3.6). Python 2.7 is not supported yet, but pull
 requests are always welcome!
 
+Installation
+------------
+
+.. code-block:: bash
+    $ pip install streaming-form-data
+
+In case you prefer cloning the Github repository and installing manually, please
+note that :code:`master` is the development branch, so :code:`stable` is what
+you should be cloning.
+
 Usage
 -----
 
