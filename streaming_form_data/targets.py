@@ -7,6 +7,22 @@ class BaseTarget:
     data_received.
     """
 
+    def __init__(self):
+        self.multipart_filename = None
+
+    # 'multipart_filename ' is filled before start() call.
+    # It contains optional 'filename' value from 'Content-Disposition' header
+    # Default value is None in case 'filename' is not present.
+    #
+    # NOTE! You should be very careful with this value
+    #       because it comes from the user.
+    #       You should never use it without filtering
+    #       to construct filename on disk.
+    #
+    #       Example library for filtering user strings
+    #       for use in URLs, filenames:
+    #       https://github.com/un33k/python-slugify
+
     def start(self):
         pass
 
@@ -18,12 +34,16 @@ class BaseTarget:
 
 
 class NullTarget(BaseTarget):
+    def __init__(self):
+        super().__init__()
+
     def data_received(self, chunk):
         pass
 
 
 class ValueTarget(BaseTarget):
     def __init__(self):
+        super().__init__()
         self._values = []
 
     def data_received(self, chunk):
@@ -35,25 +55,26 @@ class ValueTarget(BaseTarget):
 
 
 class FileTarget(BaseTarget):
-    def __init__(self, filename):
+    def __init__(self, filename, allow_overwrite=True):
+        super().__init__()
         self.filename = filename
 
+        self._openmode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
 
     def start(self):
-        self._fd = open(self.filename, 'wb')
+        self._fd = open(self.filename, self._openmode)
 
     def data_received(self, chunk):
         self._fd.write(chunk)
-        self._fd.flush()
 
     def finish(self):
-        self._fd.flush()
         self._fd.close()
 
 
 class SHA256Target(BaseTarget):
     def __init__(self):
+        super().__init__()
         self._hash = hashlib.sha256()
 
     def data_received(self, chunk):

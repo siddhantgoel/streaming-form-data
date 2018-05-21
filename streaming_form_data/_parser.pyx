@@ -66,6 +66,9 @@ class Part:
 
         self._reading = False
 
+    def set_multipart_filename(self, value):
+        self.target.multipart_filename = value
+
     def start(self):
         self._reading = True
         self.target.start()
@@ -229,6 +232,7 @@ cdef class _Parser:
                     name = params.get('name')
                     if name:
                         part = self._part_for(name) or self.default_part
+                        part.set_multipart_filename(params.get('filename'))
                         part.start()
 
                         self.set_active_part(part)
