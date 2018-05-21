@@ -34,9 +34,6 @@ class BaseTarget:
 
 
 class NullTarget(BaseTarget):
-    def __init__(self):
-        super().__init__()
-
     def data_received(self, chunk):
         pass
 
@@ -44,6 +41,7 @@ class NullTarget(BaseTarget):
 class ValueTarget(BaseTarget):
     def __init__(self):
         super().__init__()
+
         self._values = []
 
     def data_received(self, chunk):
@@ -57,6 +55,7 @@ class ValueTarget(BaseTarget):
 class FileTarget(BaseTarget):
     def __init__(self, filename, allow_overwrite=True):
         super().__init__()
+
         self.filename = filename
 
         self._openmode = 'wb' if allow_overwrite else 'xb'
@@ -75,6 +74,7 @@ class FileTarget(BaseTarget):
 class SHA256Target(BaseTarget):
     def __init__(self):
         super().__init__()
+
         self._hash = hashlib.sha256()
 
     def data_received(self, chunk):
