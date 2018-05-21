@@ -12,14 +12,13 @@ help:
 	@:
 
 clean:
-	rm -f $(shell find streaming_form_data -maxdepth 1 -name "*.pyd")
-	rm -rf build
-	rm -rf dist
+	rm -rf build/
+	rm -rf dist/
 	rm -rf streaming_form_data.egg-info
 
-requirements_output  := build/requirements.touch
+cython_file          := streaming_form_data/_parser.pyx
 install_local_output := build/install.touch
-cython_file := streaming_form_data/_parser.pyx
+requirements_output  := build/requirements.touch
 
 test-all: build test speedtest profile annotate ;
 
@@ -40,16 +39,17 @@ speedtest: $(install_local_output)
 	python utils/speedtest.py
 
 profile: $(install_local_output)
-	python utils/benchmark.py --data-size 17555000 -c binary/octet-stream
+	python utils/profile.py --data-size 17555000 -c binary/octet-stream
 
 annotate: $(requirements_output)
 	mkdir -p build
 	cython -a $(cython_file) -o build/annotation.html
 
-# list all targets which names does not match any real file name
+# All targets where the names do not match any real file name
+
 .PHONY: help clean test-all build upload install_local test speedtest profile annotate
 
-# Real file rules begin
+# Real file rules
 
 library_inputs := setup.py \
                   $(shell find streaming_form_data -maxdepth 1 -name "*.py") \
