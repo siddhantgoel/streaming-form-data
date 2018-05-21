@@ -58,25 +58,34 @@ the registered :code:`Target` class which will then decide what to do with it.
 In case there's a part which is not needed, it can be associated to a
 :code:`NullTarget` object and it will be discarded.
 
+If the :code:`Content-Disposition` header included the :code:`filename`
+directive, this value will be available as the :code:`self.multipart_filename`
+attribute in :code:`Target` classes.
+
 
 API
 ---
 
-The API has two main points of entry:
+:code:`StreamingFormDataParser`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- :code:`StreamingFormDataParser` class - This is the main entry point, and
-  expects a dictionary of request :code:`headers`. These headers are used to
-  determine the input :code:`Content-Type`.
-- :code:`Target` class(es) - When registering inputs with the parser, instances
-  of subclasses of the :code:`Target` class should be used, since these targets
-  ultimately determine what to do with the data.
+This class is the main entry point, and expects a dictionary of request
+:code:`headers`. These headers are used to determine the input
+:code:`Content-Type`.
 
-Currently the following three :code:`Target` classes are included with this
-library.
+:code:`Target` classes
+~~~~~~~~~~~~~~~~~~~~~~
+
+When registering inputs with the parser, instances of subclasses of the
+:code:`Target` class should be used, since these targets ultimately determine
+what to do with the data.
+
+Currently the following :code:`Target` classes are included with this library.
 
 - :code:`ValueTarget` - holds the input in memory
 - :code:`FileTarget` - pipes the input to a file on disk
 - :code:`SHA256Target` - computes the SHA-256 hash of the input
+- :code:`NullTarget` - discards the input completely
 
 Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
 and define a :code:`data_received` function.
