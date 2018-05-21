@@ -580,3 +580,41 @@ Foo
 
         self.assertRaises(ParseFailedException, parser.register,
                           'name', ValueTarget())
+
+    def test_missing_filename_directive(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"
+
+Foo
+--1234--
+'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget()
+
+        self.assertFalse(target.multipart_filename)
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
+
+        parser.data_received(data)
+
+        self.assertEqual(target.value, b'Foo')
+        self.assertFalse(target.multipart_filename)
+
+    def test_filename_passed_to_target(self):
+        filename = 'file.txt'
+
+        content_type, body = encoded_dataset(filename)
+
+        target = ValueTarget()
+
+        self.assertFalse(target.multipart_filename)
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': content_type})
+        parser.register(filename, target)
+        parser.data_received(body)
+
+        self.assertEqual(target.multipart_filename, filename)
