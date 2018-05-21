@@ -232,6 +232,7 @@ cdef class _Parser:
                     name = params.get('name')
                     if name:
                         part = self._part_for(name) or self.default_part
+
                         part.set_multipart_filename(params.get('filename'))
                         part.start()
 
