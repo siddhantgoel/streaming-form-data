@@ -9,6 +9,8 @@ v0.5.0
 - Add example usage for :code:`bottle` framework (thanks @kolomenkin)
 - Refactor tests to work with random bytes instead of increasing repository size
   with test files (thanks @kolomenkin)
+- Make :code:`Content-Type` header lookups truly case-insensitive (mixed cases
+  also allowed) (thanks @kolomenkin)
 
 v0.4.5
 ------
