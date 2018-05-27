@@ -35,8 +35,15 @@ cdef class Finder:
 
     cpdef feed(self, Byte byte):
         if byte != self.target_ptr[self.index]:
-            self.state = FinderState.FS_START
-            self.index = 0
+            if self.state != FinderState.FS_START:
+                self.state = FinderState.FS_START
+                self.index = 0
+                # try matching substring
+                # This is not universal code, but the code specialized from multipart delimiters
+                # (length is at least 5 bytes, starting with \r\n and has no \r\n in the middle)
+                if byte == self.target_ptr[0]:
+                    self.state = FinderState.FS_WORKING
+                    self.index = 1
         else:
             self.state = FinderState.FS_WORKING
             self.index += 1
@@ -109,7 +116,6 @@ cdef enum ParserState:
 
 
 cdef class _Parser:
-    cdef bytes delimiter, ender
     cdef ParserState state
     cdef Finder delimiter_finder, ender_finder
     cdef Index delimiter_length, ender_length
@@ -119,9 +125,6 @@ cdef class _Parser:
     cdef bytes _leftover_buffer
 
     def __init__(self, delimiter, ender):
-        self.delimiter = delimiter
-        self.ender = ender
-
         self.delimiter_finder = Finder(delimiter)
         self.ender_finder = Finder(ender)
 
@@ -150,7 +153,7 @@ cdef class _Parser:
         self.set_active_part(None)
 
     cdef on_body(self, bytes value):
-        if self.active_part:
+        if self.active_part and len(value) > 0:
             self.active_part.data_received(value)
 
     cdef _part_for(self, name):
@@ -176,7 +179,8 @@ cdef class _Parser:
         return self._parse(chunk, index)
 
     cdef int _parse(self, bytes chunk, Index index):
-        cdef Index idx, buffer_start, chunk_len, _idx
+        cdef Index idx, buffer_start, chunk_len
+        cdef Index match_start, skip_count, matched_length
         cdef Byte byte
         cdef const Byte *chunk_ptr
         chunk_ptr = chunk
@@ -204,6 +208,11 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != Constants.LF:
                     return 30
+                if buffer_start != 0:
+                    return 40
+                # ensure we have read correct starting delimiter
+                if b'\r\n' + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
+                    return 50
 
                 buffer_start = idx + 1
 
@@ -254,10 +263,12 @@ cdef class _Parser:
                 if self.delimiter_finder.found():
                     self.state = ParserState.PS_READING_HEADER
 
-                    _idx = idx - self.delimiter_length
+                    if idx + 1 < self.delimiter_length:
+                        return 80
+                    match_start = idx + 1 - self.delimiter_length
 
-                    if _idx > buffer_start:
-                        self.on_body(chunk[buffer_start: _idx - 1])
+                    if match_start >= buffer_start:
+                        self.on_body(chunk[buffer_start: match_start])
 
                         buffer_start = idx + 1
                     else:
@@ -269,14 +280,12 @@ cdef class _Parser:
                 elif self.ender_finder.found():
                     self.state = ParserState.PS_END
 
-                    _idx = idx - self.ender_length
+                    if idx + 1 < self.ender_length:
+                        return 100
+                    match_start = idx + 1 - self.ender_length
 
-                    if _idx > buffer_start:
-                        if chunk_ptr[_idx] == Constants.LF and \
-                                chunk_ptr[_idx - 1] == Constants.CR:
-                            self.on_body(chunk[buffer_start: _idx - 1])
-                        else:
-                            self.on_body(chunk[buffer_start: _idx + 1])
+                    if match_start >= buffer_start:
+                         self.on_body(chunk[buffer_start: match_start])
                     else:
                         return 110
 
@@ -291,13 +300,18 @@ cdef class _Parser:
 
             idx += 1
 
+        if idx != chunk_len:
+            return 140
+        if buffer_start > chunk_len:
+            return 150
+
         if self.state == ParserState.PS_READING_BODY:
             matched_length = max(self.delimiter_finder.matched_length(),
                                  self.ender_finder.matched_length())
-            _idx = idx - matched_length
-            if _idx - buffer_start >= Constants.MinFileBodyChunkSize:
-                self.on_body(chunk[buffer_start: _idx])
-                buffer_start = _idx
+            match_start = idx - matched_length
+            if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
+                self.on_body(chunk[buffer_start: match_start])
+                buffer_start = match_start
 
         if idx - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: idx]
