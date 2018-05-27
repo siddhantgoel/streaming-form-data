@@ -189,12 +189,12 @@ cdef class _Parser:
 
             if self.state == ParserState.PS_START:
                 if byte != Constants.Hyphen:
-                    return 1
+                    return 10
 
                 self.state = ParserState.PS_STARTING_BOUNDARY
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != Constants.Hyphen:
-                    return 1
+                    return 20
 
                 self.state = ParserState.PS_READING_BOUNDARY
             elif self.state == ParserState.PS_READING_BOUNDARY:
@@ -203,7 +203,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != Constants.LF:
-                    return 1
+                    return 30
 
                 buffer_start = idx + 1
 
@@ -214,7 +214,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != Constants.LF:
-                    return 1
+                    return 60
 
                 value, params = cgi.parse_header(
                     chunk[buffer_start: idx + 1].decode('utf-8'))
@@ -241,7 +241,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != Constants.LF:
-                    return 1
+                    return 70
 
                 buffer_start = idx + 1
 
@@ -261,7 +261,7 @@ cdef class _Parser:
 
                         buffer_start = idx + 1
                     else:
-                        return 1
+                        return 90
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
@@ -278,7 +278,7 @@ cdef class _Parser:
                         else:
                             self.on_body(chunk[buffer_start: _idx + 1])
                     else:
-                        return 1
+                        return 110
 
                     buffer_start = idx + 1
 
@@ -287,7 +287,7 @@ cdef class _Parser:
             elif self.state == ParserState.PS_END:
                 return 0
             else:
-                return 1
+                return 120
 
             idx += 1
 
