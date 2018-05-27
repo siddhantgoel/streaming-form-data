@@ -16,6 +16,7 @@ cdef enum FinderState:
     FS_START, FS_WORKING, FS_END
 
 
+# Knuth-Morris-Pratt algorithm
 cdef class Finder:
     cdef bytes target
     cdef Index index
@@ -206,16 +207,8 @@ cdef class _Parser:
 
                 buffer_end += 1
 
-                if buffer_end - buffer_start < 4:
-                    return 1
-
-                if chunk[buffer_start] == Constants.Hyphen and \
-                        chunk[buffer_start + 1] == Constants.Hyphen and \
-                        chunk[buffer_end - 1] == Constants.Hyphen and \
-                        chunk[buffer_end - 2] == Constants.Hyphen:
-                    self.state = ParserState.PS_END
-
-                buffer_start = buffer_end = idx + 1
+                buffer_start = idx + 1
+                buffer_end = buffer_start
 
                 self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
