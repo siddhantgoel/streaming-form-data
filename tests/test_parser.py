@@ -561,23 +561,6 @@ Foo
 
         self.assertEqual(target.value, b'')
 
-    def test_line_does_not_end_with_correct_linebreak(self):
-        data = b'''\
---1234
-Content-Disposition: form-data; name="files"; filename="ab.txt"
-
-Foo--1234--'''.replace(b'\n', b'\r\n')
-
-        target = ValueTarget()
-
-        parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
-        parser.register('files', target)
-
-        parser.data_received(data)
-
-        self.assertEqual(target.value, b'Foo')
-
     def test_without_name_parameter(self):
         data = b'''\
 --1234
