@@ -292,11 +292,11 @@ cdef class _Parser:
                     if self.ender_finder.inactive() and \
                             self.delimiter_finder.inactive() and \
                             buffer_end - buffer_start > Constants.MaxBufferSize:
-                        _idx = buffer_end - 1
+                        _idx = buffer_end - 3
 
                         self.on_body(chunk[buffer_start: _idx])
 
-                        buffer_start = idx
+                        buffer_start = idx - 2
             elif self.state == ParserState.PS_END:
                 return 0
             else:
