@@ -97,6 +97,10 @@ def main():
             print('ERROR! Decoded data mismatch! Orig size: ',
                   len(filedata), '; got size:', len(result))
             print('-------------------------------------------')
+        if not target._finished:
+            print('-------------------------------------------')
+            print('ERROR! Data decoding is not complete!')
+            print('-------------------------------------------')
 
     time_diff = end_time - begin_time
     print('Test took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB' %

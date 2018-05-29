@@ -115,8 +115,11 @@ class CustomTargetTestCase(TestCase):
         self.assertEqual(target.value, b'')
 
         target.multipart_filename = 'file.txt'
+        self.assertEqual(target._started, False)
+        self.assertEqual(target._finished, False)
 
         target.start()
+        target._started = True
         self.assertEqual(target.multipart_filename, 'file.txt')
         self.assertEqual(target.value, b'[start]')
 
@@ -126,10 +129,13 @@ class CustomTargetTestCase(TestCase):
         target.data_received(b'chunk3')
 
         target.finish()
+        target._finished = True
 
         self.assertEqual(target.multipart_filename, 'file.txt')
         self.assertEqual(target.value,
                          b'[start] chunk1 chunk2 chunk3 [finish]')
+        self.assertEqual(target._started, True)
+        self.assertEqual(target._finished, True)
 
     def test_not_sent(self):
         target = CustomTarget()

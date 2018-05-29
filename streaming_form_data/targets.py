@@ -10,6 +10,9 @@ class BaseTarget:
     def __init__(self):
         self.multipart_filename = None
 
+        self._started = False
+        self._finished = False
+
     # 'multipart_filename ' is filled before start() call.
     # It contains optional 'filename' value from 'Content-Disposition' header
     # Default value is None in case 'filename' is not present.

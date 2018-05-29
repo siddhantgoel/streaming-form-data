@@ -72,6 +72,7 @@ class Part:
     def start(self):
         self._reading = True
         self.target.start()
+        self.target._started = True
 
     def data_received(self, chunk):
         self.target.data_received(chunk)
@@ -79,6 +80,7 @@ class Part:
     def finish(self):
         self._reading = False
         self.target.finish()
+        self.target._finished = True
 
     @property
     def is_reading(self):

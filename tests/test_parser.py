@@ -61,6 +61,8 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello world')
+        self.assertEqual(target._started, True)
+        self.assertEqual(target._finished, True)
 
     def test_case_insensitive_content_type(self):
         content_type_header = 'Content-Type'
@@ -418,6 +420,8 @@ Foo
         parser.data_received(data)
 
         self.assertEqual(target.value, b'Foo')
+        self.assertEqual(target._started, True)
+        self.assertEqual(target._finished, True)
 
     def test_unquoted_names(self):
         data = b'''\
