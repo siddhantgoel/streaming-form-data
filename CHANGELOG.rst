@@ -5,12 +5,12 @@ v0.5.0
 ------
 - Make :code:`filename` (from the :code:`Content-Disposition` header) available
   as the :code:`self.multipart_filename` attribute in :code:`Target` classes
-  (thanks @kolomenkin)
-- Add example usage for :code:`bottle` framework (thanks @kolomenkin)
+  (thanks `@kolomenkin`_)
+- Add example usage for :code:`bottle` framework (thanks `@kolomenkin`_)
 - Refactor tests to work with random bytes instead of increasing repository size
-  with test files (thanks @kolomenkin)
+  with test files (thanks `@kolomenkin`_)
 - Make :code:`Content-Type` header lookups truly case-insensitive (mixed cases
-  also allowed) (thanks @kolomenkin)
+  also allowed) (thanks `@kolomenkin`_)
 
 v0.4.5
 ------
@@ -69,3 +69,6 @@ v0.3.0
 ------
 
 - Initial release
+
+
+.. _@kolomenkin: https://github.com/kolomenkin
