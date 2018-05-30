@@ -42,13 +42,23 @@ class NullTarget(BaseTarget):
 
 
 class ValueTarget(BaseTarget):
-    def __init__(self):
+    def __init__(self, max_length=-1):
         super().__init__()
+
+        self._max_length = max_length
+        self._length = 0
 
         self._values = []
 
     def data_received(self, chunk):
+        new_length = self._length + len(chunk)
+
+        if self._max_length > -1 and new_length > self._max_length:
+            raise ValueError(
+                'Value exceeds max length of {}'.format(self._max_length))
+
         self._values.append(chunk)
+        self._length = new_length
 
     @property
     def value(self):

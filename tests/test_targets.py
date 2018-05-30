@@ -51,6 +51,19 @@ class ValueTargetTestCase(TestCase):
         self.assertEqual(target.value, b'')
         self.assertTrue(target.multipart_filename is None)
 
+    def test_exceed_max_length(self):
+        target = ValueTarget(max_length=8)
+
+        target.start()
+
+        target.data_received(b'hello')
+        target.data_received(b' ')
+        with self.assertRaises(ValueError) as context:
+            target.data_received(b'world')
+
+        self.assertEqual(
+            'Value exceeds max length of 8', str(context.exception))
+
 
 class FileTargetTestCase(TestCase):
     def test_basic(self):
