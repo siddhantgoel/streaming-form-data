@@ -1,9 +1,9 @@
 from io import BytesIO
 from itertools import chain
 import math
-from numpy import random
 from unittest import TestCase
 
+from numpy import random
 from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import StreamingFormDataParser
@@ -181,7 +181,6 @@ class ParserTestCaseBase(TestCase):
 
 
 class DifferentChunksTestCase(ParserTestCaseBase):
-
     def test_basic_last_attach(self):
         data = get_random_bytes(1024 * 1024, 159)
         self.do_test(data, 'random_bytes', True)
@@ -199,7 +198,6 @@ class DifferentChunksTestCase(ParserTestCaseBase):
         self.do_test(data, 'hyphens_crlfs', False)
 
     def do_test(self, original_data, dataset_name, last_part):
-
         with BytesIO(original_data) as dataset_:
             if last_part:
                 fields = {
@@ -231,7 +229,6 @@ class DifferentChunksTestCase(ParserTestCaseBase):
 
 
 class DifferentFileSizesTestCase(ParserTestCaseBase):
-
     def test_basic(self):
         data = get_random_bytes(get_max_useful_number(), 137)
         self.do_test(data, 'random_bytes')
@@ -241,7 +238,6 @@ class DifferentFileSizesTestCase(ParserTestCaseBase):
         self.do_test(data, 'hyphens_crlfs')
 
     def do_test(self, data, dataset_name):
-
         useful_numbers = get_useful_numbers()
 
         idx = 0
@@ -265,13 +261,11 @@ class DifferentFileSizesTestCase(ParserTestCaseBase):
 
 
 class StressMatrixTestCase(ParserTestCaseBase):
-
     def test_basic(self):
         data = get_random_bytes(get_max_useful_number(), 171)
         self.do_test(data, 'random_bytes')
 
     def do_test(self, data, dataset_name):
-
         useful_numbers = get_useful_numbers(short_list=True)
         self.assertEqual(len(useful_numbers), 140)
 
