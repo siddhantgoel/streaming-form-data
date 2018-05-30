@@ -8,29 +8,29 @@ from time import time
 
 class DummyTarget(BaseTarget):
     def __init__(self, print_report, gather_data):
-        self.print_report = print_report
-        self.gather_data = gather_data
-        self.result = bytearray()
+        self._print_report = print_report
+        self._gather_data = gather_data
+        self._values = []
 
     def start(self):
-        if self.print_report:
+        if self._print_report:
             print('DummyTarget: start')
 
     def data_received(self, chunk):
-        if self.print_report:
+        if self._print_report:
             print('DummyTarget: data_received:', len(chunk), 'bytes')
-        if self.gather_data:
-            self.result += chunk
+        if self._gather_data:
+            self._values.append(chunk)
 
     def finish(self):
-        if self.print_report:
+        if self._print_report:
             print('DummyTarget: finish')
 
     def get_result(self):
-        return self.result
+        return b''.join(self._values)
 
 
-def fill_bytes_random_fast(size):
+def fill_bytes_random(size):
     random.seed(42)
     return random.bytes(size)
 
@@ -43,8 +43,7 @@ def main():
     mebibyte = kibibyte * kibibyte
     filedata_size = 40 * mebibyte
 
-    filedata = fill_bytes_random_fast(filedata_size)
-    # print('data sample:', filedata[0:100])
+    filedata = fill_bytes_random(filedata_size)
 
     with BytesIO(filedata) as fd:
         content_type = 'binary/octet-stream'
@@ -97,6 +96,10 @@ def main():
             print('-------------------------------------------')
             print('ERROR! Decoded data mismatch! Orig size: ',
                   len(filedata), '; got size:', len(result))
+            print('-------------------------------------------')
+        if not target._finished:
+            print('-------------------------------------------')
+            print('ERROR! Data decoding is not complete!')
             print('-------------------------------------------')
 
     time_diff = end_time - begin_time

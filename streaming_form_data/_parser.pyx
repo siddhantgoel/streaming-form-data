@@ -72,6 +72,7 @@ class Part:
     def start(self):
         self._reading = True
         self.target.start()
+        self.target._started = True
 
     def data_received(self, chunk):
         self.target.data_received(chunk)
@@ -79,6 +80,7 @@ class Part:
     def finish(self):
         self._reading = False
         self.target.finish()
+        self.target._finished = True
 
     @property
     def is_reading(self):
@@ -292,11 +294,11 @@ cdef class _Parser:
                     if self.ender_finder.inactive() and \
                             self.delimiter_finder.inactive() and \
                             buffer_end - buffer_start > Constants.MaxBufferSize:
-                        _idx = buffer_end - 1
+                        _idx = buffer_end - 3
 
                         self.on_body(chunk[buffer_start: _idx])
 
-                        buffer_start = idx
+                        buffer_start = idx - 2
             elif self.state == ParserState.PS_END:
                 return 0
             else:
