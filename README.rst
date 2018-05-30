@@ -1,7 +1,7 @@
 Streaming multipart/form-data parser
 ====================================
 
-.. image:: https://travis-ci.org/siddhantgoel/streaming-form-data.svg?branch=master
+.. image:: https://travis-ci.org/siddhantgoel/streaming-form-data.svg?branch=stable
     :target: https://travis-ci.org/siddhantgoel/streaming-form-data
 
 .. image:: https://badge.fury.io/py/streaming-form-data.svg
