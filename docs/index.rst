@@ -94,12 +94,11 @@ and define a :code:`data_received` function.
 Examples
 --------
 
-Most of the testing has been done using the :code:`Tornado` web framework which
-allows reading HTTP request data as it arrives in chunks. If you'd like to
-document usage with another web framework (which ideally allows chunked reads),
-please open an issue or a pull request. 🙂
+- :code:`Bottle` - https://git.io/vhCUy
+- :code:`Tornado` - https://git.io/vhCUM
 
-- :code:`Tornado` - https://git.io/vHeqQ
+If you'd like to document usage with another web framework (which ideally
+allows chunked HTTP reads), please open an issue or a pull request.
 
 
 .. toctree::
