@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v0.5.1
+------
+- Fix parser bug which could lead to spurious CR or CRLF being added to the end
+  of transferred form field value (thanks `@kolomenkin`_)
+
 v0.5.0
 ------
 - Make :code:`filename` (from the :code:`Content-Disposition` header) available
