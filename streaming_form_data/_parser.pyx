@@ -3,7 +3,6 @@ import cgi
 from streaming_form_data.targets import NullTarget
 
 ctypedef unsigned char Byte
-ctypedef size_t Index
 
 cdef enum Constants:
     Hyphen = 45
@@ -20,7 +19,7 @@ cdef enum FinderState:
 cdef class Finder:
     cdef bytes target
     cdef const Byte *target_ptr
-    cdef Index target_len, index
+    cdef size_t target_len, index
     cdef FinderState state
 
     def __init__(self, target):
@@ -68,7 +67,7 @@ cdef class Finder:
     cpdef bint found(self):  # cpdef for access from tests
         return self.state == FinderState.FS_END
 
-    cdef Index matched_length(self):
+    cdef size_t matched_length(self):
         return self.index
 
 
@@ -110,7 +109,7 @@ cdef enum ParserState:
 cdef class _Parser:
     cdef ParserState state
     cdef Finder delimiter_finder, ender_finder
-    cdef Index delimiter_length, ender_length
+    cdef size_t delimiter_length, ender_length
     cdef object expected_parts
     cdef object active_part, default_part
 
@@ -160,7 +159,7 @@ cdef class _Parser:
             return 0
 
         cdef bytes chunk
-        cdef Index index
+        cdef size_t index
 
         if self._leftover_buffer:
             chunk = self._leftover_buffer + data
@@ -172,9 +171,9 @@ cdef class _Parser:
 
         return self._parse(chunk, index)
 
-    def _parse(self, bytes chunk, Index index):
-        cdef Index idx, buffer_start, chunk_len
-        cdef Index match_start, skip_count, matched_length
+    def _parse(self, bytes chunk, size_t index):
+        cdef size_t idx, buffer_start, chunk_len
+        cdef size_t match_start, skip_count, matched_length
         cdef Byte byte
         cdef const Byte *chunk_ptr
         chunk_ptr = chunk
@@ -322,9 +321,9 @@ cdef class _Parser:
     # rewind_fast_forward is searching for "\r\n--" sequence in provided buffer.
     # It returns number of chars which can be skipped before delimiter starts (including potential 4-byte match).
     # It may also update Finder object state.
-    cdef Index rewind_fast_forward(self, const Byte *chunk_ptr, Index pos_first, Index pos_last):
+    cdef size_t rewind_fast_forward(self, const Byte *chunk_ptr, size_t pos_first, size_t pos_last):
         cdef const Byte *ptr, *ptr_end
-        cdef Index skipped
+        cdef size_t skipped
 
         # algorithm needs at least 4 chars in buffer
         if pos_first + 3 > pos_last:
