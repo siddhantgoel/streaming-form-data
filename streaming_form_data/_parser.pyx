@@ -33,7 +33,7 @@ cdef class Finder:
         self.index = 0
         self.state = FinderState.FS_START
 
-    cpdef feed(self, Byte byte):
+    cpdef feed(self, Byte byte):  # cpdef for access from tests
         if byte != self.target_ptr[self.index]:
             if self.state != FinderState.FS_START:
                 self.state = FinderState.FS_START
@@ -51,24 +51,24 @@ cdef class Finder:
             if self.index == self.target_len:
                 self.state = FinderState.FS_END
 
-    cpdef reset(self):
+    cdef reset(self):
         self.state = FinderState.FS_START
         self.index = 0
 
-    @property
+    @property  # for access from tests
     def target(self):
         return self.target
 
-    cpdef bint inactive(self):
+    cpdef bint inactive(self):  # cpdef for access from tests
         return self.state == FinderState.FS_START
 
-    cpdef bint active(self):
+    cpdef bint active(self):  # cpdef for access from tests
         return self.state == FinderState.FS_WORKING
 
-    cpdef bint found(self):
+    cpdef bint found(self):  # cpdef for access from tests
         return self.state == FinderState.FS_END
 
-    cpdef Index matched_length(self):
+    cdef Index matched_length(self):
         return self.index
 
 
@@ -80,13 +80,10 @@ class Part:
         self.name = name
         self.target = target
 
-        self._reading = False
-
     def set_multipart_filename(self, value):
         self.target.multipart_filename = value
 
     def start(self):
-        self._reading = True
         self.target.start()
         self.target._started = True
 
@@ -94,13 +91,8 @@ class Part:
         self.target.data_received(chunk)
 
     def finish(self):
-        self._reading = False
         self.target.finish()
         self.target._finished = True
-
-    @property
-    def is_reading(self):
-        return self._reading
 
 
 cdef enum ParserState:
@@ -140,19 +132,21 @@ cdef class _Parser:
 
         self._leftover_buffer = None
 
-    cpdef register(self, str name, object target):
+    def register(self, str name, object target):
         if not self._part_for(name):
             self.expected_parts.append(Part(name, target))
 
-    cdef set_active_part(self, part):
+    def set_active_part(self, part, filename):
         self.active_part = part
+        self.active_part.set_multipart_filename(filename)
+        self.active_part.start()
 
-    cdef unset_active_part(self):
+    def unset_active_part(self):
         if self.active_part:
             self.active_part.finish()
-        self.set_active_part(None)
+        self.active_part = None
 
-    cdef on_body(self, bytes value):
+    def on_body(self, bytes value):
         if self.active_part and len(value) > 0:
             self.active_part.data_received(value)
 
@@ -161,7 +155,7 @@ cdef class _Parser:
             if part.name == name:
                 return part
 
-    cpdef int data_received(self, bytes data):
+    def data_received(self, bytes data):
         if not data:
             return 0
 
@@ -178,7 +172,7 @@ cdef class _Parser:
 
         return self._parse(chunk, index)
 
-    cdef int _parse(self, bytes chunk, Index index):
+    def _parse(self, bytes chunk, Index index):
         cdef Index idx, buffer_start, chunk_len
         cdef Index match_start, skip_count, matched_length
         cdef Byte byte
@@ -233,11 +227,7 @@ cdef class _Parser:
                     name = params.get('name')
                     if name:
                         part = self._part_for(name) or self.default_part
-
-                        part.set_multipart_filename(params.get('filename'))
-                        part.start()
-
-                        self.set_active_part(part)
+                        self.set_active_part(part, params.get('filename'))
 
                 buffer_start = idx + 1
 
