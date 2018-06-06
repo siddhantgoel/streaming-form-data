@@ -6,13 +6,19 @@ ctypedef unsigned char Byte
 
 cdef enum Constants:
     Hyphen = 45
-    CR = 13
-    LF = 10
+    CR     = 13
+    LF     = 10
     MinFileBodyChunkSize = 1024
 
 
 cdef enum FinderState:
     FS_START, FS_WORKING, FS_END
+
+
+cdef enum ErrorGroup:
+    Internal    = 100  # 100..199: internal program errors (asserts)
+    Delimiting  = 200  # 200..299: problems with delimiting multipart stream into parts
+    PartHeaders = 300  # 300..399: problems with parsing particular part headers
 
 
 # Knuth-Morris-Pratt algorithm
@@ -186,12 +192,12 @@ cdef class _Parser:
 
             if self.state == ParserState.PS_START:
                 if byte != Constants.Hyphen:
-                    return 10
+                    return ErrorGroup.Delimiting + 1
 
                 self.state = ParserState.PS_STARTING_BOUNDARY
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != Constants.Hyphen:
-                    return 20
+                    return ErrorGroup.Delimiting + 2
 
                 self.state = ParserState.PS_READING_BOUNDARY
             elif self.state == ParserState.PS_READING_BOUNDARY:
@@ -200,12 +206,12 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != Constants.LF:
-                    return 30
+                    return ErrorGroup.Delimiting + 3
                 if buffer_start != 0:
-                    return 40
+                    return ErrorGroup.Delimiting + 4
                 # ensure we have read correct starting delimiter
                 if b'\r\n' + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
-                    return 50
+                    return ErrorGroup.Delimiting + 5
 
                 buffer_start = idx + 1
 
@@ -216,7 +222,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != Constants.LF:
-                    return 60
+                    return ErrorGroup.PartHeaders + 1
 
                 value, params = cgi.parse_header(
                     chunk[buffer_start: idx + 1].decode('utf-8'))
@@ -239,7 +245,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != Constants.LF:
-                    return 70
+                    return ErrorGroup.PartHeaders + 2
 
                 buffer_start = idx + 1
 
@@ -253,7 +259,7 @@ cdef class _Parser:
                     self.state = ParserState.PS_READING_HEADER
 
                     if idx + 1 < self.delimiter_length:
-                        return 80
+                        return ErrorGroup.Internal + 1
                     match_start = idx + 1 - self.delimiter_length
 
                     if match_start >= buffer_start:
@@ -261,7 +267,7 @@ cdef class _Parser:
 
                         buffer_start = idx + 1
                     else:
-                        return 90
+                        return ErrorGroup.Internal + 2
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
@@ -270,13 +276,13 @@ cdef class _Parser:
                     self.state = ParserState.PS_END
 
                     if idx + 1 < self.ender_length:
-                        return 100
+                        return ErrorGroup.Internal + 3
                     match_start = idx + 1 - self.ender_length
 
                     if match_start >= buffer_start:
                          self.on_body(chunk[buffer_start: match_start])
                     else:
-                        return 110
+                        return ErrorGroup.Internal + 4
 
                     buffer_start = idx + 1
 
@@ -296,14 +302,14 @@ cdef class _Parser:
             elif self.state == ParserState.PS_END:
                 return 0
             else:
-                return 120
+                return ErrorGroup.Internal + 5
 
             idx += 1
 
         if idx != chunk_len:
-            return 140
+            return ErrorGroup.Internal + 6
         if buffer_start > chunk_len:
-            return 150
+            return ErrorGroup.Internal + 7
 
         if self.state == ParserState.PS_READING_BODY:
             matched_length = max(self.delimiter_finder.matched_length(),
