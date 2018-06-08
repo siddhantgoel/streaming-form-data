@@ -41,7 +41,7 @@ def main():
 
     kibibyte = 1024
     mebibyte = kibibyte * kibibyte
-    filedata_size = 40 * mebibyte
+    filedata_size = 400 * mebibyte
 
     filedata = fill_bytes_random(filedata_size)
 

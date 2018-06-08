@@ -36,9 +36,8 @@ class StreamingFormDataParser:
 
         raw_boundary = parse_content_boundary(headers)
 
-        boundary = b'--' + raw_boundary
-        delimiter = boundary + b'\r\n'
-        ender = boundary + b'--'
+        delimiter = b'\r\n--' + raw_boundary + b'\r\n'
+        ender = b'\r\n--' + raw_boundary + b'--'
 
         self._parser = _Parser(delimiter, ender)
 
@@ -55,5 +54,7 @@ class StreamingFormDataParser:
         if not self._running:
             self._running = True
 
-        if self._parser.data_received(data) > 0:
-            raise ParseFailedException()
+        retval = self._parser.data_received(data)
+        if retval > 0:
+            raise ParseFailedException(
+                '_parser.data_received failed with code: ' + str(retval))
