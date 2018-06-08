@@ -182,6 +182,7 @@ cdef class _Parser:
         cdef size_t match_start, skip_count, matched_length
         cdef Byte byte
         cdef const Byte *chunk_ptr
+
         chunk_ptr = chunk
         chunk_len = len(chunk)
         buffer_start = 0
@@ -296,7 +297,8 @@ cdef class _Parser:
                     # we are not already in the middle of potential delimiter
 
                     if self.delimiter_finder.inactive():
-                        skip_count = self.rewind_fast_forward(chunk_ptr, idx + 1, chunk_len-1)
+                        skip_count = self.rewind_fast_forward(
+                            chunk_ptr, idx + 1, chunk_len-1)
                         idx += skip_count
 
             elif self.state == ParserState.PS_END:
@@ -325,17 +327,21 @@ cdef class _Parser:
         return 0
 
     # rewind_fast_forward is searching for "\r\n--" sequence in provided buffer.
-    # It returns number of chars which can be skipped before delimiter starts (including potential 4-byte match).
+    # It returns number of chars which can be skipped before delimiter starts
+    # (including potential 4-byte match).
     # It may also update Finder object state.
-    cdef size_t rewind_fast_forward(self, const Byte *chunk_ptr, size_t pos_first, size_t pos_last):
-        cdef const Byte *ptr, *ptr_end
+    cdef size_t rewind_fast_forward(self, const Byte *chunk_ptr,
+                                    size_t pos_first, size_t pos_last):
+        cdef const Byte *ptr
+        cdef const Byte *ptr_end
         cdef size_t skipped
 
         # algorithm needs at least 4 chars in buffer
         if pos_first + 3 > pos_last:
             return 0
 
-        # calculate pointer to a first char of the buffer and a pointer to a char after the end of the buffer 
+        # calculate pointer to a first char of the buffer and a pointer to a
+        # char after the end of the buffer
         ptr = chunk_ptr + pos_first + 3
         ptr_end = chunk_ptr + pos_last + 1
         skipped = 0
@@ -347,16 +353,22 @@ cdef class _Parser:
 
         while True:
             if ptr >= ptr_end:
-                # normalize pointer value because we could jump few chars past the buffer end
+                # normalize pointer value because we could jump few chars past
+                # the buffer end
                 ptr = ptr_end - 1
-                # if we iterated till the end of the buffer, we may need to keep up to 3 chars in the buffer until next chunk
-                skipped = pos_last - pos_first + 1  # guess we will skip all chars in the buffer
+
+                # if we iterated till the end of the buffer, we may need to
+                # keep up to 3 chars in the buffer until next chunk
+                # guess we will skip all chars in the buffer
+                skipped = pos_last - pos_first + 1 
 
                 if ptr[0] == Constants.CR:
                     skipped = skipped - 1
                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:
                     skipped = skipped - 2
-                elif ptr[0] == Constants.Hyphen and ptr[-1] == Constants.LF and ptr[-2] == Constants.CR:
+                elif ptr[0] == Constants.Hyphen and \
+                        ptr[-1] == Constants.LF and \
+                        ptr[-2] == Constants.CR:
                     skipped = skipped - 3
                 break
 
@@ -372,12 +384,15 @@ cdef class _Parser:
                         self.delimiter_finder.feed(Constants.LF)
                         self.delimiter_finder.feed(Constants.Hyphen)
                         self.delimiter_finder.feed(Constants.Hyphen)
+
                         self.ender_finder.reset()
                         self.ender_finder.feed(Constants.CR)
                         self.ender_finder.feed(Constants.LF)
                         self.ender_finder.feed(Constants.Hyphen)
                         self.ender_finder.feed(Constants.Hyphen)
+
                         skipped = (ptr - chunk_ptr) - pos_first + 1
+
                         break
                     ptr += 4
 
