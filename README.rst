@@ -82,3 +82,13 @@ installation on your system.
 4. Install this package - :code:`pip install .`.
 
 5. You should now be able to run the test suite - :code:`py.test tests/`.
+
+Authors
+-------
+
+- Siddhant Goel <`@siddhantgoel`_>
+- Sergey Kolomenkin <`@kolomenkin`_>
+
+
+.. _@kolomenkin: https://github.com/kolomenkin
+.. _@siddhantgoel: https://github.com/siddhantgoel
