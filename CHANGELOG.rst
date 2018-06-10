@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v0.6.0
+------
+- Major performance improvements; we're now able to parse ~1800MB per second, from ~15MB per second in the previous version (thanks `@kolomenkin`_)
+
 v0.5.1
 ------
 - Fix parser bug which could lead to spurious CR or CRLF being added to the end
