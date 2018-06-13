@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v0.6.1
+------
+- Include :code:`streaming_form_data/_parser.pyx` file in the distribution to avoid installation errors
+
 v0.6.0
 ------
 - Major performance improvements; we're now able to parse ~1800MB per second, from ~15MB per second in the previous version (thanks `@kolomenkin`_)
