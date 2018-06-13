@@ -12,6 +12,8 @@ from streaming_form_data.targets import ValueTarget, FileTarget
 @stream_request_body
 class UploadHandler(RequestHandler):
     def prepare(self):
+        gigabyte = 1024 * 1024 * 1024
+        self.request.connection.set_max_body_size(100 * gigabyte)
         self.value = ValueTarget()
         name = 'uploaded-file-tornado-{}.dat'.format(int(time()))
         self.file_ = FileTarget(os.path.join(tempfile.gettempdir(), name))
