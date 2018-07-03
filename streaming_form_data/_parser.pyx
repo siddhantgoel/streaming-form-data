@@ -2,12 +2,14 @@ import cgi
 
 from streaming_form_data.targets import NullTarget
 
-ctypedef unsigned char Byte
+
+ctypedef unsigned char Byte  # noqa: E999
+
 
 cdef enum Constants:
     Hyphen = 45
-    CR     = 13
-    LF     = 10
+    CR = 13
+    LF = 10
     MinFileBodyChunkSize = 1024
 
 
@@ -15,10 +17,13 @@ cdef enum FinderState:
     FS_START, FS_WORKING, FS_END
 
 
+# 100..199: internal program errors (asserts)
+# 200..299: problems with delimiting multipart stream into parts
+# 300..399: problems with parsing particular part headers
 cdef enum ErrorGroup:
-    Internal    = 100  # 100..199: internal program errors (asserts)
-    Delimiting  = 200  # 200..299: problems with delimiting multipart stream into parts
-    PartHeaders = 300  # 300..399: problems with parsing particular part headers
+    Internal = 100
+    Delimiting = 200
+    PartHeaders = 300
 
 
 # Knuth-Morris-Pratt algorithm
@@ -38,14 +43,16 @@ cdef class Finder:
         self.index = 0
         self.state = FinderState.FS_START
 
-    cpdef feed(self, Byte byte):  # cpdef for access from tests
+    cpdef feed(self, Byte byte):
         if byte != self.target_ptr[self.index]:
             if self.state != FinderState.FS_START:
                 self.state = FinderState.FS_START
                 self.index = 0
-                # try matching substring
-                # This is not universal code, but the code specialized from multipart delimiters
-                # (length is at least 5 bytes, starting with \r\n and has no \r\n in the middle)
+
+                # Try matching substring
+                # This is not universal, but specialized from multipart
+                # delimiters (length at least 5 bytes, starting with \r\n and
+                # has no \r\n in the middle)
                 if byte == self.target_ptr[0]:
                     self.state = FinderState.FS_WORKING
                     self.index = 1
@@ -60,17 +67,17 @@ cdef class Finder:
         self.state = FinderState.FS_START
         self.index = 0
 
-    @property  # for access from tests
+    @property
     def target(self):
         return self.target
 
-    cpdef bint inactive(self):  # cpdef for access from tests
+    cpdef bint inactive(self):
         return self.state == FinderState.FS_START
 
-    cpdef bint active(self):  # cpdef for access from tests
+    cpdef bint active(self):
         return self.state == FinderState.FS_WORKING
 
-    cpdef bint found(self):  # cpdef for access from tests
+    cpdef bint found(self):
         return self.state == FinderState.FS_END
 
     cdef size_t matched_length(self):
@@ -103,9 +110,14 @@ class Part:
 cdef enum ParserState:
     PS_START,
 
-    PS_STARTING_BOUNDARY, PS_READING_BOUNDARY, PS_ENDING_BOUNDARY,
+    PS_STARTING_BOUNDARY,
+    PS_READING_BOUNDARY,
+    PS_ENDING_BOUNDARY,
 
-    PS_READING_HEADER, PS_ENDING_HEADER, PS_ENDED_HEADER, PS_ENDING_ALL_HEADERS,
+    PS_READING_HEADER,
+    PS_ENDING_HEADER,
+    PS_ENDED_HEADER,
+    PS_ENDING_ALL_HEADERS,
 
     PS_READING_BODY,
 
@@ -211,7 +223,8 @@ cdef class _Parser:
                 if buffer_start != 0:
                     return ErrorGroup.Delimiting + 4
                 # ensure we have read correct starting delimiter
-                if b'\r\n' + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
+                if b'\r\n' + chunk[buffer_start: idx + 1] != \
+                        self.delimiter_finder.target:
                     return ErrorGroup.Delimiting + 5
 
                 buffer_start = idx + 1
@@ -281,7 +294,7 @@ cdef class _Parser:
                     match_start = idx + 1 - self.ender_length
 
                     if match_start >= buffer_start:
-                         self.on_body(chunk[buffer_start: match_start])
+                        self.on_body(chunk[buffer_start: match_start])
                     else:
                         return ErrorGroup.Internal + 4
 
@@ -326,9 +339,9 @@ cdef class _Parser:
 
         return 0
 
-    # rewind_fast_forward is searching for "\r\n--" sequence in provided buffer.
-    # It returns number of chars which can be skipped before delimiter starts
-    # (including potential 4-byte match).
+    # rewind_fast_forward searches for "\r\n--" sequence in provided buffer.
+    # It returns the number of chars which can be skipped before the delimiter
+    # starts (including potential 4-byte match).
     # It may also update Finder object state.
     cdef size_t rewind_fast_forward(self, const Byte *chunk_ptr,
                                     size_t pos_first, size_t pos_last):
@@ -360,7 +373,7 @@ cdef class _Parser:
                 # if we iterated till the end of the buffer, we may need to
                 # keep up to 3 chars in the buffer until next chunk
                 # guess we will skip all chars in the buffer
-                skipped = pos_last - pos_first + 1 
+                skipped = pos_last - pos_first + 1
 
                 if ptr[0] == Constants.CR:
                     skipped = skipped - 1
