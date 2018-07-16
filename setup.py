@@ -25,7 +25,7 @@ setup(
     description='Streaming parser for multipart/form-data',
     long_description=long_description,
     author='Siddhant Goel',
-    author_email='siddhantgoel@gmail.com',
+    author_email='me@sgoel.org',
     license='MIT',
     url='https://github.com/siddhantgoel/streaming-form-data',
     packages=['streaming_form_data'],
