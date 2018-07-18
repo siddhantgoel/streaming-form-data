@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+v1.0.0 (under development)
+--------------------------
+- Add function hooks in :code:`Target` classes which should be overridden
+  instead of the actual functions themselves (users should now define
+  :code:`on_data_received` instead of overriding :code:`data_received`)
+- Allow :code:`validators` to validate each call to :code:`data_received`
+- Move the :code:`_Parser` class to the :code:`PS_ERROR` state when targets
+  raise an exception
+
 v0.6.1
 ------
 - Include :code:`streaming_form_data/_parser.pyx` file in the distribution to avoid installation errors
