@@ -121,7 +121,9 @@ cdef enum ParserState:
 
     PS_READING_BODY,
 
-    PS_END
+    PS_END,
+
+    PS_ERROR
 
 
 cdef class _Parser:
@@ -205,11 +207,13 @@ cdef class _Parser:
 
             if self.state == ParserState.PS_START:
                 if byte != Constants.Hyphen:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.Delimiting + 1
 
                 self.state = ParserState.PS_STARTING_BOUNDARY
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != Constants.Hyphen:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.Delimiting + 2
 
                 self.state = ParserState.PS_READING_BOUNDARY
@@ -219,12 +223,17 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != Constants.LF:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.Delimiting + 3
+
                 if buffer_start != 0:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.Delimiting + 4
+
                 # ensure we have read correct starting delimiter
                 if b'\r\n' + chunk[buffer_start: idx + 1] != \
                         self.delimiter_finder.target:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.Delimiting + 5
 
                 buffer_start = idx + 1
@@ -236,6 +245,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != Constants.LF:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.PartHeaders + 1
 
                 value, params = cgi.parse_header(
@@ -259,6 +269,7 @@ cdef class _Parser:
 
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != Constants.LF:
+                    self.state = ParserState.PS_ERROR
                     return ErrorGroup.PartHeaders + 2
 
                 buffer_start = idx + 1
@@ -273,14 +284,16 @@ cdef class _Parser:
                     self.state = ParserState.PS_READING_HEADER
 
                     if idx + 1 < self.delimiter_length:
+                        self.state = ParserState.PS_ERROR
                         return ErrorGroup.Internal + 1
+
                     match_start = idx + 1 - self.delimiter_length
 
                     if match_start >= buffer_start:
                         self.on_body(chunk[buffer_start: match_start])
-
                         buffer_start = idx + 1
                     else:
+                        self.state = ParserState.PS_ERROR
                         return ErrorGroup.Internal + 2
 
                     self.unset_active_part()
@@ -290,12 +303,14 @@ cdef class _Parser:
                     self.state = ParserState.PS_END
 
                     if idx + 1 < self.ender_length:
+                        self.state = ParserState.PS_ERROR
                         return ErrorGroup.Internal + 3
                     match_start = idx + 1 - self.ender_length
 
                     if match_start >= buffer_start:
                         self.on_body(chunk[buffer_start: match_start])
                     else:
+                        self.state = ParserState.PS_ERROR
                         return ErrorGroup.Internal + 4
 
                     buffer_start = idx + 1
@@ -317,13 +332,17 @@ cdef class _Parser:
             elif self.state == ParserState.PS_END:
                 return 0
             else:
+                self.state = ParserState.PS_ERROR
                 return ErrorGroup.Internal + 5
 
             idx += 1
 
         if idx != chunk_len:
+            self.state = ParserState.PS_ERROR
             return ErrorGroup.Internal + 6
+
         if buffer_start > chunk_len:
+            self.state = ParserState.PS_ERROR
             return ErrorGroup.Internal + 7
 
         if self.state == ParserState.PS_READING_BODY:
