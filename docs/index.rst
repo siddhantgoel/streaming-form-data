@@ -89,6 +89,32 @@ Currently the following :code:`Target` classes are included with this library.
 Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
 and define a :code:`data_received` function.
 
+:code:`Validator` classes
+-------------------------
+
+:code:`Target` classes accept a list of :code:`validator` callables when being
+instantiated. Every time :code:`data_received` is called with a given
+:code:`chunk`, the target would run this :code:`chunk` through all the callables
+in the :code:`validators` it has.
+
+This is useful for performing certain validation tasks like making sure the
+input size is not exceeding a certain value. This is shown in the following code
+snippet.
+
+.. code-block:: python
+
+    >>> from streaming_form_data import StreamingFormDataParser
+    >>> from streaming_form_data.targets import ValueTarget
+    >>> from streaming_form_data.validators import MaxSizeValidator
+    >>>
+    >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
+    >>>
+    >>> parser = StreamingFormDataParser(headers=headers)
+    >>>
+    >>> parser.register('name', ValueTarget(validators=(MaxSizeValidator(100),)))
+    >>>
+    >>> parser.data_received(chunk)
+
 
 Examples
 --------
