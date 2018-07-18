@@ -87,7 +87,7 @@ Currently the following :code:`Target` classes are included with this library.
 - :code:`NullTarget` - discards the input completely
 
 Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
-and define a :code:`data_received` function.
+and define a :code:`on_data_received` function.
 
 :code:`Validator` classes
 -------------------------
