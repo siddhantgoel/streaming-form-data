@@ -7,12 +7,12 @@ class BaseTarget:
     data_received.
     """
 
-    def __init__(self, validators=None):
+    def __init__(self, validator=None):
         self.multipart_filename = None
 
         self._started = False
         self._finished = False
-        self._validators = validators
+        self._validator = validator
 
     # 'multipart_filename ' is filled before start() call.
     # It contains optional 'filename' value from 'Content-Disposition' header
@@ -28,11 +28,8 @@ class BaseTarget:
     #       https://github.com/un33k/python-slugify
 
     def _validate(self, chunk):
-        if not self._validators:
-            return
-
-        for validator in self._validators:
-            validator(chunk)
+        if self._validator:
+            self._validator(chunk)
 
     def start(self):
         self._started = True

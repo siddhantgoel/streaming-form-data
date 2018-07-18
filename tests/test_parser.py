@@ -672,7 +672,7 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
-        target = ValueTarget(validators=(MaxSizeValidator(1),))
+        target = ValueTarget(validator=MaxSizeValidator(1))
 
         parser = StreamingFormDataParser(
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})
@@ -691,7 +691,7 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 Foo
 --1234--'''.replace(b'\n', b'\r\n')
 
-        target = FileTarget('/tmp/file.txt', validators=(MaxSizeValidator(1),))
+        target = FileTarget('/tmp/file.txt', validator=MaxSizeValidator(1))
 
         parser = StreamingFormDataParser(
             headers={'Content-Type': 'multipart/form-data; boundary=1234'})

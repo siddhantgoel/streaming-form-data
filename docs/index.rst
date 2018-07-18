@@ -94,10 +94,9 @@ and define an :code:`on_data_received` function.
 :code:`Validator` classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:code:`Target` classes accept a list of :code:`validator` callables when being
+:code:`Target` classes accept a :code:`validator` callable when being
 instantiated. Every time :code:`data_received` is called with a given
-:code:`chunk`, the target runs this :code:`chunk` through all the callables in
-the :code:`validators` it has.
+:code:`chunk`, the target runs this :code:`chunk` through the given callable.
 
 This is useful for performing certain validation tasks like making sure the
 input size is not exceeding a certain value. This is shown in the following code
@@ -113,7 +112,7 @@ snippet.
     >>>
     >>> parser = StreamingFormDataParser(headers=headers)
     >>>
-    >>> parser.register('name', ValueTarget(validators=(MaxSizeValidator(100),)))
+    >>> parser.register('name', ValueTarget(validator=MaxSizeValidator(100)))
     >>>
     >>> parser.data_received(chunk)
 

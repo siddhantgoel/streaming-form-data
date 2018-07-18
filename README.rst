@@ -61,7 +61,6 @@ Usage
 
     >>> from streaming_form_data import StreamingFormDataParser
     >>> from streaming_form_data.targets import ValueTarget, FileTarget
-    >>> from streaming_form_data.validators import MaxSizeValidator
     >>>
     >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
     >>>
