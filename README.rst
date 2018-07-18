@@ -33,8 +33,7 @@ new targets should inherit :code:`streaming_form_data.targets.BaseTarget` and
 define a :code:`data_received` function.
 
 Please note, that this library has only been tested with Python 3 (specifically,
-versions 3.3, 3.4, 3.5, and 3.6). Python 2.7 is not supported yet, but pull
-requests are always welcome!
+versions 3.3, 3.4, 3.5, and 3.6).
 
 Installation
 ------------

@@ -16,8 +16,7 @@ parser works byte-by-byte. This also means that passing the entire input as a
 single chunk should also work.
 
 Please note, that this library has only been tested with Python 3 (specifically,
-versions 3.3, 3.4, 3.5, and 3.6). Python 2.7 is not supported yet, but pull
-requests are always welcome. 🙂
+versions 3.3, 3.4, 3.5, and 3.6).
 
 Installation
 ------------
