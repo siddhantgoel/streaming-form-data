@@ -2,8 +2,9 @@ import os.path
 import tempfile
 from unittest import TestCase
 
-from streaming_form_data.targets \
-    import BaseTarget, NullTarget, ValueTarget, FileTarget
+from streaming_form_data.targets import (BaseTarget, FileTarget, NullTarget,
+                                         ValueTarget)
+from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
 class NullTargetTestCase(TestCase):
@@ -50,6 +51,18 @@ class ValueTargetTestCase(TestCase):
         target = ValueTarget()
         self.assertEqual(target.value, b'')
         self.assertTrue(target.multipart_filename is None)
+
+    def test_total_size_validator(self):
+        target = ValueTarget(validators=(MaxSizeValidator(10),))
+
+        self.assertEqual(target.value, b'')
+
+        target.start()
+
+        target.data_received(b'hello')
+        target.data_received(b' ')
+
+        self.assertRaises(ValidationError, target.data_received, b'world')
 
 
 class FileTargetTestCase(TestCase):

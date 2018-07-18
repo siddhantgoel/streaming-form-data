@@ -97,14 +97,12 @@ class Part:
 
     def start(self):
         self.target.start()
-        self.target._started = True
 
     def data_received(self, chunk):
         self.target.data_received(chunk)
 
     def finish(self):
         self.target.finish()
-        self.target._finished = True
 
 
 cdef enum ParserState:

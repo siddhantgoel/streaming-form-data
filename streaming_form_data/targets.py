@@ -7,11 +7,12 @@ class BaseTarget:
     data_received.
     """
 
-    def __init__(self):
+    def __init__(self, validators=None):
         self.multipart_filename = None
 
         self._started = False
         self._finished = False
+        self._validators = validators
 
     # 'multipart_filename ' is filled before start() call.
     # It contains optional 'filename' value from 'Content-Disposition' header
@@ -26,28 +27,47 @@ class BaseTarget:
     #       for use in URLs, filenames:
     #       https://github.com/un33k/python-slugify
 
+    def _validate(self, chunk):
+        if not self._validators:
+            return
+
+        for validator in self._validators:
+            validator(chunk)
+
     def start(self):
+        self._started = True
+        self.on_start()
+
+    def on_start(self):
         pass
 
     def data_received(self, chunk):
+        self._validate(chunk)
+        self.on_data_received(chunk)
+
+    def on_data_received(self, chunk):
         raise NotImplementedError()
 
     def finish(self):
+        self.on_finish()
+        self._finished = True
+
+    def on_finish(self):
         pass
 
 
 class NullTarget(BaseTarget):
-    def data_received(self, chunk):
+    def on_data_received(self, chunk):
         pass
 
 
 class ValueTarget(BaseTarget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self._values = []
 
-    def data_received(self, chunk):
+    def on_data_received(self, chunk):
         self._values.append(chunk)
 
     @property
@@ -56,31 +76,31 @@ class ValueTarget(BaseTarget):
 
 
 class FileTarget(BaseTarget):
-    def __init__(self, filename, allow_overwrite=True):
-        super().__init__()
+    def __init__(self, filename, allow_overwrite=True, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.filename = filename
 
         self._openmode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
 
-    def start(self):
+    def on_start(self):
         self._fd = open(self.filename, self._openmode)
 
-    def data_received(self, chunk):
+    def on_data_received(self, chunk):
         self._fd.write(chunk)
 
-    def finish(self):
+    def on_finish(self):
         self._fd.close()
 
 
 class SHA256Target(BaseTarget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self._hash = hashlib.sha256()
 
-    def data_received(self, chunk):
+    def on_data_received(self, chunk):
         self._hash.update(chunk)
 
     @property
