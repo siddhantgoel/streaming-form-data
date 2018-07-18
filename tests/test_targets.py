@@ -53,7 +53,7 @@ class ValueTargetTestCase(TestCase):
         self.assertTrue(target.multipart_filename is None)
 
     def test_total_size_validator(self):
-        target = ValueTarget(validators=(MaxSizeValidator(10),))
+        target = ValueTarget(validator=MaxSizeValidator(10))
 
         self.assertEqual(target.value, b'')
 
