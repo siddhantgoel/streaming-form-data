@@ -12,25 +12,33 @@ Streaming multipart/form-data parser
 
 
 :code:`streaming_form_data` provides a Python parser for parsing
-multipart/form-data input chunks. Chunk size is determined by the API user, but
-currently there are no restrictions on what the size should be, since the parser
-works byte-by-byte. Although, this also means that passing the entire input as a
-single chunk should also work.
+:code:`multipart/form-data` input chunks (the most commonly used encoding when
+submitting data through HTML forms).
+
+Chunk size is determined by the API user, but currently there are no
+restrictions on what the chunk size should be, since the parser works
+byte-by-byte (which means that passing the entire input as a single chunk should
+also work).
 
 The main entry point is the :code:`StreamingFormDataParser` class, which expects
 a dictionary of request :code:`headers`.
 
-The parser is fed chunks of (byte) input, and takes action depending on what the
-current byte is. In case it notices input that's expected, it passes on the
-input to the configured :code:`Target`, which then decides what to do with it.
-In case there's a part that we don't need, this input is simply discarded using
-a :code:`NullTarget` object.
+The parser is fed chunks of (bytes) input, and takes action depending on what
+the current byte is. In case it notices input that's expected (input that has
+been registered by calling :code:`parser.register`, it will pass on the input to
+the registered :code:`Target` class which will then decide what to do with it.
+In case there's a part which is not needed, it can be associated to a
+:code:`NullTarget` object and it will be discarded.
 
-Currently three targets are included with this library - :code:`ValueTarget`,
-:code:`FileTarget`, and :code:`SHA256Target`. :code:`ValueTarget` stores the
-input in memory, and :code:`FileTarget` pipes the input to a file on disk. Any
-new targets should inherit :code:`streaming_form_data.targets.BaseTarget` and
-define a :code:`data_received` function.
+Currently the following :code:`Target` classes are included with this library.
+
+- :code:`ValueTarget` - holds the input in memory
+- :code:`FileTarget` - pipes the input to a file on disk
+- :code:`SHA256Target` - computes the SHA-256 hash of the input
+- :code:`NullTarget` - discards the input completely
+
+Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
+and define an :code:`on_data_received` function.
 
 Please note, that this library has only been tested with Python 3 (specifically,
 versions 3.3, 3.4, 3.5, and 3.6).
@@ -53,6 +61,7 @@ Usage
 
     >>> from streaming_form_data import StreamingFormDataParser
     >>> from streaming_form_data.targets import ValueTarget, FileTarget
+    >>> from streaming_form_data.validators import MaxSizeValidator
     >>>
     >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
     >>>

@@ -10,10 +10,12 @@ Streaming multipart/form-data parser
 
 :code:`streaming_form_data` provides a Python parser for parsing
 :code:`multipart/form-data` input chunks (the most commonly used encoding when
-submitting values through HTML forms). Chunk size is determined by the API user,
-but currently there are no restrictions on what the size should be, since the
-parser works byte-by-byte. This also means that passing the entire input as a
-single chunk should also work.
+submitting data through HTML forms).
+
+Chunk size is determined by the API user, but currently there are no
+restrictions on what the chunk size should be, since the parser works
+byte-by-byte (which means that passing the entire input as a single chunk should
+also work).
 
 Please note, that this library has only been tested with Python 3 (specifically,
 versions 3.3, 3.4, 3.5, and 3.6).
@@ -70,7 +72,7 @@ API
 
 This class is the main entry point, and expects a dictionary of request
 :code:`headers`. These headers are used to determine the input
-:code:`Content-Type`.
+:code:`Content-Type` and some other metadata.
 
 :code:`Target` classes
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -87,15 +89,15 @@ Currently the following :code:`Target` classes are included with this library.
 - :code:`NullTarget` - discards the input completely
 
 Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
-and define a :code:`on_data_received` function.
+and define an :code:`on_data_received` function.
 
 :code:`Validator` classes
--------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :code:`Target` classes accept a list of :code:`validator` callables when being
 instantiated. Every time :code:`data_received` is called with a given
-:code:`chunk`, the target would run this :code:`chunk` through all the callables
-in the :code:`validators` it has.
+:code:`chunk`, the target runs this :code:`chunk` through all the callables in
+the :code:`validators` it has.
 
 This is useful for performing certain validation tasks like making sure the
 input size is not exceeding a certain value. This is shown in the following code
