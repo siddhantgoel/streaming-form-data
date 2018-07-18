@@ -6,6 +6,7 @@ from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import StreamingFormDataParser, ParseFailedException
 from streaming_form_data.targets import BaseTarget, ValueTarget
+from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
 def get_random_bytes(size, seed):
@@ -75,8 +76,8 @@ class StreamingFormDataParserTestCase(TestCase):
         parser.data_received(encoder.to_string())
 
         self.assertEqual(target.value, b'hello world')
-        self.assertEqual(target._started, True)
-        self.assertEqual(target._finished, True)
+        self.assertTrue(target._started)
+        self.assertTrue(target._finished)
 
     def test_case_insensitive_content_type(self):
         content_type_header = 'Content-Type'
@@ -384,8 +385,8 @@ Foo
 
         self.assertEqual(target.multipart_filename, 'ab.txt')
         self.assertEqual(target.value, b'Foo\r\n--123')
-        self.assertEqual(target._started, True)
-        self.assertEqual(target._finished, True)
+        self.assertTrue(target._started)
+        self.assertTrue(target._finished)
 
     def test_multiple_files(self):
         txt_filename = 'file.txt'
@@ -459,8 +460,8 @@ Foo
 
         self.assertEqual(target.multipart_filename, 'ab.txt')
         self.assertEqual(target.value, b'Foo')
-        self.assertEqual(target._started, True)
-        self.assertEqual(target._finished, True)
+        self.assertTrue(target._started)
+        self.assertTrue(target._finished)
 
     def test_unquoted_names(self):
         data = b'''\
@@ -662,3 +663,22 @@ Foo
         parser.register(filename, target)
 
         self.assertRaises(ValueError, parser.data_received, body)
+
+    def test_target_exceeds_max_size(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--'''.replace(b'\n', b'\r\n')
+
+        target = ValueTarget(validators=(MaxSizeValidator(1),))
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
+
+        self.assertRaises(ValidationError, parser.data_received, data)
+
+        self.assertTrue(target._started)
+        self.assertFalse(target._finished)
