@@ -5,7 +5,7 @@ from unittest import TestCase
 from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import StreamingFormDataParser, ParseFailedException
-from streaming_form_data.targets import BaseTarget, ValueTarget
+from streaming_form_data.targets import BaseTarget, FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
@@ -681,4 +681,23 @@ Foo
         self.assertRaises(ValidationError, parser.data_received, data)
 
         self.assertTrue(target._started)
-        self.assertFalse(target._finished)
+        self.assertTrue(target._finished)
+
+    def test_file_target_exceeds_max_size(self):
+        data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--'''.replace(b'\n', b'\r\n')
+
+        target = FileTarget('/tmp/file.txt', validators=(MaxSizeValidator(1),))
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+        parser.register('files', target)
+
+        self.assertRaises(ValidationError, parser.data_received, data)
+
+        self.assertTrue(target._started)
+        self.assertTrue(target._finished)
