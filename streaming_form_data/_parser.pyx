@@ -20,7 +20,7 @@ cdef enum FinderState:
 # 100..199: internal program errors (asserts)
 # 200..299: problems with delimiting multipart stream into parts
 # 300..399: problems with parsing particular part headers
-cdef enum ErrorGroup:
+cpdef enum ErrorGroup:
     Internal = 100
     Delimiting = 200
     PartHeaders = 300
@@ -290,7 +290,12 @@ cdef class _Parser:
                     match_start = idx + 1 - self.delimiter_length
 
                     if match_start >= buffer_start:
-                        self.on_body(chunk[buffer_start: match_start])
+                        try:
+                            self.on_body(chunk[buffer_start: match_start])
+                        except:
+                            self.state = ParserState.PS_ERROR
+                            raise
+
                         buffer_start = idx + 1
                     else:
                         self.state = ParserState.PS_ERROR
@@ -308,7 +313,11 @@ cdef class _Parser:
                     match_start = idx + 1 - self.ender_length
 
                     if match_start >= buffer_start:
-                        self.on_body(chunk[buffer_start: match_start])
+                        try:
+                            self.on_body(chunk[buffer_start: match_start])
+                        except:
+                            self.state = ParserState.PS_ERROR
+                            raise
                     else:
                         self.state = ParserState.PS_ERROR
                         return ErrorGroup.Internal + 4
@@ -326,7 +335,7 @@ cdef class _Parser:
 
                     if self.delimiter_finder.inactive():
                         skip_count = self.rewind_fast_forward(
-                            chunk_ptr, idx + 1, chunk_len-1)
+                            chunk_ptr, idx + 1, chunk_len - 1)
                         idx += skip_count
 
             elif self.state == ParserState.PS_END:
@@ -350,7 +359,12 @@ cdef class _Parser:
                                  self.ender_finder.matched_length())
             match_start = idx - matched_length
             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
-                self.on_body(chunk[buffer_start: match_start])
+                try:
+                    self.on_body(chunk[buffer_start: match_start])
+                except:
+                    self.state = ParserState.PS_ERROR
+                    raise
+
                 buffer_start = match_start
 
         if idx - buffer_start > 0:

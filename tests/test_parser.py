@@ -5,7 +5,7 @@ from unittest import TestCase
 from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import StreamingFormDataParser, ParseFailedException
-from streaming_form_data.targets import ValueTarget
+from streaming_form_data.targets import BaseTarget, ValueTarget
 
 
 def get_random_bytes(size, seed):
@@ -645,3 +645,20 @@ Foo
         parser.data_received(body)
 
         self.assertEqual(target.multipart_filename, filename)
+
+    def test_target_raises_exception(self):
+        filename = 'file.txt'
+
+        content_type, body = encoded_dataset(filename)
+
+        class BadTarget(BaseTarget):
+            def data_received(self, data):
+                raise ValueError()
+
+        target = BadTarget()
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': content_type})
+        parser.register(filename, target)
+
+        self.assertRaises(ValueError, parser.data_received, body)

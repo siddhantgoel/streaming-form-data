@@ -1,6 +1,6 @@
 import cgi
 
-from streaming_form_data._parser import _Parser
+from streaming_form_data._parser import _Parser, ErrorGroup
 
 
 class ParseFailedException(Exception):
@@ -55,6 +55,14 @@ class StreamingFormDataParser:
             self._running = True
 
         retval = self._parser.data_received(data)
+
         if retval > 0:
+            if ErrorGroup.Internal <= retval < ErrorGroup.Delimiting:
+                message = 'internal errors'
+            elif ErrorGroup.Delimiting <= retval < ErrorGroup.PartHeaders:
+                message = 'delimiting multipart stream into parts'
+            elif ErrorGroup.PartHeaders <= retval:
+                message = 'parsing particular part headers'
+
             raise ParseFailedException(
-                '_parser.data_received failed with code: ' + str(retval))
+                '_parser.data_received failed with {}'.format(message))
