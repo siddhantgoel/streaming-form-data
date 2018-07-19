@@ -3,12 +3,13 @@ CHANGELOG
 
 v1.0.0 (under development)
 --------------------------
+- Add exception handling in the :code:`_Parser` class (move to the
+  :code:`PS_ERROR` state when targets raise an exception)
+- Support chunk-input validation in :code:`Target` objects using
+  :code:`validator` callables
 - Add function hooks in :code:`Target` classes which should be overridden
   instead of the actual functions themselves (users should now define
   :code:`on_data_received` instead of overriding :code:`data_received`)
-- Allow :code:`validators` to validate each call to :code:`data_received`
-- Move the :code:`_Parser` class to the :code:`PS_ERROR` state when targets
-  raise an exception
 
 v0.6.1
 ------
