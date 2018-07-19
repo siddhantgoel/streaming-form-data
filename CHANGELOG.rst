@@ -1,8 +1,8 @@
 CHANGELOG
 =========
 
-v1.0.0 (under development)
---------------------------
+v1.0.0
+------
 - Add exception handling in the :code:`_Parser` class (move to the
   :code:`PS_ERROR` state when targets raise an exception)
 - Support chunk-input validation in :code:`Target` objects using
