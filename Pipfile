@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+streaming-form-data = {editable = true, path = "."}
+
+[dev-packages]
+"flake8" = "==3.4.0"
+"flake8-per-file-ignores" = "==0.6"
+numpy = "==1.15.0"
+pytest = "==3.6.4"
+requests-toolbelt = "==0.8.0"
+twine = "==1.11.0"
+Cython = "==0.28.4"
+line_profiler = "==2.1.2"
+
+[requires]
+python_version = "3.6"

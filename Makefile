@@ -55,10 +55,10 @@ library_inputs := setup.py \
                   $(shell find streaming_form_data -maxdepth 1 -name "*.py") \
                   $(cython_file)
 
-$(requirements_output): requirements.dev.txt
-	pip install -r requirements.dev.txt
+$(requirements_output):
+	pipenv install --dev
 	@mkdir -p "$(@D)" && touch "$@"
 
 $(install_local_output): $(requirements_output) $(library_inputs)
-	pip install -e .
+	pipenv install
 	@mkdir -p "$(@D)" && touch "$@"
