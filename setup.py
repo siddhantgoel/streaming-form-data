@@ -29,5 +29,15 @@ setup(
     license='MIT',
     url='https://github.com/siddhantgoel/streaming-form-data',
     packages=['streaming_form_data'],
-    ext_modules=extensions
+    ext_modules=extensions,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+    ]
 )
