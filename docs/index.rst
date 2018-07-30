@@ -18,7 +18,7 @@ byte-by-byte (which means that passing the entire input as a single chunk should
 also work).
 
 Please note, that this library has only been tested with Python 3 (specifically,
-versions 3.3, 3.4, 3.5, and 3.6).
+versions 3.4, 3.5, and 3.6).
 
 Installation
 ------------
