@@ -71,21 +71,17 @@ Usage
 Development
 -----------
 
-To work on this package, please make sure you have a working Python 3
-installation on your system.
+Please make sure you have Python 3 and pipenv_ installed.
 
-1. Create a virtualenv -
-   :code:`python -m venv venv && source venv/bin/activate`.
-
-2. Git clone the repository -
+1. Git clone the repository -
    :code:`git clone https://github.com/siddhantgoel/streaming-form-data`
 
-3. Install the packages required for development -
-   :code:`pip install -r requirements.dev.txt`
+2. Install the packages required for development -
+   :code:`pipenv install --dev`
 
-4. Install this package - :code:`pip install .`.
+3. That's basically it. You should now be able to run the test suite -
+   :code:`py.test`.
 
-5. You should now be able to run the test suite - :code:`py.test tests/`.
 
 Authors
 -------
@@ -96,3 +92,4 @@ Authors
 
 .. _@kolomenkin: https://github.com/kolomenkin
 .. _@siddhantgoel: https://github.com/siddhantgoel
+.. _pipenv: https://docs.pipenv.org/install/#installing-pipenv
