@@ -17,9 +17,6 @@ restrictions on what the chunk size should be, since the parser works
 byte-by-byte (which means that passing the entire input as a single chunk should
 also work).
 
-Please note, that this library has only been tested with Python 3 (specifically,
-versions 3.4, 3.5, and 3.6).
-
 Installation
 ------------
 

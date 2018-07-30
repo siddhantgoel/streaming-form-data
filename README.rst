@@ -40,9 +40,6 @@ Currently the following :code:`Target` classes are included with this library.
 Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
 and define an :code:`on_data_received` function.
 
-Please note, that this library has only been tested with Python 3 (specifically,
-versions 3.4, 3.5, and 3.6).
-
 Installation
 ------------
 
