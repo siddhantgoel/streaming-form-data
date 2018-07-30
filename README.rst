@@ -83,13 +83,4 @@ Please make sure you have Python 3 and pipenv_ installed.
    :code:`py.test`.
 
 
-Authors
--------
-
-- Siddhant Goel <`@siddhantgoel`_>
-- Sergey Kolomenkin <`@kolomenkin`_>
-
-
-.. _@kolomenkin: https://github.com/kolomenkin
-.. _@siddhantgoel: https://github.com/siddhantgoel
 .. _pipenv: https://docs.pipenv.org/install/#installing-pipenv
