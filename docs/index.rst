@@ -24,7 +24,7 @@ Installation
 
     $ pip install streaming_form_data
 
-The core parser is written in :code:`Cython`, which is a superset of Python but
+The core parser is written in :code:`Cython`, which is a superset of Python that
 compiles the input down to a C extension which can then be imported in normal
 Python code.
 
@@ -49,16 +49,51 @@ Usage
     >>>
     >>> parser.data_received(chunk)
 
-The parser is fed chunks of (bytes) input, and takes action depending on what
-the current byte is. In case it notices input that's expected (input that has
-been registered by calling :code:`parser.register`, it will pass on the input to
-the registered :code:`Target` class which will then decide what to do with it.
-In case there's a part which is not needed, it can be associated to a
-:code:`NullTarget` object and it will be discarded.
+Usage can broadly be split into three stages.
 
-If the :code:`Content-Disposition` header included the :code:`filename`
-directive, this value will be available as the :code:`self.multipart_filename`
-attribute in :code:`Target` classes.
+1. Initialization
+~~~~~~~~~~~~~~~~~
+
+The :code:`StreamingFormDataParser` class expects a dictionary of HTTP request
+headers when being instantiated. These headers are used to determine the input
+:code:`Content-Type` and a few other metadata.
+
+2. Input Registration
+~~~~~~~~~~~~~~~~~~~~~
+
+HTML forms typically have multiple fields. For instance, a form could have a
+text input field called :code:`name` and a file input field called
+:code:`file`.
+
+This needs to be communicated to the parser using the :code:`parser.register`
+function. This function expects two arguments - the name of the input field, and
+the associated :code:`Target` class (which determines how the input should be
+handled).
+
+For instance, if you want to store the contents of the :code:`name` field in an
+in-memory variable, and the :code:`file` field in a file on disk, you can tell
+this to the parser as follows.
+
+.. code-block:: python
+
+    >>> name_target = ValueTarget()
+    >>> file_target = FileTarget('/tmp/file.dat')
+    >>>
+    >>> parser.register('name', name_target)
+    >>> parser.register('file', file_target)
+
+3. Streaming data
+~~~~~~~~~~~~~~~~~
+
+At this stage the parser has everything it needs to be able to work. Depending
+on what web framework you're using, just pass the actual HTTP request body to
+the parser, either one chunk at a time or the complete thing at once.
+
+.. code-block:: python
+
+    >> chunk = read_next_chunk() # depends on your web framework of choice
+    >>
+    >> parser.data_received(chunk)
 
 
 API
@@ -67,26 +102,72 @@ API
 :code:`StreamingFormDataParser`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This class is the main entry point, and expects a dictionary of request
+This class is the main entry point, and expects a dictionary of HTTP request
 :code:`headers`. These headers are used to determine the input
-:code:`Content-Type` and some other metadata.
+:code:`Content-Type` and a few other metadata.
 
 :code:`Target` classes
 ~~~~~~~~~~~~~~~~~~~~~~
 
 When registering inputs with the parser, instances of subclasses of the
-:code:`Target` class should be used, since these targets ultimately determine
+:code:`Target` class should be used. These target classes ultimately determine
 what to do with the data.
 
-Currently the following :code:`Target` classes are included with this library.
+:code:`ValueTarget`
+```````````````````
 
-- :code:`ValueTarget` - holds the input in memory
-- :code:`FileTarget` - pipes the input to a file on disk
-- :code:`SHA256Target` - computes the SHA-256 hash of the input
-- :code:`NullTarget` - discards the input completely
+:code:`ValueTarget` objects hold the input in memory.
 
-Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
-and define an :code:`on_data_received` function.
+.. code-block:: python
+
+    >>> target = ValueTarget()
+
+:code:`FileTarget`
+``````````````````
+
+:code:`FileTarget` objects stream the contents to a file on-disk.
+
+.. code-block:: python
+
+    >>> target = FileTarget('/tmp/file.txt')
+
+:code:`SHA256Target`
+````````````````````
+
+:code:`SHA256Target` objects calculate a :code:`SHA256` hash of the given input,
+and hold the result in memory.
+
+.. code-block:: python
+
+    >>> target = SHA256Target()
+
+:code:`NullTarget`
+````````````````````
+
+:code:`NullTarget` objects discard the input completely.
+
+.. code-block:: python
+
+    >>> target = NullTarget()
+
+Custom :code:`Target` classes
+`````````````````````````````
+
+It's possible to define custom targets for your specific use case by inheriting
+the :code:`streaming_form_data.targets.BaseTarget` class and overriding the
+:code:`on_data_received` function.
+
+.. code-block:: python
+
+    >>> from streaming_form_data.targets import BaseTarget
+    >>>
+    >>> class CustomTarget(BaseTarget):
+    ...     def on_data_received(self, chunk):
+    ...         do_something_with(chunk)
+
+If the :code:`Content-Disposition` header included the :code:`filename`
+directive, this value will be available as the :code:`self.multipart_filename`
+attribute in :code:`Target` classes.
 
 :code:`Validator` classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,17 +182,9 @@ snippet.
 
 .. code-block:: python
 
-    >>> from streaming_form_data import StreamingFormDataParser
     >>> from streaming_form_data.targets import ValueTarget
-    >>> from streaming_form_data.validators import MaxSizeValidator
     >>>
-    >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
-    >>>
-    >>> parser = StreamingFormDataParser(headers=headers)
-    >>>
-    >>> parser.register('name', ValueTarget(validator=MaxSizeValidator(100)))
-    >>>
-    >>> parser.data_received(chunk)
+    >>> target = ValueTarget(validator=MaxSizeValidator(100))
 
 
 Examples

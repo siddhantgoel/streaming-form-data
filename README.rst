@@ -13,32 +13,7 @@ Streaming multipart/form-data parser
 
 :code:`streaming_form_data` provides a Python parser for parsing
 :code:`multipart/form-data` input chunks (the most commonly used encoding when
-submitting data through HTML forms).
-
-Chunk size is determined by the API user, but currently there are no
-restrictions on what the chunk size should be, since the parser works
-byte-by-byte (which means that passing the entire input as a single chunk should
-also work).
-
-The main entry point is the :code:`StreamingFormDataParser` class, which expects
-a dictionary of request :code:`headers`.
-
-The parser is fed chunks of (bytes) input, and takes action depending on what
-the current byte is. In case it notices input that's expected (input that has
-been registered by calling :code:`parser.register`, it will pass on the input to
-the registered :code:`Target` class which will then decide what to do with it.
-In case there's a part which is not needed, it can be associated to a
-:code:`NullTarget` object and it will be discarded.
-
-Currently the following :code:`Target` classes are included with this library.
-
-- :code:`ValueTarget` - holds the input in memory
-- :code:`FileTarget` - pipes the input to a file on disk
-- :code:`SHA256Target` - computes the SHA-256 hash of the input
-- :code:`NullTarget` - discards the input completely
-
-Any new targets should inherit :code:`streaming_form_data.targets.BaseTarget`
-and define an :code:`on_data_received` function.
+submitting data over HTTP through HTML forms).
 
 Installation
 ------------
@@ -49,7 +24,7 @@ Installation
 
 In case you prefer cloning the Github repository and installing manually, please
 note that :code:`master` is the development branch, so :code:`stable` is what
-you should be cloning.
+you should be working with.
 
 Usage
 -----
@@ -57,7 +32,7 @@ Usage
 .. code-block:: python
 
     >>> from streaming_form_data import StreamingFormDataParser
-    >>> from streaming_form_data.targets import ValueTarget, FileTarget
+    >>> from streaming_form_data.targets import ValueTarget, FileTarget, NullTarget
     >>>
     >>> headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
     >>>
@@ -65,8 +40,14 @@ Usage
     >>>
     >>> parser.register('name', ValueTarget())
     >>> parser.register('file', FileTarget('/tmp/file.txt'))
+    >>> parser.register('discard-me', NullTarget())
     >>>
     >>> parser.data_received(chunk)
+
+Documentation
+-------------
+
+Up-to-date documentation is available on readthedocs_.
 
 Development
 -----------
@@ -84,3 +65,4 @@ Please make sure you have Python 3 and pipenv_ installed.
 
 
 .. _pipenv: https://docs.pipenv.org/install/#installing-pipenv
+.. _readthedocs: https://streaming-form-data.readthedocs.io/
