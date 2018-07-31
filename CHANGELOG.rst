@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.1.0
+------
+- Built using Cython 0.28.4
+- Improve documentation
+
 v1.0.0
 ------
 - Add exception handling in the :code:`_Parser` class (move to the
