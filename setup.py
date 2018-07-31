@@ -30,6 +30,7 @@ setup(
     url='https://github.com/siddhantgoel/streaming-form-data',
     packages=['streaming_form_data'],
     ext_modules=extensions,
+    python_requires='>=3.4.0',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
