@@ -47,7 +47,7 @@ Usage
 Documentation
 -------------
 
-Up-to-date documentation is available on readthedocs_.
+Up-to-date documentation is available on `Read the Docs`_.
 
 Development
 -----------
@@ -65,4 +65,4 @@ Please make sure you have Python 3 and pipenv_ installed.
 
 
 .. _pipenv: https://docs.pipenv.org/install/#installing-pipenv
-.. _readthedocs: https://streaming-form-data.readthedocs.io/
+.. _Read the Docs: https://streaming-form-data.readthedocs.io/
