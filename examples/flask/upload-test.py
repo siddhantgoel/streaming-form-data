@@ -12,30 +12,12 @@ app = Flask(__name__)
 
 page = '''
 <!doctype html>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js"></script>
 <title>Upload new File</title>
 <h1>Upload new File</h1>
 <form method=post enctype=multipart/form-data id="upload-file">
   <input type=file name=file>
   <input type=submit value=Upload>
 </form><br>
-<div id="msg"/>
-<script>
-$(function() {
-    var timestamp;
-    $('#upload-file').ajaxForm({
-        beforeSend: function() {
-            timestamp = performance.now();
-            $("#msg").html("starting upload<br>")
-        },
-        complete: function(xhr) {
-            $("#msg").append(xhr.responseText + "<br>")
-            $("#msg").append("time spent on file transmission: " + (performance.now()-timestamp) / 1000 + "s")
-        }
-    });
-});
-</script>
 '''
 
 
