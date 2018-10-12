@@ -42,7 +42,7 @@ def upload_file():
             parser.data_received(chunk)
         timeB = time.perf_counter()
         print("time spent on file reception: %fs" % (timeB-timeA))
-        return "upload done"
+        return file.multipart_filename + ": upload done"
     return page
 
 
