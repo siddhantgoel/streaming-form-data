@@ -24,7 +24,7 @@ page = '''
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        file = FileTarget(os.path.join(tempfile.gettempdir(), "test"))
+        file_ = FileTarget(os.path.join(tempfile.gettempdir(), "test"))
 
         hdict = {}
         for h in request.headers:
@@ -32,7 +32,7 @@ def upload_file():
 
         parser = StreamingFormDataParser(headers=hdict)
 
-        parser.register('file', file)
+        parser.register('file', file_)
 
         timeA = time.perf_counter()
         while True:
@@ -41,8 +41,10 @@ def upload_file():
                 break
             parser.data_received(chunk)
         timeB = time.perf_counter()
+
         print("time spent on file reception: %fs" % (timeB-timeA))
-        return file.multipart_filename + ": upload done"
+
+        return file_.multipart_filename + ": upload done"
     return page
 
 
