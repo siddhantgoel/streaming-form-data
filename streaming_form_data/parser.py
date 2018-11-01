@@ -10,7 +10,7 @@ class ParseFailedException(Exception):
 def parse_content_boundary(headers):
     content_type = None
 
-    for key in headers:
+    for key in headers.keys():
         if key.lower() == 'content-type':
             content_type = headers.get(key)
             break
