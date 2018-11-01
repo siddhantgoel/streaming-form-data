@@ -1,50 +1,70 @@
 #!/usr/bin/python3
 
-from flask import Flask, request
-import time
 import os
 import tempfile
+import time
+from textwrap import dedent
+
+from flask import Flask, request
 
 from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget
 
+
 app = Flask(__name__)
 
-page = '''
-<!doctype html>
-<title>Upload new File</title>
-<h1>Upload new File</h1>
-<form method=post enctype=multipart/form-data id="upload-file">
-  <input type=file name=file>
-  <input type=submit value=Upload>
-</form><br>
-'''
+
+page = dedent('''
+    <!doctype html>
+    <head>
+        <title>Upload new File</title>
+    </head>
+    <body>
+        <h1>Upload new File</h1>
+        <form method="post" enctype="multipart/form-data" id="upload-file">
+          <input type="file" name="file">
+          <input type="submit" value="Upload">
+        </form>
+    </body>
+''')
 
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        file_ = FileTarget(os.path.join(tempfile.gettempdir(), "test"))
+        file_ = FileTarget(os.path.join(tempfile.gettempdir(), 'test'))
 
-        hdict = {}
-        for h in request.headers:
-            hdict[h[0]] = h[1]
-
-        parser = StreamingFormDataParser(headers=hdict)
+        parser = StreamingFormDataParser(headers=request.headers)
 
         parser.register('file', file_)
 
-        timeA = time.perf_counter()
+        time_start = time.perf_counter()
+
         while True:
             chunk = request.stream.read(8192)
             if not chunk:
                 break
             parser.data_received(chunk)
-        timeB = time.perf_counter()
 
-        print("time spent on file reception: %fs" % (timeB-timeA))
+        time_finish = time.perf_counter()
 
-        return file_.multipart_filename + ": upload done"
+        response = dedent('''
+            <!doctype html>
+            <head>
+                <title>Done!</title>
+            </head>
+            <body>
+                <h1>
+                    {file_name}: upload done
+                </h1>
+                <h2>
+                    Time spent on file reception: {duration}s
+                </h2>
+            </body>
+        '''.format(file_name=file_.multipart_filename,
+                   duration=(time_finish-time_start)))
+
+        return response
     return page
 
 
