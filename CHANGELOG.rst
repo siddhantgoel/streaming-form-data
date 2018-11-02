@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.2.0
+------
+- Built using Cython 0.28.5
+- Use :code:`keys()` to iterate over request headers
+
 v1.1.0
 ------
 - Built using Cython 0.28.4
