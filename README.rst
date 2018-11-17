@@ -52,7 +52,7 @@ Up-to-date documentation is available on `Read the Docs`_.
 Development
 -----------
 
-Please make sure you have Python 3 and pipenv_ installed.
+Please make sure you have Python 3.4+ and pipenv_ installed.
 
 1. Git clone the repository -
    :code:`git clone https://github.com/siddhantgoel/streaming-form-data`
