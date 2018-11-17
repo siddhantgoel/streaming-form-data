@@ -13,7 +13,7 @@ numpy = "==1.15.0"
 pytest = "==3.6.4"
 requests-toolbelt = "==0.8.0"
 twine = "==1.11.0"
-Cython = "==0.28.5"
+Cython = "==0.29"
 line_profiler = "==2.1.2"
 
 [requires]
