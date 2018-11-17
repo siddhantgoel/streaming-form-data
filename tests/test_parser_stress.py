@@ -50,10 +50,10 @@ def is_multiple(n, base):
 
 def is_useful_number(n):
     """
-    This function returns true if the number is chosen by euristic algorithm
-    to be used for testing Parser as chunk size of transferred data size.
-    Most of these numbers will be prime numbers +- 1.
-    The main idea of this function is to help speedup stress testing by using
+    This function returns True if the number can be used for testing the Parser
+    with the chunk size of transferred data size. Most of these numbers will be
+    prime numbers +- 1.
+    The main idea of this function is to help speedup stress testing by using a
     wide range of algorithm parameters without the need to use all possible
     values.
     """
@@ -91,10 +91,9 @@ def is_useful_number(n):
 
 def is_more_useful_number(n):
     """
-    This function is the same like is_useful_number
-    but it choses less numbers.
-    The function is written to be used in O(n^2) algorithm where
-    both chunk size and file size vary.
+    This function is the same like is_useful_number but it choses less numbers.
+    The function is written to be used in O(n^2) algorithm where both chunk
+    size and file size vary.
     """
     if n <= 100 and is_prime(n):
         return True
@@ -130,27 +129,25 @@ def is_more_useful_number(n):
 
 def get_max_useful_number():
     """
-    This number was chosen euristically.
-    I need this number to be as big as possible to test better.
-    But I need it to be small to wait test execution less time.
-    The number is bigger than 64K (2^16).
-    And it also covers next 10K-multiple number +- 1.
+    This number was chosen heuristically. It needs to be big enough to test
+    better, but small enough so that the test suite doesn't take forever.
+
+    The number is bigger than 64K (2^16), and it covers the next
+    10K-multiple numbers +- 1.
     """
     return 70 * 1000 + 1
 
 
 def get_useful_numbers(short_list=False):
-    """
-    upper_limit number was chosen euristically
-    """
+    # chosen heuristically
     upper_limit = 17000 if short_list else get_max_useful_number()
+
     check_func = is_more_useful_number if short_list else is_useful_number
 
     return [x for x in range(1, upper_limit + 1) if check_func(x)]
 
 
 class ParserTestCaseBase(TestCase):
-
     def subTest(self, test_idx, test_name, chunksize, original_data,
                 content_type, multipart_data, multipart_filename):
         print(test_idx, '; name: ', test_name, '; data_size: ',
@@ -175,6 +172,7 @@ class ParserTestCaseBase(TestCase):
         self.assertEqual(target.multipart_filename, multipart_filename)
         self.assertEqual(target._started, True)
         self.assertEqual(target._finished, True)
+
         result = target.value
         self.assertEqual(len(result), len(original_data))
         self.assertEqual(result, original_data)
