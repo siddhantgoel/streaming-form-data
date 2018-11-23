@@ -1,11 +1,12 @@
-from argparse import ArgumentParser
 import cProfile
-from functools import wraps
-from io import StringIO, BytesIO
-from numpy import random
 import pstats
+from argparse import ArgumentParser
+from functools import wraps
+from io import BytesIO, StringIO
 
+from numpy import random
 from requests_toolbelt import MultipartEncoder
+
 from streaming_form_data.parser import StreamingFormDataParser
 from streaming_form_data.targets import ValueTarget
 

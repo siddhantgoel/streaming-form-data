@@ -1,10 +1,10 @@
 from io import BytesIO
-from numpy import random
 from unittest import TestCase
 
+from numpy import random
 from requests_toolbelt import MultipartEncoder
 
-from streaming_form_data import StreamingFormDataParser, ParseFailedException
+from streaming_form_data import ParseFailedException, StreamingFormDataParser
 from streaming_form_data.targets import BaseTarget, FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 

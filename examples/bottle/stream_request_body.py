@@ -3,9 +3,8 @@ import tempfile
 from time import time
 
 import bottle
-
 from streaming_form_data import StreamingFormDataParser
-from streaming_form_data.targets import ValueTarget, FileTarget
+from streaming_form_data.targets import FileTarget, ValueTarget
 
 
 bottle.TEMPLATE_PATH = [os.path.join(os.path.dirname(__file__), 'templates')]

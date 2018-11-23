@@ -1,6 +1,6 @@
 import cgi
 
-from streaming_form_data._parser import _Parser, ErrorGroup
+from streaming_form_data._parser import ErrorGroup, _Parser
 
 
 class ParseFailedException(Exception):

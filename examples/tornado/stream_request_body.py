@@ -2,11 +2,10 @@ import os.path
 import tempfile
 from time import time
 
-from tornado.web import Application, RequestHandler, stream_request_body
-from tornado.ioloop import IOLoop
-
 from streaming_form_data import StreamingFormDataParser
-from streaming_form_data.targets import ValueTarget, FileTarget
+from streaming_form_data.targets import FileTarget, ValueTarget
+from tornado.ioloop import IOLoop
+from tornado.web import Application, RequestHandler, stream_request_body
 
 
 @stream_request_body

@@ -1,9 +1,11 @@
 from io import BytesIO
+from time import time
+
 from numpy import random
 from requests_toolbelt import MultipartEncoder
+
 from streaming_form_data.parser import StreamingFormDataParser
-from streaming_form_data.targets import NullTarget, BaseTarget
-from time import time
+from streaming_form_data.targets import BaseTarget, NullTarget
 
 
 class DummyTarget(BaseTarget):

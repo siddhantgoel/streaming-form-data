@@ -1,5 +1,5 @@
-from argparse import ArgumentParser
 import mimetypes
+from argparse import ArgumentParser
 
 from requests_toolbelt import MultipartEncoder
 

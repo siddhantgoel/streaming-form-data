@@ -1,6 +1,6 @@
+import math
 from io import BytesIO
 from itertools import chain
-import math
 from unittest import TestCase
 
 from numpy import random
