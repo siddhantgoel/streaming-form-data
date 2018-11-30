@@ -1,3 +1,5 @@
+# cython: language_level=3
+
 import cgi
 
 from streaming_form_data.targets import NullTarget
