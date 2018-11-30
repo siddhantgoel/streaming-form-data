@@ -1,15 +1,13 @@
 language: python
 
-cache: pip
-
 python:
     - "3.4"
     - "3.5"
     - "3.6"
 
 install:
-    - pip install pipenv
-    - make install-local
+    - make install-deps
+    - make build
 
 script:
     - make test
