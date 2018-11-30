@@ -52,17 +52,17 @@ Up-to-date documentation is available on `Read the Docs`_.
 Development
 -----------
 
-Please make sure you have Python 3.4+ and pipenv_ installed.
+Please make sure you have Python 3.4+ and `pip-tools`_ installed.
 
 1. Git clone the repository -
    :code:`git clone https://github.com/siddhantgoel/streaming-form-data`
 
 2. Install the packages required for development -
-   :code:`pipenv install --dev`
+   :code:`make local`
 
 3. That's basically it. You should now be able to run the test suite -
    :code:`py.test`.
 
 
-.. _pipenv: https://docs.pipenv.org/install/#installing-pipenv
+.. _pip tools: https://github.com/jazzband/pip-tools
 .. _Read the Docs: https://streaming-form-data.readthedocs.io/

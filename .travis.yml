@@ -6,8 +6,7 @@ python:
     - "3.6"
 
 install:
-    - make install-deps
-    - make build
+    - make local
 
 script:
     - make test

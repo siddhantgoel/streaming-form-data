@@ -28,7 +28,7 @@ install-deps:
 build:
 	python setup.py build_ext --inplace
 
-local: update-deps install-deps build
+local: install-deps build
 
 #
 # Utils
