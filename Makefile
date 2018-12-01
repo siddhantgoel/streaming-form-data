@@ -47,7 +47,7 @@ profile:
 dist:
 	python setup.py sdist
 
-publish: package
+publish: dist
 	twine upload dist/*
 
 .PHONY: clean \
