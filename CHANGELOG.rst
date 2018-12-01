@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v1.3.0
+------
+- Built using Cython 0.29.1
+
 v1.2.0
 ------
 - Built using Cython 0.28.5
