@@ -8,7 +8,7 @@ atomicwrites==1.2.1       # via pytest
 attrs==18.2.0             # via pytest
 certifi==2018.11.29       # via requests
 chardet==3.0.4            # via requests
-cython==0.29
+cython==0.29.1
 flake8-per-file-ignores==0.6
 flake8==3.4.0
 idna==2.7                 # via requests
