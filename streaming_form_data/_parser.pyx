@@ -292,7 +292,7 @@ cdef class _Parser:
                     if match_start >= buffer_start:
                         try:
                             self.on_body(chunk[buffer_start: match_start])
-                        except:
+                        except Exception:
                             self.mark_error()
                             raise
 
@@ -315,7 +315,7 @@ cdef class _Parser:
                     if match_start >= buffer_start:
                         try:
                             self.on_body(chunk[buffer_start: match_start])
-                        except:
+                        except Exception:
                             self.mark_error()
                             raise
                     else:
@@ -361,7 +361,7 @@ cdef class _Parser:
             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
                 try:
                     self.on_body(chunk[buffer_start: match_start])
-                except:
+                except Exception:
                     self.mark_error()
                     raise
 
