@@ -2,8 +2,12 @@ import os.path
 import tempfile
 from unittest import TestCase
 
-from streaming_form_data.targets import (BaseTarget, FileTarget, NullTarget,
-                                         ValueTarget)
+from streaming_form_data.targets import (
+    BaseTarget,
+    FileTarget,
+    NullTarget,
+    ValueTarget,
+)
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
@@ -145,8 +149,9 @@ class CustomTargetTestCase(TestCase):
         target._finished = True
 
         self.assertEqual(target.multipart_filename, 'file.txt')
-        self.assertEqual(target.value,
-                         b'[start] chunk1 chunk2 chunk3 [finish]')
+        self.assertEqual(
+            target.value, b'[start] chunk1 chunk2 chunk3 [finish]'
+        )
         self.assertEqual(target._started, True)
         self.assertEqual(target._finished, True)
 

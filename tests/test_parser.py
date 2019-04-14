@@ -46,9 +46,7 @@ def open_dataset(filename):
 
 def encoded_dataset(filename):
     with open_dataset(filename) as dataset_:
-        fields = {
-            filename: (filename, dataset_, 'text/plain')
-        }
+        fields = {filename: (filename, dataset_, 'text/plain')}
 
         encoder = MultipartEncoder(fields=fields)
 
@@ -60,7 +58,8 @@ class StreamingFormDataParserTestCase(TestCase):
         encoder = MultipartEncoder(fields={'name': 'hello'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
 
         parser.data_received(encoder.to_string())
 
@@ -70,7 +69,8 @@ class StreamingFormDataParserTestCase(TestCase):
         encoder = MultipartEncoder(fields={'value': 'hello world'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('value', target)
 
         parser.data_received(encoder.to_string())
@@ -82,16 +82,19 @@ class StreamingFormDataParserTestCase(TestCase):
     def test_case_insensitive_content_type(self):
         content_type_header = 'Content-Type'
 
-        for header_key in (content_type_header,
-                           content_type_header.lower(),
-                           content_type_header.upper(),
-                           'cOnTeNt-tYPe'):
+        for header_key in (
+            content_type_header,
+            content_type_header.lower(),
+            content_type_header.upper(),
+            'cOnTeNt-tYPe',
+        ):
             target = ValueTarget()
 
             encoder = MultipartEncoder(fields={'value': 'hello world'})
 
             parser = StreamingFormDataParser(
-                headers={header_key: encoder.content_type})
+                headers={header_key: encoder.content_type}
+            )
             parser.register('value', target)
 
             parser.data_received(encoder.to_string())
@@ -99,39 +102,41 @@ class StreamingFormDataParserTestCase(TestCase):
             self.assertEqual(target.value, b'hello world')
 
     def test_missing_content_type(self):
-        self.assertRaises(ParseFailedException,
-                          StreamingFormDataParser, {})
+        self.assertRaises(ParseFailedException, StreamingFormDataParser, {})
 
         headers = {'someheader': 'somevalue'}
-        self.assertRaises(ParseFailedException,
-                          StreamingFormDataParser, headers)
+        self.assertRaises(
+            ParseFailedException, StreamingFormDataParser, headers
+        )
 
     def test_incorrect_content_type(self):
         headers = {'Content-Type': 'multipart/mixed; boundary=1234'}
-        self.assertRaises(ParseFailedException,
-                          StreamingFormDataParser, headers)
+        self.assertRaises(
+            ParseFailedException, StreamingFormDataParser, headers
+        )
 
         headers = {'Content-Type': 'multipart/form-data'}
-        self.assertRaises(ParseFailedException,
-                          StreamingFormDataParser, headers)
+        self.assertRaises(
+            ParseFailedException, StreamingFormDataParser, headers
+        )
 
         headers = {'Content-Type': 'multipart/form-data; delimiter=1234'}
-        self.assertRaises(ParseFailedException,
-                          StreamingFormDataParser, headers)
+        self.assertRaises(
+            ParseFailedException, StreamingFormDataParser, headers
+        )
 
     def test_basic_multiple(self):
         first = ValueTarget()
         second = ValueTarget()
         third = ValueTarget()
 
-        encoder = MultipartEncoder(fields={
-            'first': 'foo',
-            'second': 'bar',
-            'third': 'baz'
-        })
+        encoder = MultipartEncoder(
+            fields={'first': 'foo', 'second': 'bar', 'third': 'baz'}
+        )
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
 
         parser.register('first', first)
         parser.register('second', second)
@@ -153,7 +158,8 @@ class StreamingFormDataParserTestCase(TestCase):
         body = encoder.to_string()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('value', target)
 
         index = body.index(b'world')
@@ -172,16 +178,19 @@ class StreamingFormDataParserTestCase(TestCase):
         second = ValueTarget()
         third = ValueTarget()
 
-        encoder = MultipartEncoder(fields={
-            'first': expected_first_value,
-            'second': expected_second_value,
-            'third': expected_third_value,
-        })
+        encoder = MultipartEncoder(
+            fields={
+                'first': expected_first_value,
+                'second': expected_second_value,
+                'third': expected_third_value,
+            }
+        )
 
         body = encoder.to_string()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
 
         parser.register('first', first)
         parser.register('second', second)
@@ -208,16 +217,16 @@ class StreamingFormDataParserTestCase(TestCase):
         first = ValueTarget()
         second = ValueTarget()
 
-        encoder = MultipartEncoder(fields={
-            'first': 'hello' * 500,
-            'second': 'hello' * 500
-        })
+        encoder = MultipartEncoder(
+            fields={'first': 'hello' * 500, 'second': 'hello' * 500}
+        )
 
         body = encoder.to_string()
         boundary = encoder.boundary.encode('utf-8')
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
 
         parser.register('first', first)
         parser.register('second', second)
@@ -231,9 +240,18 @@ class StreamingFormDataParserTestCase(TestCase):
         self.assertEqual(second.value, expected_second_value.encode('utf-8'))
 
     def test_file_content_single(self):
-        filenames = ('file.txt', 'image-600x400.png', 'image-2560x1600.png',
-                     'empty.html', 'hyphen-hyphen.txt', 'LF.txt', 'CRLF.txt',
-                     '1M.dat', '1M-1.dat', '1M+1.dat')
+        filenames = (
+            'file.txt',
+            'image-600x400.png',
+            'image-2560x1600.png',
+            'empty.html',
+            'hyphen-hyphen.txt',
+            'LF.txt',
+            'CRLF.txt',
+            '1M.dat',
+            '1M-1.dat',
+            '1M+1.dat',
+        )
 
         for filename in filenames:
             with open_dataset(filename) as dataset_:
@@ -244,7 +262,8 @@ class StreamingFormDataParserTestCase(TestCase):
             value = ValueTarget()
 
             parser = StreamingFormDataParser(
-                headers={'Content-Type': content_type})
+                headers={'Content-Type': content_type}
+            )
             parser.register(filename, value)
 
             parser.data_received(body)
@@ -260,7 +279,8 @@ class StreamingFormDataParserTestCase(TestCase):
         txt = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': content_type})
+            headers={'Content-Type': content_type}
+        )
         parser.register('file.txt', txt)
 
         size = 50
@@ -285,7 +305,8 @@ class StreamingFormDataParserTestCase(TestCase):
             txt = ValueTarget()
 
             parser = StreamingFormDataParser(
-                headers={'Content-Type': content_type})
+                headers={'Content-Type': content_type}
+            )
             parser.register('file.txt', txt)
 
             parser.data_received(body[:index])
@@ -301,7 +322,7 @@ class StreamingFormDataParserTestCase(TestCase):
             fields = {
                 'name': 'hello world',
                 'age': '10',
-                'cv.txt': ('file.txt', dataset_, 'text/plain')
+                'cv.txt': ('file.txt', dataset_, 'text/plain'),
             }
 
             encoder = MultipartEncoder(fields=fields)
@@ -315,7 +336,8 @@ class StreamingFormDataParserTestCase(TestCase):
             cv = ValueTarget()
 
             parser = StreamingFormDataParser(
-                headers={'Content-Type': content_type})
+                headers={'Content-Type': content_type}
+            )
 
             parser.register('name', name)
             parser.register('age', age)
@@ -334,7 +356,8 @@ class StreamingFormDataParserTestCase(TestCase):
         encoder = MultipartEncoder(fields={'value': 'hello\r\nworld'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('value', target)
         parser.data_received(encoder.to_string())
 
@@ -346,7 +369,8 @@ class StreamingFormDataParserTestCase(TestCase):
         encoder = MultipartEncoder(fields={'value': 'hello\r\n'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('value', target)
 
         parser.data_received(encoder.to_string())
@@ -359,7 +383,8 @@ class StreamingFormDataParserTestCase(TestCase):
         encoder = MultipartEncoder(fields={'value': '\r\nworld'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('value', target)
 
         parser.data_received(encoder.to_string())
@@ -373,12 +398,15 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
 --123
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -401,16 +429,23 @@ Foo
         txt_target = ValueTarget()
         png_target = ValueTarget()
 
-        with open_dataset(txt_filename) as txt_file, \
-                open_dataset(png_filename) as png_file:
-            encoder = MultipartEncoder(fields={
-                txt_filename: (txt_filename, txt_file,
-                               'application/plain'),
-                png_filename: (png_filename, png_file, 'image/png')
-            })
+        with open_dataset(txt_filename) as txt_file, open_dataset(
+            png_filename
+        ) as png_file:
+            encoder = MultipartEncoder(
+                fields={
+                    txt_filename: (
+                        txt_filename,
+                        txt_file,
+                        'application/plain',
+                    ),
+                    png_filename: (png_filename, png_file, 'image/png'),
+                }
+            )
 
             parser = StreamingFormDataParser(
-                headers={'Content-Type': encoder.content_type})
+                headers={'Content-Type': encoder.content_type}
+            )
 
             parser.register(txt_filename, txt_target)
             parser.register(png_filename, png_target)
@@ -421,8 +456,12 @@ Foo
             self.assertEqual(png_target.value, expected_png)
 
     def test_large_file(self):
-        for filename in ['image-500k.png', 'image-2560x1600.png',
-                         'image-600x400.png', 'image-high-res.jpg']:
+        for filename in [
+            'image-500k.png',
+            'image-2560x1600.png',
+            'image-600x400.png',
+            'image-high-res.jpg',
+        ]:
             with open_dataset(filename) as dataset_:
                 expected_value = dataset_.read()
 
@@ -431,7 +470,8 @@ Foo
             value = ValueTarget()
 
             parser = StreamingFormDataParser(
-                headers={'Content-Type': content_type})
+                headers={'Content-Type': content_type}
+            )
             parser.register(filename, value)
 
             parser.data_received(body)
@@ -448,12 +488,15 @@ Foo
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -469,12 +512,15 @@ Foo
 Content-Disposition: form-data; name=files; filename=ab.txt
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -482,26 +528,35 @@ Foo
         self.assertEqual(target.value, b'Foo')
 
     def test_special_filenames(self):
-        filenames = ['a;b.txt',
-                     'a"b.txt',
-                     'a";b.txt',
-                     'a;"b.txt',
-                     'a";";.txt',
-                     'a\\"b.txt',
-                     'a\\b.txt']
+        filenames = [
+            'a;b.txt',
+            'a"b.txt',
+            'a";b.txt',
+            'a;"b.txt',
+            'a";";.txt',
+            'a\\"b.txt',
+            'a\\b.txt',
+        ]
 
         for filename in filenames:
-            data = '''\
+            data = (
+                '''\
 --1234
 Content-Disposition: form-data; name=files; filename={}
 
 Foo
---1234--'''.format(filename).replace('\n', '\r\n').encode('utf-8')
+--1234--'''.format(
+                    filename
+                )
+                .replace('\n', '\r\n')
+                .encode('utf-8')
+            )
 
             target = ValueTarget()
 
             parser = StreamingFormDataParser(
-                headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+                headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+            )
             parser.register('files', target)
 
             parser.data_received(data)
@@ -514,12 +569,15 @@ Foo
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary="1234"'})
+            headers={'Content-Type': 'multipart/form-data; boundary="1234"'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -532,12 +590,17 @@ Foo
 --1234
 
 Foo
---1234--'''.replace('\n', '\r\n').encode('utf-8')
+--1234--'''.replace(
+            '\n', '\r\n'
+        ).encode(
+            'utf-8'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -550,12 +613,15 @@ Foo
 Content-Disposition: invalid; name="files"; filename="ab.txt"
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -568,12 +634,15 @@ Foo
 Content-Disposition: form-data; filename="ab.txt"
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -587,12 +656,15 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
 --1234--
-'''.replace(b'\n', b'\r\n')
+'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -603,11 +675,13 @@ Foo
         encoder = MultipartEncoder(fields={'name': 'hello'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.data_received(encoder.to_string())
 
-        self.assertRaises(ParseFailedException, parser.register,
-                          'name', ValueTarget())
+        self.assertRaises(
+            ParseFailedException, parser.register, 'name', ValueTarget()
+        )
 
     def test_missing_filename_directive(self):
         data = b'''\
@@ -616,14 +690,17 @@ Content-Disposition: form-data; name="files"
 
 Foo
 --1234--
-'''.replace(b'\n', b'\r\n')
+'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget()
 
         self.assertFalse(target.multipart_filename)
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         parser.data_received(data)
@@ -641,7 +718,8 @@ Foo
         self.assertFalse(target.multipart_filename)
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': content_type})
+            headers={'Content-Type': content_type}
+        )
         parser.register(filename, target)
         parser.data_received(body)
 
@@ -659,7 +737,8 @@ Foo
         target = BadTarget()
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': content_type})
+            headers={'Content-Type': content_type}
+        )
         parser.register(filename, target)
 
         self.assertRaises(ValueError, parser.data_received, body)
@@ -670,12 +749,15 @@ Foo
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = ValueTarget(validator=MaxSizeValidator(1))
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         self.assertRaises(ValidationError, parser.data_received, data)
@@ -689,12 +771,15 @@ Foo
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--'''.replace(b'\n', b'\r\n')
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        )
 
         target = FileTarget('/tmp/file.txt', validator=MaxSizeValidator(1))
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': 'multipart/form-data; boundary=1234'})
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
         parser.register('files', target)
 
         self.assertRaises(ValidationError, parser.data_received, data)

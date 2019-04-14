@@ -1,2 +1,4 @@
-from streaming_form_data.parser import (StreamingFormDataParser,  # NOQA
-                                        ParseFailedException)  # NOQA
+from streaming_form_data.parser import (  # NOQA
+    StreamingFormDataParser,
+    ParseFailedException,
+)

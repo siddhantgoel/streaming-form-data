@@ -7,8 +7,12 @@ from requests_toolbelt import MultipartEncoder
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('-f', '--filename', required=True, help='Data file')
-    parser.add_argument('-d', '--decode', help='Decode output before printing',
-                        action='store_true')
+    parser.add_argument(
+        '-d',
+        '--decode',
+        help='Decode output before printing',
+        action='store_true',
+    )
     return parser.parse_args()
 
 
@@ -21,7 +25,7 @@ def main():
         fields = {
             'name': 'hello world',
             'lines': 'first line\r\n\r\nsecond line',
-            'file': (args.filename, file_, content_type)
+            'file': (args.filename, file_, content_type),
         }
 
         body = MultipartEncoder(fields=fields).to_string()

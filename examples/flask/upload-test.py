@@ -14,7 +14,8 @@ from streaming_form_data.targets import FileTarget
 app = Flask(__name__)
 
 
-page = dedent('''
+page = dedent(
+    '''
     <!doctype html>
     <head>
         <title>Upload new File</title>
@@ -26,7 +27,8 @@ page = dedent('''
           <input type="submit" value="Upload">
         </form>
     </body>
-''')
+'''
+)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -48,7 +50,8 @@ def upload_file():
 
         time_finish = time.perf_counter()
 
-        response = dedent('''
+        response = dedent(
+            '''
             <!doctype html>
             <head>
                 <title>Done!</title>
@@ -61,8 +64,11 @@ def upload_file():
                     Time spent on file reception: {duration}s
                 </h2>
             </body>
-        '''.format(file_name=file_.multipart_filename,
-                   duration=(time_finish-time_start)))
+        '''.format(
+                file_name=file_.multipart_filename,
+                duration=(time_finish - time_start),
+            )
+        )
 
         return response
     return page

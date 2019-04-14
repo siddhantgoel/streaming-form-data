@@ -27,7 +27,8 @@ class ParserTargetExceptionTestCase(TestCase):
         encoder = MultipartEncoder(fields={'value': 'hello world'})
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('value', target)
 
         data = encoder.to_string()

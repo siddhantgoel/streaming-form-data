@@ -50,16 +50,16 @@ def main():
     with BytesIO(filedata) as fd:
         content_type = 'binary/octet-stream'
 
-        encoder = MultipartEncoder(fields={
-            'file': ('file', fd, content_type)
-        })
+        encoder = MultipartEncoder(fields={'file': ('file', fd, content_type)})
         headers = {'Content-Type': encoder.content_type}
         body = encoder.to_string()
 
     print_report = False
     gather_data = False
+
     if not gather_data:
         filedata = None  # free memory
+
     target = DummyTarget(print_report=print_report, gather_data=gather_data)
 
     parser = StreamingFormDataParser(headers)
@@ -75,19 +75,25 @@ def main():
     end_time = time()
     print('Data prepared')
     time_diff = end_time - begin_time
-    print('Preparation took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB' %
-          (time_diff,
-           (body_length / time_diff / mebibyte if time_diff > 0 else 0),
-           body_length / mebibyte))
+    print(
+        'Preparation took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB'
+        % (
+            time_diff,
+            (body_length / time_diff / mebibyte if time_diff > 0 else 0),
+            body_length / mebibyte,
+        )
+    )
 
     print('Begin test...')
 
     begin_time = time()
+
     while remaining > 0:
         chunksize = min(defaultChunksize, remaining)
         parser.data_received(body[position: position + chunksize])
         remaining -= chunksize
         position += chunksize
+
     end_time = time()
 
     print('End test')
@@ -96,8 +102,12 @@ def main():
         result = target.get_result()
         if result != filedata:
             print('-------------------------------------------')
-            print('ERROR! Decoded data mismatch! Orig size: ',
-                  len(filedata), '; got size:', len(result))
+            print(
+                'ERROR! Decoded data mismatch! Orig size: ',
+                len(filedata),
+                '; got size:',
+                len(result),
+            )
             print('-------------------------------------------')
         if not target._finished:
             print('-------------------------------------------')
@@ -105,10 +115,14 @@ def main():
             print('-------------------------------------------')
 
     time_diff = end_time - begin_time
-    print('Test took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB' %
-          (time_diff,
-           (body_length / time_diff / mebibyte if time_diff > 0 else 0),
-           body_length / mebibyte))
+    print(
+        'Test took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB'
+        % (
+            time_diff,
+            (body_length / time_diff / mebibyte if time_diff > 0 else 0),
+            body_length / mebibyte,
+        )
+    )
 
 
 if __name__ == '__main__':

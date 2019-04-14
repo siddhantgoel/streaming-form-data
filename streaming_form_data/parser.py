@@ -46,7 +46,8 @@ class StreamingFormDataParser:
     def register(self, name, target):
         if self._running:
             raise ParseFailedException(
-                'Registering parts not allowed when parser is running')
+                'Registering parts not allowed when parser is running'
+            )
 
         self._parser.register(name, target)
 
@@ -65,4 +66,5 @@ class StreamingFormDataParser:
                 message = 'parsing particular part headers'
 
             raise ParseFailedException(
-                '_parser.data_received failed with {}'.format(message))
+                '_parser.data_received failed with {}'.format(message)
+            )

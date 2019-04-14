@@ -34,13 +34,14 @@ def upload_page():
             break
         parser.data_received(chunk)
 
-    return {'name': value.value,
-            'filename': file.filename}
+    return {'name': value.value, 'filename': file.filename}
 
 
 if __name__ == '__main__':
-    bottle.run(app=bottle.app(),
-               server='paste',
-               host='localhost',
-               port=9000,
-               debug=True)
+    bottle.run(
+        app=bottle.app(),
+        server='paste',
+        host='localhost',
+        port=9000,
+        debug=True,
+    )

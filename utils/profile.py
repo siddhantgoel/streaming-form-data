@@ -29,20 +29,35 @@ def c_profile(sort_by='tottime'):
             print(stream.getvalue())
 
             return result
+
         return wrapped
+
     return decorator
 
 
 def parse_args():
     parser = ArgumentParser()
-    parser.add_argument('-c', '--content-type', type=str, required=True,
-                        help='Content Type of the input file')
-    parser.add_argument('-f', '--filename', type=str, required=False,
-                        help='File to be uploaded')
-    parser.add_argument('--data-size', metavar='SIZE',
-                        type=int, required=False,
-                        help='Size of generated data' +
-                        ' to be used instead of real file')
+    parser.add_argument(
+        '-c',
+        '--content-type',
+        type=str,
+        required=True,
+        help='Content Type of the input file',
+    )
+    parser.add_argument(
+        '-f',
+        '--filename',
+        type=str,
+        required=False,
+        help='File to be uploaded',
+    )
+    parser.add_argument(
+        '--data-size',
+        metavar='SIZE',
+        type=int,
+        required=False,
+        help='Size of generated data' + ' to be used instead of real file',
+    )
     return parser.parse_args()
 
 
@@ -56,8 +71,10 @@ def open_data(args):
         return open(args.filename, 'rb')
     if args.data_size is not None:
         return BytesIO(get_random_bytes(args.data_size, 42))
-    raise Exception('Not enough arguments passed: ' +
-                    'please specify --filename or --data_size argument')
+    raise Exception(
+        'Not enough arguments passed: '
+        + 'please specify --filename or --data_size argument'
+    )
 
 
 @c_profile()
@@ -65,12 +82,13 @@ def main():
     args = parse_args()
 
     with open_data(args) as fd:
-        encoder = MultipartEncoder(fields={
-            'file': ('file', fd, args.content_type)
-        })
+        encoder = MultipartEncoder(
+            fields={'file': ('file', fd, args.content_type)}
+        )
 
         parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type})
+            headers={'Content-Type': encoder.content_type}
+        )
         parser.register('file', ValueTarget())
 
         parser.data_received(encoder.to_string())
