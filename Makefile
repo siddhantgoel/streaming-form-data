@@ -1,3 +1,6 @@
+BLACK_CMD=black
+BLACK_OPTS=--line-length 79 --skip-string-normalization
+
 cython-file := streaming_form_data/_parser.pyx
 
 clean:
@@ -27,6 +30,12 @@ install-deps:
 
 build:
 	python setup.py build_ext --inplace
+
+black:
+	$(BLACK_CMD) $(BLACK_OPTS) streaming_form_data/*.py
+	$(BLACK_CMD) $(BLACK_OPTS) tests/
+	$(BLACK_CMD) $(BLACK_OPTS) utils/
+	$(BLACK_CMD) $(BLACK_OPTS) examples/**/*.py
 
 local: install-deps build
 
