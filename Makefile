@@ -1,5 +1,5 @@
-BLACK_CMD=black
-BLACK_OPTS=--line-length 79 --skip-string-normalization
+BLACK=black
+POETRY=poetry run
 
 cython-file := streaming_form_data/_parser.pyx
 
@@ -13,54 +13,24 @@ clean:
 #
 
 annotate:
-	cython -a $(cython-file) -o build/annotation.html
+	$(POETRY) cython -a $(cython-file) -o build/annotation.html
 
 compile:
-	cython $(cython-file)
-
-test:
-	flake8
-	py.test
-
-update-deps:
-	pip-compile requirements.dev.in > requirements.dev.txt
-
-install-deps:
-	pip install -r requirements.dev.txt
-
-build:
-	python setup.py build_ext --inplace
+	$(POETRY) cython $(cython-file)
 
 black:
-	$(BLACK_CMD) $(BLACK_OPTS) streaming_form_data/*.py
-	$(BLACK_CMD) $(BLACK_OPTS) tests/
-	$(BLACK_CMD) $(BLACK_OPTS) utils/
-	$(BLACK_CMD) $(BLACK_OPTS) examples/**/*.py
-
-local: install-deps build
+	$(POETRY) $(BLACK) streaming_form_data/*.py tests/ utils/ examples/**/*.py
 
 #
 # Utils
 #
 
 speed-test:
-	python utils/speedtest.py
+	$(POETRY) python utils/speedtest.py
 
 profile:
-	python utils/profile.py --data-size 17555000 -c binary/octet-stream
-
-#
-# PyPI
-#
-
-dist:
-	python setup.py sdist
-
-publish: dist
-	twine upload dist/*
+	$(POETRY) python utils/profile.py --data-size 17555000 -c binary/octet-stream
 
 .PHONY: clean \
-	annotate compile test \
-	speed-test profile \
-	update-deps install-deps build local \
-	dist publish
+	annotate compile \
+	speed-test profile
