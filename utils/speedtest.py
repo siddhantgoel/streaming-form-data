@@ -90,7 +90,7 @@ def main():
 
     while remaining > 0:
         chunksize = min(defaultChunksize, remaining)
-        parser.data_received(body[position: position + chunksize])
+        parser.data_received(body[position : position + chunksize])
         remaining -= chunksize
         position += chunksize
 

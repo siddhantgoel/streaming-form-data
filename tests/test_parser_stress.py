@@ -185,7 +185,7 @@ class ParserTestCaseBase(TestCase):
 
         while remaining:
             step_size = min(remaining, chunksize)
-            parser.data_received(multipart_data[offset: offset + step_size])
+            parser.data_received(multipart_data[offset : offset + step_size])
             offset += step_size
             remaining -= step_size
 
