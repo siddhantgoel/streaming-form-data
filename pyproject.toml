@@ -4,6 +4,7 @@ version = "1.4.0"
 description = "Streaming parser for multipart/form-data"
 authors = ["Siddhant Goel <me@sgoel.org>"]
 license = "MIT"
+build = "build.py"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Web Environment",
@@ -15,6 +16,7 @@ classifiers = [
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3 :: Only",
 ]
+include = ["LICENSE.txt"]
 url = "https://github.com/siddhantgoel/streaming-form-data"
 
 [tool.poetry.dependencies]

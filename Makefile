@@ -19,7 +19,7 @@ compile:
 	$(POETRY) cython $(cython-file)
 
 black:
-	$(POETRY) $(BLACK) streaming_form_data/*.py tests/ utils/ examples/**/*.py
+	$(POETRY) $(BLACK) streaming_form_data/*.py tests/ utils/ examples/**/*.py build.py
 
 #
 # Utils
