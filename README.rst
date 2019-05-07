@@ -52,21 +52,21 @@ Up-to-date documentation is available on `Read the Docs`_.
 Development
 -----------
 
-Please make sure you have Python 3.4+ installed.
+Please make sure you have Python 3.4+ and Poetry_ installed.
 
 1. Git clone the repository -
    :code:`git clone https://github.com/siddhantgoel/streaming-form-data`
 
 2. Install the packages required for development -
-   :code:`make local`
+   :code:`poetry install`
 
 3. That's basically it. You should now be able to run the test suite -
-   :code:`py.test`.
+   :code:`poetry run py.test`.
 
 Please note that :code:`tests/test_parser_stress.py` stress tests the parser
 with large inputs, which can take a while. As an alternative, pass the filename
 as an argument to :code:`py.test` to run tests selectively.
 
 
-.. _pip tools: https://github.com/jazzband/pip-tools
+.. _Poetry: https://poetry.eustace.io/
 .. _Read the Docs: https://streaming-form-data.readthedocs.io/
