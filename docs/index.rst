@@ -191,6 +191,7 @@ Examples
 --------
 
 - :code:`Bottle` - https://git.io/vhCUy
+- :code:`Flask` - https://git.io/fjPoA
 - :code:`Tornado` - https://git.io/vhCUM
 
 If you'd like to document usage with another web framework (which ideally
