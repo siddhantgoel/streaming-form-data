@@ -25,8 +25,8 @@ python = "^3.5"
 [tool.poetry.dev-dependencies]
 numpy = "^1.16"
 pytest = "^4.4"
-requests-toolbelt = "^0.9.1"
-cython = "^0.29.7"
+requests-toolbelt = "^0.9"
+cython = "^0.29"
 flake8 = "^3.7"
 black = {version = "^18.3-alpha.0",allows-prereleases = true,python = "^3.6"}
 
