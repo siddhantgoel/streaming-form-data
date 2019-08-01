@@ -1,13 +1,15 @@
 import cgi
+from typing import Mapping, Type
 
-from streaming_form_data._parser import ErrorGroup, _Parser
+from streaming_form_data._parser import ErrorGroup, _Parser  # type: ignore
+from streaming_form_data.targets import BaseTarget
 
 
 class ParseFailedException(Exception):
     pass
 
 
-def parse_content_boundary(headers):
+def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
     content_type = None
 
     for key in headers.keys():
@@ -31,7 +33,7 @@ def parse_content_boundary(headers):
 
 
 class StreamingFormDataParser:
-    def __init__(self, headers):
+    def __init__(self, headers: Mapping[str, str]):
         self.headers = headers
 
         raw_boundary = parse_content_boundary(headers)
@@ -43,7 +45,7 @@ class StreamingFormDataParser:
 
         self._running = False
 
-    def register(self, name, target):
+    def register(self, name: str, target: Type[BaseTarget]):
         if self._running:
             raise ParseFailedException(
                 'Registering parts not allowed when parser is running'
@@ -51,7 +53,7 @@ class StreamingFormDataParser:
 
         self._parser.register(name, target)
 
-    def data_received(self, data):
+    def data_received(self, data: bytes):
         if not self._running:
             self._running = True
 
