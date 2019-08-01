@@ -28,7 +28,6 @@ cpdef enum ErrorGroup:
     PartHeaders = 300
 
 
-# Knuth-Morris-Pratt algorithm
 cdef class Finder:
     cdef bytes target
     cdef const Byte *target_ptr
@@ -335,7 +334,8 @@ cdef class _Parser:
 
                     if self.delimiter_finder.inactive():
                         skip_count = self.rewind_fast_forward(
-                            chunk_ptr, idx + 1, chunk_len - 1)
+                            chunk_ptr, idx + 1, chunk_len - 1
+                        )
                         idx += skip_count
 
             elif self.state == ParserState.PS_END:
@@ -355,9 +355,12 @@ cdef class _Parser:
             return ErrorGroup.Internal + 7
 
         if self.state == ParserState.PS_READING_BODY:
-            matched_length = max(self.delimiter_finder.matched_length(),
-                                 self.ender_finder.matched_length())
+            matched_length = max(
+                self.delimiter_finder.matched_length(),
+                self.ender_finder.matched_length()
+            )
             match_start = idx - matched_length
+
             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
                 try:
                     self.on_body(chunk[buffer_start: match_start])
@@ -376,8 +379,9 @@ cdef class _Parser:
     # It returns the number of chars which can be skipped before the delimiter
     # starts (including potential 4-byte match).
     # It may also update Finder object state.
-    cdef size_t rewind_fast_forward(self, const Byte *chunk_ptr,
-                                    size_t pos_first, size_t pos_last):
+    cdef size_t rewind_fast_forward(
+        self, const Byte *chunk_ptr, size_t pos_first, size_t pos_last
+    ):
         cdef const Byte *ptr
         cdef const Byte *ptr_end
         cdef size_t skipped
@@ -412,9 +416,11 @@ cdef class _Parser:
                     skipped = skipped - 1
                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:
                     skipped = skipped - 2
-                elif ptr[0] == Constants.Hyphen and \
-                        ptr[-1] == Constants.LF and \
-                        ptr[-2] == Constants.CR:
+                elif (
+                    ptr[0] == Constants.Hyphen
+                    and ptr[-1] == Constants.LF
+                    and ptr[-2] == Constants.CR
+                ):
                     skipped = skipped - 3
                 break
 
