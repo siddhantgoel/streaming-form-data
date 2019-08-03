@@ -27,7 +27,7 @@ class BaseTarget:
     #       for use in URLs, filenames:
     #       https://github.com/un33k/python-slugify
 
-    def _validate(self, chunk):
+    def _validate(self, chunk: bytes):
         if self._validator:
             self._validator(chunk)
 
@@ -38,11 +38,11 @@ class BaseTarget:
     def on_start(self):
         pass
 
-    def data_received(self, chunk):
+    def data_received(self, chunk: bytes):
         self._validate(chunk)
         self.on_data_received(chunk)
 
-    def on_data_received(self, chunk):
+    def on_data_received(self, chunk: bytes):
         raise NotImplementedError()
 
     def finish(self):
@@ -54,7 +54,7 @@ class BaseTarget:
 
 
 class NullTarget(BaseTarget):
-    def on_data_received(self, chunk):
+    def on_data_received(self, chunk: bytes):
         pass
 
 
@@ -64,7 +64,7 @@ class ValueTarget(BaseTarget):
 
         self._values = []
 
-    def on_data_received(self, chunk):
+    def on_data_received(self, chunk: bytes):
         self._values.append(chunk)
 
     @property
@@ -78,13 +78,13 @@ class FileTarget(BaseTarget):
 
         self.filename = filename
 
-        self._openmode = 'wb' if allow_overwrite else 'xb'
+        self._mode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
 
     def on_start(self):
-        self._fd = open(self.filename, self._openmode)
+        self._fd = open(self.filename, self._mode)
 
-    def on_data_received(self, chunk):
+    def on_data_received(self, chunk: bytes):
         self._fd.write(chunk)
 
     def on_finish(self):
@@ -97,7 +97,7 @@ class SHA256Target(BaseTarget):
 
         self._hash = hashlib.sha256()
 
-    def on_data_received(self, chunk):
+    def on_data_received(self, chunk: bytes):
         self._hash.update(chunk)
 
     @property
