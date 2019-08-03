@@ -16,4 +16,5 @@ install:
 
 script:
     - poetry run flake8
+    - poetry run mypy streaming_form_data/
     - poetry run py.test tests/
