@@ -53,11 +53,11 @@ class StreamingFormDataParser:
 
         self._parser.register(name, target)
 
-    def data_received(self, data: bytes):
+    async def data_received(self, data: bytes):
         if not self._running:
             self._running = True
 
-        retval = self._parser.data_received(data)
+        retval = await self._parser.data_received(data)
 
         if retval > 0:
             if ErrorGroup.Internal <= retval < ErrorGroup.Delimiting:

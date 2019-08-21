@@ -88,6 +88,7 @@ cdef class Finder:
 class Part:
     """One part of a multipart/form-data request
     """
+    is_async = False
 
     def __init__(self, name, target):
         self.name = name
@@ -99,8 +100,8 @@ class Part:
     def start(self):
         self.target.start()
 
-    def data_received(self, chunk):
-        self.target.data_received(chunk)
+    async def data_received(self, chunk):
+        await self.target.data_received(chunk)
 
     def finish(self):
         self.target.finish()
@@ -164,16 +165,16 @@ cdef class _Parser:
             self.active_part.finish()
         self.active_part = None
 
-    def on_body(self, bytes value):
+    async def on_body(self, bytes value):
         if self.active_part and len(value) > 0:
-            self.active_part.data_received(value)
+            await self.active_part.data_received(value)
 
     cdef _part_for(self, name):
         for part in self.expected_parts:
             if part.name == name:
                 return part
 
-    def data_received(self, bytes data):
+    async def data_received(self, bytes data):
         if not data:
             return 0
 
@@ -188,9 +189,9 @@ cdef class _Parser:
             chunk = data
             index = 0
 
-        return self._parse(chunk, index)
+        return await self._parse(chunk, index)
 
-    def _parse(self, bytes chunk, size_t index):
+    async def _parse(self, bytes chunk, size_t index):
         cdef size_t idx, buffer_start, chunk_len
         cdef size_t match_start, skip_count, matched_length
         cdef Byte byte
@@ -290,7 +291,7 @@ cdef class _Parser:
 
                     if match_start >= buffer_start:
                         try:
-                            self.on_body(chunk[buffer_start: match_start])
+                            await self.on_body(chunk[buffer_start: match_start])
                         except Exception:
                             self.mark_error()
                             raise
@@ -313,7 +314,7 @@ cdef class _Parser:
 
                     if match_start >= buffer_start:
                         try:
-                            self.on_body(chunk[buffer_start: match_start])
+                            await self.on_body(chunk[buffer_start: match_start])
                         except Exception:
                             self.mark_error()
                             raise
@@ -363,7 +364,7 @@ cdef class _Parser:
 
             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
                 try:
-                    self.on_body(chunk[buffer_start: match_start])
+                    await self.on_body(chunk[buffer_start: match_start])
                 except Exception:
                     self.mark_error()
                     raise

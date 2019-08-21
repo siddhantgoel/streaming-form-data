@@ -6,6 +6,7 @@ class BaseTarget:
     it. Any new Target should inherit from this class and override
     data_received.
     """
+    is_async = False
 
     def __init__(self, validator=None):
         self.multipart_filename = None
@@ -38,9 +39,12 @@ class BaseTarget:
     def on_start(self):
         pass
 
-    def data_received(self, chunk: bytes):
+    async def data_received(self, chunk: bytes):
         self._validate(chunk)
-        self.on_data_received(chunk)
+        if self.is_async:
+            await self.on_data_received(chunk)
+        else:
+            self.on_data_received(chunk)
 
     def on_data_received(self, chunk: bytes):
         raise NotImplementedError()
