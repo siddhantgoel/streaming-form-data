@@ -1,0 +1,32 @@
+name: streaming-form-data
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.5, 3.6, 3.7]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Set up poetry
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Lint with flake8
+      run: |
+        poetry run flake8
+    - name: Lint with mypy
+      run: |
+        poetry run mypy streaming_form_data/
+    - name: Test with py.test
+      run: |
+        poetry run py.test tests/
