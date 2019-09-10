@@ -19,14 +19,15 @@ def root_page():
 @bottle.post('/upload')
 @bottle.view('upload.html')
 def upload_page():
-    value = ValueTarget()
     name = 'uploaded-file-tornado-{}.dat'.format(int(time()))
-    file = FileTarget(os.path.join(tempfile.gettempdir(), name))
+
+    value = ValueTarget()
+    file_ = FileTarget(os.path.join(tempfile.gettempdir(), name))
 
     parser = StreamingFormDataParser(headers=bottle.request.headers)
 
     parser.register('name', value)
-    parser.register('file', file)
+    parser.register('file', file_)
 
     while True:
         chunk = bottle.request.environ['wsgi.input'].read(8192)
@@ -34,7 +35,7 @@ def upload_page():
             break
         parser.data_received(chunk)
 
-    return {'name': value.value, 'filename': file.filename}
+    return {'name': value.value, 'filename': file_.filename}
 
 
 if __name__ == '__main__':

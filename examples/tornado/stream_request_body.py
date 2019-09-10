@@ -8,13 +8,17 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler, stream_request_body
 
 
+one_gb = 100 * 1024 * 1024 * 1024
+
+
 @stream_request_body
 class UploadHandler(RequestHandler):
     def prepare(self):
-        gigabyte = 1024 * 1024 * 1024
-        self.request.connection.set_max_body_size(100 * gigabyte)
-        self.value = ValueTarget()
+        self.request.connection.set_max_body_size(one_gb)
+
         name = 'uploaded-file-tornado-{}.dat'.format(int(time()))
+
+        self.value = ValueTarget()
         self.file_ = FileTarget(os.path.join(tempfile.gettempdir(), name))
 
         self._parser = StreamingFormDataParser(headers=self.request.headers)
