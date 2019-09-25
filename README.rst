@@ -10,6 +10,9 @@ Streaming multipart/form-data parser
 .. image:: https://readthedocs.org/projects/streaming-form-data/badge/?version=latest
     :target: https://streaming-form-data.readthedocs.io/en/latest/
 
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
+
 
 :code:`streaming_form_data` provides a Python parser for parsing
 :code:`multipart/form-data` input chunks (the most commonly used encoding when
