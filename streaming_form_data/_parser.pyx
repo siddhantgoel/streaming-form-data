@@ -327,10 +327,10 @@ cdef class _Parser:
                     self.ender_finder.reset()
 
                 else:
-                    # The following block is for great speed optimization
-                    # The idea is to skip all data not containing
-                    # delimiter starting sequence '\r\n--' when
-                    # we are not already in the middle of potential delimiter
+                    # This block is purely for speed optimization.
+                    # The idea is to skip all data not containing the delimiter
+                    # starting sequence '\r\n--' when we are not already in the
+                    # middle of a potential delimiter.
 
                     if self.delimiter_finder.inactive():
                         skip_count = self.rewind_fast_forward(
@@ -375,10 +375,11 @@ cdef class _Parser:
 
         return 0
 
-    # rewind_fast_forward searches for "\r\n--" sequence in provided buffer.
-    # It returns the number of chars which can be skipped before the delimiter
-    # starts (including potential 4-byte match).
-    # It may also update Finder object state.
+    # rewind_fast_forward searches for the '\r\n--' sequence in the provided
+    # buffer. It returns the number of characters which can be skipped before
+    # the delimiter starts (including potential 4-byte match). It may also
+    # update Finder object states.
+
     cdef size_t rewind_fast_forward(
         self, const Byte *chunk_ptr, size_t pos_first, size_t pos_last
     ):
@@ -386,30 +387,30 @@ cdef class _Parser:
         cdef const Byte *ptr_end
         cdef size_t skipped
 
-        # algorithm needs at least 4 chars in buffer
+        # we need at least 4 characters in buffer
         if pos_first + 3 > pos_last:
             return 0
 
-        # calculate pointer to a first char of the buffer and a pointer to a
-        # char after the end of the buffer
+        # calculate pointer to the first character of the buffer and the
+        # pointer to a character after the end of the buffer
         ptr = chunk_ptr + pos_first + 3
         ptr_end = chunk_ptr + pos_last + 1
         skipped = 0
 
-        # try matching starting from the 4th char of multipart delimiter
-        # Hint: delimiter always starts from "\r\n--"
-        # Additional optimization:
-        # Checking only every second character while no hyphen found.
+        # try to match starting from the 4th character of the multipart
+        # delimiter (which always starts with a '\r\n--'). An additional
+        # optimization is checking only every second character while no hyphen
+        # is found.
 
         while True:
             if ptr >= ptr_end:
-                # normalize pointer value because we could jump few chars past
-                # the buffer end
+                # normalize pointer value because we could jump few characters
+                # past the buffer end
                 ptr = ptr_end - 1
 
                 # if we iterated till the end of the buffer, we may need to
-                # keep up to 3 chars in the buffer until next chunk
-                # guess we will skip all chars in the buffer
+                # keep up to 3 characters in the buffer until next chunk
+                # guess we will skip all characters in the buffer
                 skipped = pos_last - pos_first + 1
 
                 if ptr[0] == Constants.CR:
