@@ -45,7 +45,10 @@ Usage
     >>> parser.register('file', FileTarget('/tmp/file.txt'))
     >>> parser.register('discard-me', NullTarget())
     >>>
-    >>> parser.data_received(chunk)
+    >>> for chunk in request.body:
+    ...     parser.data_received(chunk)
+    ...
+    >>>
 
 Documentation
 -------------
