@@ -172,6 +172,10 @@ If the :code:`Content-Disposition` header included the :code:`filename`
 directive, this value will be available as the :code:`self.multipart_filename`
 attribute in :code:`Target` classes.
 
+Similarly, if the :code:`Content-Type` header is available for the uploaded
+files, this value will be available as the :code:`self.multipart_content_type`
+attribute in :code:`Target` classes.
+
 :code:`Validator` classes
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
