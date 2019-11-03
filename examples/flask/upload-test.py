@@ -58,7 +58,7 @@ def upload_file():
             </head>
             <body>
                 <h1>
-                    {file_name}: upload done
+                    {file_name} ({content_type}): upload done
                 </h1>
                 <h2>
                     Time spent on file reception: {duration}s
@@ -66,6 +66,7 @@ def upload_file():
             </body>
         '''.format(
                 file_name=file_.multipart_filename,
+                content_type=file_.multipart_content_type,
                 duration=(time_finish - time_start),
             )
         )
