@@ -21,6 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
+    - name: Lint with black
+      if: matrix.python-version != '3.5'
+      run: |
+        make lint-black
     - name: Lint with flake8
       run: |
         make lint-flake8
