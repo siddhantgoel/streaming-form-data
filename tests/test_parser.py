@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from io import BytesIO
 from unittest import TestCase
 
@@ -9,9 +10,20 @@ from streaming_form_data.targets import BaseTarget, FileTarget, ValueTarget
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
+@contextmanager
+def local_seed(seed):
+    state = random.get_state()
+
+    try:
+        random.seed(seed)
+        yield
+    finally:
+        random.set_state(state)
+
+
 def get_random_bytes(size, seed):
-    random.seed(seed)
-    return random.bytes(size)
+    with local_seed(seed):
+        return random.bytes(size)
 
 
 def open_dataset(filename):
