@@ -1665,7 +1665,7 @@ static const char __pyx_k_Pyx_EnumBase___new[] = "__Pyx_EnumBase.__new__";
 static const char __pyx_k_Pyx_EnumBase___str[] = "__Pyx_EnumBase.__str__";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_multipart_filename[] = "multipart_filename";
-static const char __pyx_k_Content_Disposition[] = "Content-Disposition";
+static const char __pyx_k_Content_Disposition[] = "Content-Disposition:";
 static const char __pyx_k_Pyx_EnumBase___repr[] = "__Pyx_EnumBase.__repr__";
 static const char __pyx_k_pyx_unpickle_Finder[] = "__pyx_unpickle_Finder";
 static const char __pyx_k_Unknown_enum_value_s[] = "Unknown enum value: '%s'";
@@ -5572,8 +5572,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     return ErrorGroup.PartHeaders + 1
  * 
  *                 value, params = cgi.parse_header(             # <<<<<<<<<<<<<<
- *                     chunk[buffer_start: idx + 1].decode('utf-8'))
- * 
+ *                     chunk[buffer_start: idx + 1].decode('utf-8')
+ *                 )
  */
       __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_cgi); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 250, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
@@ -5584,9 +5584,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       /* "streaming_form_data/_parser.pyx":251
  * 
  *                 value, params = cgi.parse_header(
- *                     chunk[buffer_start: idx + 1].decode('utf-8'))             # <<<<<<<<<<<<<<
+ *                     chunk[buffer_start: idx + 1].decode('utf-8')             # <<<<<<<<<<<<<<
+ *                 )
  * 
- *                 if value.startswith('Content-Disposition') and \
  */
       if (unlikely(__pyx_v_chunk == Py_None)) {
         PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
@@ -5661,22 +5661,22 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     return ErrorGroup.PartHeaders + 1
  * 
  *                 value, params = cgi.parse_header(             # <<<<<<<<<<<<<<
- *                     chunk[buffer_start: idx + 1].decode('utf-8'))
- * 
+ *                     chunk[buffer_start: idx + 1].decode('utf-8')
+ *                 )
  */
       __Pyx_XDECREF_SET(__pyx_v_value, __pyx_t_7);
       __pyx_t_7 = 0;
       __Pyx_XDECREF_SET(__pyx_v_params, __pyx_t_4);
       __pyx_t_4 = 0;
 
-      /* "streaming_form_data/_parser.pyx":253
- *                     chunk[buffer_start: idx + 1].decode('utf-8'))
+      /* "streaming_form_data/_parser.pyx":254
+ *                 )
  * 
- *                 if value.startswith('Content-Disposition') and \             # <<<<<<<<<<<<<<
- *                         value.endswith('form-data'):
- *                     name = params.get('name')
+ *                 if value.startswith('Content-Disposition:'):             # <<<<<<<<<<<<<<
+ *                     if not value.endswith('form-data'):
+ *                         self.mark_error()
  */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_startswith); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 253, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_startswith); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 254, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __pyx_t_7 = NULL;
       if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -5690,63 +5690,84 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       }
       __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_kp_u_Content_Disposition) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_kp_u_Content_Disposition);
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-      if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 253, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_5);
-      __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 253, __pyx_L1_error)
-      __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      if (__pyx_t_3) {
-      } else {
-        __pyx_t_6 = __pyx_t_3;
-        goto __pyx_L16_bool_binop_done;
-      }
-
-      /* "streaming_form_data/_parser.pyx":254
- * 
- *                 if value.startswith('Content-Disposition') and \
- *                         value.endswith('form-data'):             # <<<<<<<<<<<<<<
- *                     name = params.get('name')
- *                     if name:
- */
-      __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_endswith); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 254, __pyx_L1_error)
-      __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_7 = NULL;
-      if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
-        __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_4);
-        if (likely(__pyx_t_7)) {
-          PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
-          __Pyx_INCREF(__pyx_t_7);
-          __Pyx_INCREF(function);
-          __Pyx_DECREF_SET(__pyx_t_4, function);
-        }
-      }
-      __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_kp_u_form_data) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_kp_u_form_data);
-      __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 254, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-      __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
+      __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 254, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-      __pyx_t_6 = __pyx_t_3;
-      __pyx_L16_bool_binop_done:;
-
-      /* "streaming_form_data/_parser.pyx":253
- *                     chunk[buffer_start: idx + 1].decode('utf-8'))
- * 
- *                 if value.startswith('Content-Disposition') and \             # <<<<<<<<<<<<<<
- *                         value.endswith('form-data'):
- *                     name = params.get('name')
- */
       if (__pyx_t_6) {
 
         /* "streaming_form_data/_parser.pyx":255
- *                 if value.startswith('Content-Disposition') and \
- *                         value.endswith('form-data'):
- *                     name = params.get('name')             # <<<<<<<<<<<<<<
- *                     if name:
- *                         part = self._part_for(name) or self.default_part
+ * 
+ *                 if value.startswith('Content-Disposition:'):
+ *                     if not value.endswith('form-data'):             # <<<<<<<<<<<<<<
+ *                         self.mark_error()
+ *                         return ErrorGroup.PartHeaders + 1
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_params, __pyx_n_s_get); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_value, __pyx_n_s_endswith); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_4);
+        __pyx_t_7 = NULL;
+        if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
+          __pyx_t_7 = PyMethod_GET_SELF(__pyx_t_4);
+          if (likely(__pyx_t_7)) {
+            PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_4);
+            __Pyx_INCREF(__pyx_t_7);
+            __Pyx_INCREF(function);
+            __Pyx_DECREF_SET(__pyx_t_4, function);
+          }
+        }
+        __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_kp_u_form_data) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_kp_u_form_data);
+        __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __Pyx_GOTREF(__pyx_t_5);
+        __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_5); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 255, __pyx_L1_error)
+        __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+        __pyx_t_3 = ((!__pyx_t_6) != 0);
+        if (__pyx_t_3) {
+
+          /* "streaming_form_data/_parser.pyx":256
+ *                 if value.startswith('Content-Disposition:'):
+ *                     if not value.endswith('form-data'):
+ *                         self.mark_error()             # <<<<<<<<<<<<<<
+ *                         return ErrorGroup.PartHeaders + 1
+ * 
+ */
+          __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 256, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
+
+          /* "streaming_form_data/_parser.pyx":257
+ *                     if not value.endswith('form-data'):
+ *                         self.mark_error()
+ *                         return ErrorGroup.PartHeaders + 1             # <<<<<<<<<<<<<<
+ * 
+ *                     name = params.get('name')
+ */
+          __Pyx_XDECREF(__pyx_r);
+          __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_PartHeaders + 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 257, __pyx_L1_error)
+          __Pyx_GOTREF(__pyx_t_5);
+          __pyx_r = __pyx_t_5;
+          __pyx_t_5 = 0;
+          goto __pyx_L0;
+
+          /* "streaming_form_data/_parser.pyx":255
+ * 
+ *                 if value.startswith('Content-Disposition:'):
+ *                     if not value.endswith('form-data'):             # <<<<<<<<<<<<<<
+ *                         self.mark_error()
+ *                         return ErrorGroup.PartHeaders + 1
+ */
+        }
+
+        /* "streaming_form_data/_parser.pyx":259
+ *                         return ErrorGroup.PartHeaders + 1
+ * 
+ *                     name = params.get('name')             # <<<<<<<<<<<<<<
+ * 
+ *                     if name:
+ */
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_v_params, __pyx_n_s_get); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_7 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -5760,56 +5781,56 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         }
         __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_n_u_name) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_n_u_name);
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 255, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 259, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF_SET(__pyx_v_name, __pyx_t_5);
         __pyx_t_5 = 0;
 
-        /* "streaming_form_data/_parser.pyx":256
- *                         value.endswith('form-data'):
+        /* "streaming_form_data/_parser.pyx":261
  *                     name = params.get('name')
+ * 
  *                     if name:             # <<<<<<<<<<<<<<
  *                         part = self._part_for(name) or self.default_part
  *                         self.set_active_part(part, params.get('filename'))
  */
-        __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_v_name); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 256, __pyx_L1_error)
-        if (__pyx_t_6) {
+        __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_name); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 261, __pyx_L1_error)
+        if (__pyx_t_3) {
 
-          /* "streaming_form_data/_parser.pyx":257
- *                     name = params.get('name')
+          /* "streaming_form_data/_parser.pyx":262
+ * 
  *                     if name:
  *                         part = self._part_for(name) or self.default_part             # <<<<<<<<<<<<<<
  *                         self.set_active_part(part, params.get('filename'))
  * 
  */
-          __pyx_t_4 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->_part_for(__pyx_v_self, __pyx_v_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 257, __pyx_L1_error)
+          __pyx_t_4 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->_part_for(__pyx_v_self, __pyx_v_name); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 262, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_6 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 257, __pyx_L1_error)
-          if (!__pyx_t_6) {
+          __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_4); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 262, __pyx_L1_error)
+          if (!__pyx_t_3) {
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           } else {
             __Pyx_INCREF(__pyx_t_4);
             __pyx_t_5 = __pyx_t_4;
             __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-            goto __pyx_L19_bool_binop_done;
+            goto __pyx_L18_bool_binop_done;
           }
           __Pyx_INCREF(__pyx_v_self->default_part);
           __pyx_t_5 = __pyx_v_self->default_part;
-          __pyx_L19_bool_binop_done:;
+          __pyx_L18_bool_binop_done:;
           __Pyx_XDECREF_SET(__pyx_v_part, __pyx_t_5);
           __pyx_t_5 = 0;
 
-          /* "streaming_form_data/_parser.pyx":258
+          /* "streaming_form_data/_parser.pyx":263
  *                     if name:
  *                         part = self._part_for(name) or self.default_part
  *                         self.set_active_part(part, params.get('filename'))             # <<<<<<<<<<<<<<
  * 
  *                 buffer_start = idx + 1
  */
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_active_part); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 258, __pyx_L1_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_active_part); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 263, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_4);
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_params, __pyx_n_s_get); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 258, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_params, __pyx_n_s_get); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 263, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_10 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
@@ -5823,7 +5844,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           }
           __pyx_t_7 = (__pyx_t_10) ? __Pyx_PyObject_Call2Args(__pyx_t_8, __pyx_t_10, __pyx_n_u_filename) : __Pyx_PyObject_CallOneArg(__pyx_t_8, __pyx_n_u_filename);
           __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 258, __pyx_L1_error)
+          if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 263, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
           __pyx_t_8 = NULL;
@@ -5841,7 +5862,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           #if CYTHON_FAST_PYCALL
           if (PyFunction_Check(__pyx_t_4)) {
             PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_part, __pyx_t_7};
-            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 258, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 263, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
@@ -5850,14 +5871,14 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           #if CYTHON_FAST_PYCCALL
           if (__Pyx_PyFastCFunction_Check(__pyx_t_4)) {
             PyObject *__pyx_temp[3] = {__pyx_t_8, __pyx_v_part, __pyx_t_7};
-            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 258, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyCFunction_FastCall(__pyx_t_4, __pyx_temp+1-__pyx_t_11, 2+__pyx_t_11); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 263, __pyx_L1_error)
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
           } else
           #endif
           {
-            __pyx_t_10 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 258, __pyx_L1_error)
+            __pyx_t_10 = PyTuple_New(2+__pyx_t_11); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 263, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_10);
             if (__pyx_t_8) {
               __Pyx_GIVEREF(__pyx_t_8); PyTuple_SET_ITEM(__pyx_t_10, 0, __pyx_t_8); __pyx_t_8 = NULL;
@@ -5868,32 +5889,32 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_GIVEREF(__pyx_t_7);
             PyTuple_SET_ITEM(__pyx_t_10, 1+__pyx_t_11, __pyx_t_7);
             __pyx_t_7 = 0;
-            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_10, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 258, __pyx_L1_error)
+            __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_4, __pyx_t_10, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 263, __pyx_L1_error)
             __Pyx_GOTREF(__pyx_t_5);
             __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
           }
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "streaming_form_data/_parser.pyx":256
- *                         value.endswith('form-data'):
+          /* "streaming_form_data/_parser.pyx":261
  *                     name = params.get('name')
+ * 
  *                     if name:             # <<<<<<<<<<<<<<
  *                         part = self._part_for(name) or self.default_part
  *                         self.set_active_part(part, params.get('filename'))
  */
         }
 
-        /* "streaming_form_data/_parser.pyx":253
- *                     chunk[buffer_start: idx + 1].decode('utf-8'))
+        /* "streaming_form_data/_parser.pyx":254
+ *                 )
  * 
- *                 if value.startswith('Content-Disposition') and \             # <<<<<<<<<<<<<<
- *                         value.endswith('form-data'):
- *                     name = params.get('name')
+ *                 if value.startswith('Content-Disposition:'):             # <<<<<<<<<<<<<<
+ *                     if not value.endswith('form-data'):
+ *                         self.mark_error()
  */
       }
 
-      /* "streaming_form_data/_parser.pyx":260
+      /* "streaming_form_data/_parser.pyx":265
  *                         self.set_active_part(part, params.get('filename'))
  * 
  *                 buffer_start = idx + 1             # <<<<<<<<<<<<<<
@@ -5902,7 +5923,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
       __pyx_v_buffer_start = (__pyx_v_idx + 1);
 
-      /* "streaming_form_data/_parser.pyx":262
+      /* "streaming_form_data/_parser.pyx":267
  *                 buffer_start = idx + 1
  * 
  *                 self.state = ParserState.PS_ENDED_HEADER             # <<<<<<<<<<<<<<
@@ -5921,17 +5942,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       break;
       case __pyx_e_19streaming_form_data_7_parser_PS_ENDED_HEADER:
 
-      /* "streaming_form_data/_parser.pyx":264
+      /* "streaming_form_data/_parser.pyx":269
  *                 self.state = ParserState.PS_ENDED_HEADER
  *             elif self.state == ParserState.PS_ENDED_HEADER:
  *                 if byte == Constants.CR:             # <<<<<<<<<<<<<<
  *                     self.state = ParserState.PS_ENDING_ALL_HEADERS
  *                 else:
  */
-      __pyx_t_6 = ((__pyx_v_byte == __pyx_e_19streaming_form_data_7_parser_CR) != 0);
-      if (__pyx_t_6) {
+      __pyx_t_3 = ((__pyx_v_byte == __pyx_e_19streaming_form_data_7_parser_CR) != 0);
+      if (__pyx_t_3) {
 
-        /* "streaming_form_data/_parser.pyx":265
+        /* "streaming_form_data/_parser.pyx":270
  *             elif self.state == ParserState.PS_ENDED_HEADER:
  *                 if byte == Constants.CR:
  *                     self.state = ParserState.PS_ENDING_ALL_HEADERS             # <<<<<<<<<<<<<<
@@ -5940,17 +5961,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         __pyx_v_self->state = __pyx_e_19streaming_form_data_7_parser_PS_ENDING_ALL_HEADERS;
 
-        /* "streaming_form_data/_parser.pyx":264
+        /* "streaming_form_data/_parser.pyx":269
  *                 self.state = ParserState.PS_ENDED_HEADER
  *             elif self.state == ParserState.PS_ENDED_HEADER:
  *                 if byte == Constants.CR:             # <<<<<<<<<<<<<<
  *                     self.state = ParserState.PS_ENDING_ALL_HEADERS
  *                 else:
  */
-        goto __pyx_L21;
+        goto __pyx_L20;
       }
 
-      /* "streaming_form_data/_parser.pyx":267
+      /* "streaming_form_data/_parser.pyx":272
  *                     self.state = ParserState.PS_ENDING_ALL_HEADERS
  *                 else:
  *                     self.state = ParserState.PS_READING_HEADER             # <<<<<<<<<<<<<<
@@ -5960,9 +5981,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       /*else*/ {
         __pyx_v_self->state = __pyx_e_19streaming_form_data_7_parser_PS_READING_HEADER;
       }
-      __pyx_L21:;
+      __pyx_L20:;
 
-      /* "streaming_form_data/_parser.pyx":263
+      /* "streaming_form_data/_parser.pyx":268
  * 
  *                 self.state = ParserState.PS_ENDED_HEADER
  *             elif self.state == ParserState.PS_ENDED_HEADER:             # <<<<<<<<<<<<<<
@@ -5972,28 +5993,28 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       break;
       case __pyx_e_19streaming_form_data_7_parser_PS_ENDING_ALL_HEADERS:
 
-      /* "streaming_form_data/_parser.pyx":270
+      /* "streaming_form_data/_parser.pyx":275
  * 
  *             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
  *                 if byte != Constants.LF:             # <<<<<<<<<<<<<<
  *                     self.mark_error()
  *                     return ErrorGroup.PartHeaders + 2
  */
-      __pyx_t_6 = ((__pyx_v_byte != __pyx_e_19streaming_form_data_7_parser_LF) != 0);
-      if (__pyx_t_6) {
+      __pyx_t_3 = ((__pyx_v_byte != __pyx_e_19streaming_form_data_7_parser_LF) != 0);
+      if (__pyx_t_3) {
 
-        /* "streaming_form_data/_parser.pyx":271
+        /* "streaming_form_data/_parser.pyx":276
  *             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
  *                 if byte != Constants.LF:
  *                     self.mark_error()             # <<<<<<<<<<<<<<
  *                     return ErrorGroup.PartHeaders + 2
  * 
  */
-        __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 271, __pyx_L1_error)
+        __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 276, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "streaming_form_data/_parser.pyx":272
+        /* "streaming_form_data/_parser.pyx":277
  *                 if byte != Constants.LF:
  *                     self.mark_error()
  *                     return ErrorGroup.PartHeaders + 2             # <<<<<<<<<<<<<<
@@ -6001,13 +6022,13 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                 buffer_start = idx + 1
  */
         __Pyx_XDECREF(__pyx_r);
-        __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_PartHeaders + 2)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 272, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_PartHeaders + 2)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 277, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_r = __pyx_t_5;
         __pyx_t_5 = 0;
         goto __pyx_L0;
 
-        /* "streaming_form_data/_parser.pyx":270
+        /* "streaming_form_data/_parser.pyx":275
  * 
  *             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
  *                 if byte != Constants.LF:             # <<<<<<<<<<<<<<
@@ -6016,7 +6037,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
       }
 
-      /* "streaming_form_data/_parser.pyx":274
+      /* "streaming_form_data/_parser.pyx":279
  *                     return ErrorGroup.PartHeaders + 2
  * 
  *                 buffer_start = idx + 1             # <<<<<<<<<<<<<<
@@ -6025,7 +6046,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
       __pyx_v_buffer_start = (__pyx_v_idx + 1);
 
-      /* "streaming_form_data/_parser.pyx":276
+      /* "streaming_form_data/_parser.pyx":281
  *                 buffer_start = idx + 1
  * 
  *                 self.state = ParserState.PS_READING_BODY             # <<<<<<<<<<<<<<
@@ -6034,7 +6055,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
       __pyx_v_self->state = __pyx_e_19streaming_form_data_7_parser_PS_READING_BODY;
 
-      /* "streaming_form_data/_parser.pyx":269
+      /* "streaming_form_data/_parser.pyx":274
  *                     self.state = ParserState.PS_READING_HEADER
  * 
  *             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:             # <<<<<<<<<<<<<<
@@ -6044,39 +6065,39 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       break;
       case __pyx_e_19streaming_form_data_7_parser_PS_READING_BODY:
 
-      /* "streaming_form_data/_parser.pyx":279
+      /* "streaming_form_data/_parser.pyx":284
  *             elif self.state == ParserState.PS_READING_BODY:
  * 
  *                 self.delimiter_finder.feed(byte)             # <<<<<<<<<<<<<<
  *                 self.ender_finder.feed(byte)
  * 
  */
-      __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_v_byte, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 279, __pyx_L1_error)
+      __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_v_byte, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 284, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "streaming_form_data/_parser.pyx":280
+      /* "streaming_form_data/_parser.pyx":285
  * 
  *                 self.delimiter_finder.feed(byte)
  *                 self.ender_finder.feed(byte)             # <<<<<<<<<<<<<<
  * 
  *                 if self.delimiter_finder.found():
  */
-      __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_v_byte, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 280, __pyx_L1_error)
+      __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_v_byte, 0); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "streaming_form_data/_parser.pyx":282
+      /* "streaming_form_data/_parser.pyx":287
  *                 self.ender_finder.feed(byte)
  * 
  *                 if self.delimiter_finder.found():             # <<<<<<<<<<<<<<
  *                     self.state = ParserState.PS_READING_HEADER
  * 
  */
-      __pyx_t_6 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->found(__pyx_v_self->delimiter_finder, 0) != 0);
-      if (__pyx_t_6) {
+      __pyx_t_3 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->found(__pyx_v_self->delimiter_finder, 0) != 0);
+      if (__pyx_t_3) {
 
-        /* "streaming_form_data/_parser.pyx":283
+        /* "streaming_form_data/_parser.pyx":288
  * 
  *                 if self.delimiter_finder.found():
  *                     self.state = ParserState.PS_READING_HEADER             # <<<<<<<<<<<<<<
@@ -6085,28 +6106,28 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         __pyx_v_self->state = __pyx_e_19streaming_form_data_7_parser_PS_READING_HEADER;
 
-        /* "streaming_form_data/_parser.pyx":285
+        /* "streaming_form_data/_parser.pyx":290
  *                     self.state = ParserState.PS_READING_HEADER
  * 
  *                     if idx + 1 < self.delimiter_length:             # <<<<<<<<<<<<<<
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 1
  */
-        __pyx_t_6 = (((__pyx_v_idx + 1) < __pyx_v_self->delimiter_length) != 0);
-        if (__pyx_t_6) {
+        __pyx_t_3 = (((__pyx_v_idx + 1) < __pyx_v_self->delimiter_length) != 0);
+        if (__pyx_t_3) {
 
-          /* "streaming_form_data/_parser.pyx":286
+          /* "streaming_form_data/_parser.pyx":291
  * 
  *                     if idx + 1 < self.delimiter_length:
  *                         self.mark_error()             # <<<<<<<<<<<<<<
  *                         return ErrorGroup.Internal + 1
  * 
  */
-          __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 286, __pyx_L1_error)
+          __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "streaming_form_data/_parser.pyx":287
+          /* "streaming_form_data/_parser.pyx":292
  *                     if idx + 1 < self.delimiter_length:
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 1             # <<<<<<<<<<<<<<
@@ -6114,13 +6135,13 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     match_start = idx + 1 - self.delimiter_length
  */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 292, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_r = __pyx_t_5;
           __pyx_t_5 = 0;
           goto __pyx_L0;
 
-          /* "streaming_form_data/_parser.pyx":285
+          /* "streaming_form_data/_parser.pyx":290
  *                     self.state = ParserState.PS_READING_HEADER
  * 
  *                     if idx + 1 < self.delimiter_length:             # <<<<<<<<<<<<<<
@@ -6129,7 +6150,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         }
 
-        /* "streaming_form_data/_parser.pyx":289
+        /* "streaming_form_data/_parser.pyx":294
  *                         return ErrorGroup.Internal + 1
  * 
  *                     match_start = idx + 1 - self.delimiter_length             # <<<<<<<<<<<<<<
@@ -6138,17 +6159,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         __pyx_v_match_start = ((__pyx_v_idx + 1) - __pyx_v_self->delimiter_length);
 
-        /* "streaming_form_data/_parser.pyx":291
+        /* "streaming_form_data/_parser.pyx":296
  *                     match_start = idx + 1 - self.delimiter_length
  * 
  *                     if match_start >= buffer_start:             # <<<<<<<<<<<<<<
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])
  */
-        __pyx_t_6 = ((__pyx_v_match_start >= __pyx_v_buffer_start) != 0);
-        if (__pyx_t_6) {
+        __pyx_t_3 = ((__pyx_v_match_start >= __pyx_v_buffer_start) != 0);
+        if (__pyx_t_3) {
 
-          /* "streaming_form_data/_parser.pyx":292
+          /* "streaming_form_data/_parser.pyx":297
  * 
  *                     if match_start >= buffer_start:
  *                         try:             # <<<<<<<<<<<<<<
@@ -6164,20 +6185,20 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_XGOTREF(__pyx_t_14);
             /*try:*/ {
 
-              /* "streaming_form_data/_parser.pyx":293
+              /* "streaming_form_data/_parser.pyx":298
  *                     if match_start >= buffer_start:
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])             # <<<<<<<<<<<<<<
  *                         except Exception:
  *                             self.mark_error()
  */
-              __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_on_body); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 293, __pyx_L26_error)
+              __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_on_body); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 298, __pyx_L25_error)
               __Pyx_GOTREF(__pyx_t_4);
               if (unlikely(__pyx_v_chunk == Py_None)) {
                 PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-                __PYX_ERR(0, 293, __pyx_L26_error)
+                __PYX_ERR(0, 298, __pyx_L25_error)
               }
-              __pyx_t_10 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_match_start); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 293, __pyx_L26_error)
+              __pyx_t_10 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_match_start); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 298, __pyx_L25_error)
               __Pyx_GOTREF(__pyx_t_10);
               __pyx_t_7 = NULL;
               if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6192,12 +6213,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
               __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_10);
               __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
               __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-              if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 293, __pyx_L26_error)
+              if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 298, __pyx_L25_error)
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-              /* "streaming_form_data/_parser.pyx":292
+              /* "streaming_form_data/_parser.pyx":297
  * 
  *                     if match_start >= buffer_start:
  *                         try:             # <<<<<<<<<<<<<<
@@ -6208,15 +6229,15 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
             __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-            goto __pyx_L33_try_end;
-            __pyx_L26_error:;
+            goto __pyx_L32_try_end;
+            __pyx_L25_error:;
             __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
             __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-            /* "streaming_form_data/_parser.pyx":294
+            /* "streaming_form_data/_parser.pyx":299
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])
  *                         except Exception:             # <<<<<<<<<<<<<<
@@ -6226,23 +6247,23 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
             if (__pyx_t_11) {
               __Pyx_AddTraceback("streaming_form_data._parser._Parser._parse", __pyx_clineno, __pyx_lineno, __pyx_filename);
-              if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_4, &__pyx_t_10) < 0) __PYX_ERR(0, 294, __pyx_L28_except_error)
+              if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_4, &__pyx_t_10) < 0) __PYX_ERR(0, 299, __pyx_L27_except_error)
               __Pyx_GOTREF(__pyx_t_5);
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_GOTREF(__pyx_t_10);
 
-              /* "streaming_form_data/_parser.pyx":295
+              /* "streaming_form_data/_parser.pyx":300
  *                             self.on_body(chunk[buffer_start: match_start])
  *                         except Exception:
  *                             self.mark_error()             # <<<<<<<<<<<<<<
  *                             raise
  * 
  */
-              __pyx_t_7 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 295, __pyx_L28_except_error)
+              __pyx_t_7 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 300, __pyx_L27_except_error)
               __Pyx_GOTREF(__pyx_t_7);
               __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-              /* "streaming_form_data/_parser.pyx":296
+              /* "streaming_form_data/_parser.pyx":301
  *                         except Exception:
  *                             self.mark_error()
  *                             raise             # <<<<<<<<<<<<<<
@@ -6254,12 +6275,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
               __Pyx_XGIVEREF(__pyx_t_10);
               __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_4, __pyx_t_10);
               __pyx_t_5 = 0; __pyx_t_4 = 0; __pyx_t_10 = 0; 
-              __PYX_ERR(0, 296, __pyx_L28_except_error)
+              __PYX_ERR(0, 301, __pyx_L27_except_error)
             }
-            goto __pyx_L28_except_error;
-            __pyx_L28_except_error:;
+            goto __pyx_L27_except_error;
+            __pyx_L27_except_error:;
 
-            /* "streaming_form_data/_parser.pyx":292
+            /* "streaming_form_data/_parser.pyx":297
  * 
  *                     if match_start >= buffer_start:
  *                         try:             # <<<<<<<<<<<<<<
@@ -6271,10 +6292,10 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_XGIVEREF(__pyx_t_14);
             __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_13, __pyx_t_14);
             goto __pyx_L1_error;
-            __pyx_L33_try_end:;
+            __pyx_L32_try_end:;
           }
 
-          /* "streaming_form_data/_parser.pyx":298
+          /* "streaming_form_data/_parser.pyx":303
  *                             raise
  * 
  *                         buffer_start = idx + 1             # <<<<<<<<<<<<<<
@@ -6283,17 +6304,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
           __pyx_v_buffer_start = (__pyx_v_idx + 1);
 
-          /* "streaming_form_data/_parser.pyx":291
+          /* "streaming_form_data/_parser.pyx":296
  *                     match_start = idx + 1 - self.delimiter_length
  * 
  *                     if match_start >= buffer_start:             # <<<<<<<<<<<<<<
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])
  */
-          goto __pyx_L25;
+          goto __pyx_L24;
         }
 
-        /* "streaming_form_data/_parser.pyx":300
+        /* "streaming_form_data/_parser.pyx":305
  *                         buffer_start = idx + 1
  *                     else:
  *                         self.mark_error()             # <<<<<<<<<<<<<<
@@ -6301,11 +6322,11 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  * 
  */
         /*else*/ {
-          __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 300, __pyx_L1_error)
+          __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 305, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-          /* "streaming_form_data/_parser.pyx":301
+          /* "streaming_form_data/_parser.pyx":306
  *                     else:
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 2             # <<<<<<<<<<<<<<
@@ -6313,22 +6334,22 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     self.unset_active_part()
  */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_10 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 2)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 301, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 2)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 306, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_r = __pyx_t_10;
           __pyx_t_10 = 0;
           goto __pyx_L0;
         }
-        __pyx_L25:;
+        __pyx_L24:;
 
-        /* "streaming_form_data/_parser.pyx":303
+        /* "streaming_form_data/_parser.pyx":308
  *                         return ErrorGroup.Internal + 2
  * 
  *                     self.unset_active_part()             # <<<<<<<<<<<<<<
  *                     self.delimiter_finder.reset()
  * 
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unset_active_part); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 303, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unset_active_part); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_5 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6342,43 +6363,43 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         }
         __pyx_t_10 = (__pyx_t_5) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
-        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 303, __pyx_L1_error)
+        if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 308, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-        /* "streaming_form_data/_parser.pyx":304
+        /* "streaming_form_data/_parser.pyx":309
  * 
  *                     self.unset_active_part()
  *                     self.delimiter_finder.reset()             # <<<<<<<<<<<<<<
  * 
  *                 elif self.ender_finder.found():
  */
-        __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->reset(__pyx_v_self->delimiter_finder); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 304, __pyx_L1_error)
+        __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->reset(__pyx_v_self->delimiter_finder); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 309, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_10);
         __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-        /* "streaming_form_data/_parser.pyx":282
+        /* "streaming_form_data/_parser.pyx":287
  *                 self.ender_finder.feed(byte)
  * 
  *                 if self.delimiter_finder.found():             # <<<<<<<<<<<<<<
  *                     self.state = ParserState.PS_READING_HEADER
  * 
  */
-        goto __pyx_L23;
+        goto __pyx_L22;
       }
 
-      /* "streaming_form_data/_parser.pyx":306
+      /* "streaming_form_data/_parser.pyx":311
  *                     self.delimiter_finder.reset()
  * 
  *                 elif self.ender_finder.found():             # <<<<<<<<<<<<<<
  *                     self.state = ParserState.PS_END
  * 
  */
-      __pyx_t_6 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->found(__pyx_v_self->ender_finder, 0) != 0);
-      if (__pyx_t_6) {
+      __pyx_t_3 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->found(__pyx_v_self->ender_finder, 0) != 0);
+      if (__pyx_t_3) {
 
-        /* "streaming_form_data/_parser.pyx":307
+        /* "streaming_form_data/_parser.pyx":312
  * 
  *                 elif self.ender_finder.found():
  *                     self.state = ParserState.PS_END             # <<<<<<<<<<<<<<
@@ -6387,28 +6408,28 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         __pyx_v_self->state = __pyx_e_19streaming_form_data_7_parser_PS_END;
 
-        /* "streaming_form_data/_parser.pyx":309
+        /* "streaming_form_data/_parser.pyx":314
  *                     self.state = ParserState.PS_END
  * 
  *                     if idx + 1 < self.ender_length:             # <<<<<<<<<<<<<<
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 3
  */
-        __pyx_t_6 = (((__pyx_v_idx + 1) < __pyx_v_self->ender_length) != 0);
-        if (__pyx_t_6) {
+        __pyx_t_3 = (((__pyx_v_idx + 1) < __pyx_v_self->ender_length) != 0);
+        if (__pyx_t_3) {
 
-          /* "streaming_form_data/_parser.pyx":310
+          /* "streaming_form_data/_parser.pyx":315
  * 
  *                     if idx + 1 < self.ender_length:
  *                         self.mark_error()             # <<<<<<<<<<<<<<
  *                         return ErrorGroup.Internal + 3
  *                     match_start = idx + 1 - self.ender_length
  */
-          __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 310, __pyx_L1_error)
+          __pyx_t_10 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 315, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-          /* "streaming_form_data/_parser.pyx":311
+          /* "streaming_form_data/_parser.pyx":316
  *                     if idx + 1 < self.ender_length:
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 3             # <<<<<<<<<<<<<<
@@ -6416,13 +6437,13 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  * 
  */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_10 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 3)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 311, __pyx_L1_error)
+          __pyx_t_10 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 3)); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 316, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_r = __pyx_t_10;
           __pyx_t_10 = 0;
           goto __pyx_L0;
 
-          /* "streaming_form_data/_parser.pyx":309
+          /* "streaming_form_data/_parser.pyx":314
  *                     self.state = ParserState.PS_END
  * 
  *                     if idx + 1 < self.ender_length:             # <<<<<<<<<<<<<<
@@ -6431,7 +6452,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         }
 
-        /* "streaming_form_data/_parser.pyx":312
+        /* "streaming_form_data/_parser.pyx":317
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 3
  *                     match_start = idx + 1 - self.ender_length             # <<<<<<<<<<<<<<
@@ -6440,17 +6461,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         __pyx_v_match_start = ((__pyx_v_idx + 1) - __pyx_v_self->ender_length);
 
-        /* "streaming_form_data/_parser.pyx":314
+        /* "streaming_form_data/_parser.pyx":319
  *                     match_start = idx + 1 - self.ender_length
  * 
  *                     if match_start >= buffer_start:             # <<<<<<<<<<<<<<
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])
  */
-        __pyx_t_6 = ((__pyx_v_match_start >= __pyx_v_buffer_start) != 0);
-        if (__pyx_t_6) {
+        __pyx_t_3 = ((__pyx_v_match_start >= __pyx_v_buffer_start) != 0);
+        if (__pyx_t_3) {
 
-          /* "streaming_form_data/_parser.pyx":315
+          /* "streaming_form_data/_parser.pyx":320
  * 
  *                     if match_start >= buffer_start:
  *                         try:             # <<<<<<<<<<<<<<
@@ -6466,20 +6487,20 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_XGOTREF(__pyx_t_12);
             /*try:*/ {
 
-              /* "streaming_form_data/_parser.pyx":316
+              /* "streaming_form_data/_parser.pyx":321
  *                     if match_start >= buffer_start:
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])             # <<<<<<<<<<<<<<
  *                         except Exception:
  *                             self.mark_error()
  */
-              __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_on_body); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 316, __pyx_L38_error)
+              __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_on_body); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 321, __pyx_L37_error)
               __Pyx_GOTREF(__pyx_t_4);
               if (unlikely(__pyx_v_chunk == Py_None)) {
                 PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-                __PYX_ERR(0, 316, __pyx_L38_error)
+                __PYX_ERR(0, 321, __pyx_L37_error)
               }
-              __pyx_t_5 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_match_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 316, __pyx_L38_error)
+              __pyx_t_5 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_match_start); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 321, __pyx_L37_error)
               __Pyx_GOTREF(__pyx_t_5);
               __pyx_t_7 = NULL;
               if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6494,12 +6515,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
               __pyx_t_10 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5);
               __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
               __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 316, __pyx_L38_error)
+              if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 321, __pyx_L37_error)
               __Pyx_GOTREF(__pyx_t_10);
               __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
               __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
 
-              /* "streaming_form_data/_parser.pyx":315
+              /* "streaming_form_data/_parser.pyx":320
  * 
  *                     if match_start >= buffer_start:
  *                         try:             # <<<<<<<<<<<<<<
@@ -6510,15 +6531,15 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
             __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
             __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
-            goto __pyx_L45_try_end;
-            __pyx_L38_error:;
+            goto __pyx_L44_try_end;
+            __pyx_L37_error:;
             __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
             __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
             __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
             __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
             __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-            /* "streaming_form_data/_parser.pyx":317
+            /* "streaming_form_data/_parser.pyx":322
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])
  *                         except Exception:             # <<<<<<<<<<<<<<
@@ -6528,23 +6549,23 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
             if (__pyx_t_11) {
               __Pyx_AddTraceback("streaming_form_data._parser._Parser._parse", __pyx_clineno, __pyx_lineno, __pyx_filename);
-              if (__Pyx_GetException(&__pyx_t_10, &__pyx_t_4, &__pyx_t_5) < 0) __PYX_ERR(0, 317, __pyx_L40_except_error)
+              if (__Pyx_GetException(&__pyx_t_10, &__pyx_t_4, &__pyx_t_5) < 0) __PYX_ERR(0, 322, __pyx_L39_except_error)
               __Pyx_GOTREF(__pyx_t_10);
               __Pyx_GOTREF(__pyx_t_4);
               __Pyx_GOTREF(__pyx_t_5);
 
-              /* "streaming_form_data/_parser.pyx":318
+              /* "streaming_form_data/_parser.pyx":323
  *                             self.on_body(chunk[buffer_start: match_start])
  *                         except Exception:
  *                             self.mark_error()             # <<<<<<<<<<<<<<
  *                             raise
  *                     else:
  */
-              __pyx_t_7 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 318, __pyx_L40_except_error)
+              __pyx_t_7 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 323, __pyx_L39_except_error)
               __Pyx_GOTREF(__pyx_t_7);
               __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-              /* "streaming_form_data/_parser.pyx":319
+              /* "streaming_form_data/_parser.pyx":324
  *                         except Exception:
  *                             self.mark_error()
  *                             raise             # <<<<<<<<<<<<<<
@@ -6556,12 +6577,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
               __Pyx_XGIVEREF(__pyx_t_5);
               __Pyx_ErrRestoreWithState(__pyx_t_10, __pyx_t_4, __pyx_t_5);
               __pyx_t_10 = 0; __pyx_t_4 = 0; __pyx_t_5 = 0; 
-              __PYX_ERR(0, 319, __pyx_L40_except_error)
+              __PYX_ERR(0, 324, __pyx_L39_except_error)
             }
-            goto __pyx_L40_except_error;
-            __pyx_L40_except_error:;
+            goto __pyx_L39_except_error;
+            __pyx_L39_except_error:;
 
-            /* "streaming_form_data/_parser.pyx":315
+            /* "streaming_form_data/_parser.pyx":320
  * 
  *                     if match_start >= buffer_start:
  *                         try:             # <<<<<<<<<<<<<<
@@ -6573,20 +6594,20 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
             __Pyx_XGIVEREF(__pyx_t_12);
             __Pyx_ExceptionReset(__pyx_t_14, __pyx_t_13, __pyx_t_12);
             goto __pyx_L1_error;
-            __pyx_L45_try_end:;
+            __pyx_L44_try_end:;
           }
 
-          /* "streaming_form_data/_parser.pyx":314
+          /* "streaming_form_data/_parser.pyx":319
  *                     match_start = idx + 1 - self.ender_length
  * 
  *                     if match_start >= buffer_start:             # <<<<<<<<<<<<<<
  *                         try:
  *                             self.on_body(chunk[buffer_start: match_start])
  */
-          goto __pyx_L37;
+          goto __pyx_L36;
         }
 
-        /* "streaming_form_data/_parser.pyx":321
+        /* "streaming_form_data/_parser.pyx":326
  *                             raise
  *                     else:
  *                         self.mark_error()             # <<<<<<<<<<<<<<
@@ -6594,11 +6615,11 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  * 
  */
         /*else*/ {
-          __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 321, __pyx_L1_error)
+          __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 326, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "streaming_form_data/_parser.pyx":322
+          /* "streaming_form_data/_parser.pyx":327
  *                     else:
  *                         self.mark_error()
  *                         return ErrorGroup.Internal + 4             # <<<<<<<<<<<<<<
@@ -6606,15 +6627,15 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     buffer_start = idx + 1
  */
           __Pyx_XDECREF(__pyx_r);
-          __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 322, __pyx_L1_error)
+          __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 4)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_r = __pyx_t_5;
           __pyx_t_5 = 0;
           goto __pyx_L0;
         }
-        __pyx_L37:;
+        __pyx_L36:;
 
-        /* "streaming_form_data/_parser.pyx":324
+        /* "streaming_form_data/_parser.pyx":329
  *                         return ErrorGroup.Internal + 4
  * 
  *                     buffer_start = idx + 1             # <<<<<<<<<<<<<<
@@ -6623,14 +6644,14 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         __pyx_v_buffer_start = (__pyx_v_idx + 1);
 
-        /* "streaming_form_data/_parser.pyx":326
+        /* "streaming_form_data/_parser.pyx":331
  *                     buffer_start = idx + 1
  * 
  *                     self.unset_active_part()             # <<<<<<<<<<<<<<
  *                     self.ender_finder.reset()
  * 
  */
-        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unset_active_part); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 326, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_unset_active_part); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 331, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __pyx_t_10 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6644,33 +6665,33 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         }
         __pyx_t_5 = (__pyx_t_10) ? __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_10) : __Pyx_PyObject_CallNoArg(__pyx_t_4);
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
-        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 326, __pyx_L1_error)
+        if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 331, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "streaming_form_data/_parser.pyx":327
+        /* "streaming_form_data/_parser.pyx":332
  * 
  *                     self.unset_active_part()
  *                     self.ender_finder.reset()             # <<<<<<<<<<<<<<
  * 
  *                 else:
  */
-        __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->reset(__pyx_v_self->ender_finder); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 327, __pyx_L1_error)
+        __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->reset(__pyx_v_self->ender_finder); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 332, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-        /* "streaming_form_data/_parser.pyx":306
+        /* "streaming_form_data/_parser.pyx":311
  *                     self.delimiter_finder.reset()
  * 
  *                 elif self.ender_finder.found():             # <<<<<<<<<<<<<<
  *                     self.state = ParserState.PS_END
  * 
  */
-        goto __pyx_L23;
+        goto __pyx_L22;
       }
 
-      /* "streaming_form_data/_parser.pyx":335
+      /* "streaming_form_data/_parser.pyx":340
  *                     # middle of a potential delimiter.
  * 
  *                     if self.delimiter_finder.inactive():             # <<<<<<<<<<<<<<
@@ -6678,10 +6699,10 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                             chunk_ptr, idx + 1, chunk_len - 1
  */
       /*else*/ {
-        __pyx_t_6 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->inactive(__pyx_v_self->delimiter_finder, 0) != 0);
-        if (__pyx_t_6) {
+        __pyx_t_3 = (((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->inactive(__pyx_v_self->delimiter_finder, 0) != 0);
+        if (__pyx_t_3) {
 
-          /* "streaming_form_data/_parser.pyx":336
+          /* "streaming_form_data/_parser.pyx":341
  * 
  *                     if self.delimiter_finder.inactive():
  *                         skip_count = self.rewind_fast_forward(             # <<<<<<<<<<<<<<
@@ -6690,7 +6711,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
           __pyx_v_skip_count = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->rewind_fast_forward(__pyx_v_self, __pyx_v_chunk_ptr, (__pyx_v_idx + 1), (__pyx_v_chunk_len - 1));
 
-          /* "streaming_form_data/_parser.pyx":339
+          /* "streaming_form_data/_parser.pyx":344
  *                             chunk_ptr, idx + 1, chunk_len - 1
  *                         )
  *                         idx += skip_count             # <<<<<<<<<<<<<<
@@ -6699,7 +6720,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
           __pyx_v_idx = (__pyx_v_idx + __pyx_v_skip_count);
 
-          /* "streaming_form_data/_parser.pyx":335
+          /* "streaming_form_data/_parser.pyx":340
  *                     # middle of a potential delimiter.
  * 
  *                     if self.delimiter_finder.inactive():             # <<<<<<<<<<<<<<
@@ -6708,9 +6729,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
         }
       }
-      __pyx_L23:;
+      __pyx_L22:;
 
-      /* "streaming_form_data/_parser.pyx":277
+      /* "streaming_form_data/_parser.pyx":282
  * 
  *                 self.state = ParserState.PS_READING_BODY
  *             elif self.state == ParserState.PS_READING_BODY:             # <<<<<<<<<<<<<<
@@ -6720,7 +6741,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       break;
       case __pyx_e_19streaming_form_data_7_parser_PS_END:
 
-      /* "streaming_form_data/_parser.pyx":342
+      /* "streaming_form_data/_parser.pyx":347
  * 
  *             elif self.state == ParserState.PS_END:
  *                 return 0             # <<<<<<<<<<<<<<
@@ -6732,7 +6753,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       __pyx_r = __pyx_int_0;
       goto __pyx_L0;
 
-      /* "streaming_form_data/_parser.pyx":341
+      /* "streaming_form_data/_parser.pyx":346
  *                         idx += skip_count
  * 
  *             elif self.state == ParserState.PS_END:             # <<<<<<<<<<<<<<
@@ -6742,18 +6763,18 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       break;
       default:
 
-      /* "streaming_form_data/_parser.pyx":344
+      /* "streaming_form_data/_parser.pyx":349
  *                 return 0
  *             else:
  *                 self.mark_error()             # <<<<<<<<<<<<<<
  *                 return ErrorGroup.Internal + 5
  * 
  */
-      __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 344, __pyx_L1_error)
+      __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 349, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-      /* "streaming_form_data/_parser.pyx":345
+      /* "streaming_form_data/_parser.pyx":350
  *             else:
  *                 self.mark_error()
  *                 return ErrorGroup.Internal + 5             # <<<<<<<<<<<<<<
@@ -6761,7 +6782,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *             idx += 1
  */
       __Pyx_XDECREF(__pyx_r);
-      __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 5)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 345, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 5)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 350, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __pyx_r = __pyx_t_5;
       __pyx_t_5 = 0;
@@ -6769,7 +6790,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       break;
     }
 
-    /* "streaming_form_data/_parser.pyx":347
+    /* "streaming_form_data/_parser.pyx":352
  *                 return ErrorGroup.Internal + 5
  * 
  *             idx += 1             # <<<<<<<<<<<<<<
@@ -6779,28 +6800,28 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
     __pyx_v_idx = (__pyx_v_idx + 1);
   }
 
-  /* "streaming_form_data/_parser.pyx":349
+  /* "streaming_form_data/_parser.pyx":354
  *             idx += 1
  * 
  *         if idx != chunk_len:             # <<<<<<<<<<<<<<
  *             self.mark_error()
  *             return ErrorGroup.Internal + 6
  */
-  __pyx_t_6 = ((__pyx_v_idx != __pyx_v_chunk_len) != 0);
-  if (__pyx_t_6) {
+  __pyx_t_3 = ((__pyx_v_idx != __pyx_v_chunk_len) != 0);
+  if (__pyx_t_3) {
 
-    /* "streaming_form_data/_parser.pyx":350
+    /* "streaming_form_data/_parser.pyx":355
  * 
  *         if idx != chunk_len:
  *             self.mark_error()             # <<<<<<<<<<<<<<
  *             return ErrorGroup.Internal + 6
  * 
  */
-    __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 350, __pyx_L1_error)
+    __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 355, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "streaming_form_data/_parser.pyx":351
+    /* "streaming_form_data/_parser.pyx":356
  *         if idx != chunk_len:
  *             self.mark_error()
  *             return ErrorGroup.Internal + 6             # <<<<<<<<<<<<<<
@@ -6808,13 +6829,13 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *         if buffer_start > chunk_len:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 6)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 351, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 6)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 356, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_r = __pyx_t_5;
     __pyx_t_5 = 0;
     goto __pyx_L0;
 
-    /* "streaming_form_data/_parser.pyx":349
+    /* "streaming_form_data/_parser.pyx":354
  *             idx += 1
  * 
  *         if idx != chunk_len:             # <<<<<<<<<<<<<<
@@ -6823,28 +6844,28 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
   }
 
-  /* "streaming_form_data/_parser.pyx":353
+  /* "streaming_form_data/_parser.pyx":358
  *             return ErrorGroup.Internal + 6
  * 
  *         if buffer_start > chunk_len:             # <<<<<<<<<<<<<<
  *             self.mark_error()
  *             return ErrorGroup.Internal + 7
  */
-  __pyx_t_6 = ((__pyx_v_buffer_start > __pyx_v_chunk_len) != 0);
-  if (__pyx_t_6) {
+  __pyx_t_3 = ((__pyx_v_buffer_start > __pyx_v_chunk_len) != 0);
+  if (__pyx_t_3) {
 
-    /* "streaming_form_data/_parser.pyx":354
+    /* "streaming_form_data/_parser.pyx":359
  * 
  *         if buffer_start > chunk_len:
  *             self.mark_error()             # <<<<<<<<<<<<<<
  *             return ErrorGroup.Internal + 7
  * 
  */
-    __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 354, __pyx_L1_error)
+    __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 359, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-    /* "streaming_form_data/_parser.pyx":355
+    /* "streaming_form_data/_parser.pyx":360
  *         if buffer_start > chunk_len:
  *             self.mark_error()
  *             return ErrorGroup.Internal + 7             # <<<<<<<<<<<<<<
@@ -6852,13 +6873,13 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *         if self.state == ParserState.PS_READING_BODY:
  */
     __Pyx_XDECREF(__pyx_r);
-    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 7)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 355, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_Internal + 7)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 360, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __pyx_r = __pyx_t_5;
     __pyx_t_5 = 0;
     goto __pyx_L0;
 
-    /* "streaming_form_data/_parser.pyx":353
+    /* "streaming_form_data/_parser.pyx":358
  *             return ErrorGroup.Internal + 6
  * 
  *         if buffer_start > chunk_len:             # <<<<<<<<<<<<<<
@@ -6867,17 +6888,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
   }
 
-  /* "streaming_form_data/_parser.pyx":357
+  /* "streaming_form_data/_parser.pyx":362
  *             return ErrorGroup.Internal + 7
  * 
  *         if self.state == ParserState.PS_READING_BODY:             # <<<<<<<<<<<<<<
  *             matched_length = max(
  *                 self.delimiter_finder.matched_length(),
  */
-  __pyx_t_6 = ((__pyx_v_self->state == __pyx_e_19streaming_form_data_7_parser_PS_READING_BODY) != 0);
-  if (__pyx_t_6) {
+  __pyx_t_3 = ((__pyx_v_self->state == __pyx_e_19streaming_form_data_7_parser_PS_READING_BODY) != 0);
+  if (__pyx_t_3) {
 
-    /* "streaming_form_data/_parser.pyx":360
+    /* "streaming_form_data/_parser.pyx":365
  *             matched_length = max(
  *                 self.delimiter_finder.matched_length(),
  *                 self.ender_finder.matched_length()             # <<<<<<<<<<<<<<
@@ -6886,7 +6907,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
     __pyx_t_15 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->matched_length(__pyx_v_self->ender_finder);
 
-    /* "streaming_form_data/_parser.pyx":359
+    /* "streaming_form_data/_parser.pyx":364
  *         if self.state == ParserState.PS_READING_BODY:
  *             matched_length = max(
  *                 self.delimiter_finder.matched_length(),             # <<<<<<<<<<<<<<
@@ -6895,7 +6916,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
     __pyx_t_16 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->matched_length(__pyx_v_self->delimiter_finder);
 
-    /* "streaming_form_data/_parser.pyx":360
+    /* "streaming_form_data/_parser.pyx":365
  *             matched_length = max(
  *                 self.delimiter_finder.matched_length(),
  *                 self.ender_finder.matched_length()             # <<<<<<<<<<<<<<
@@ -6909,7 +6930,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
     }
     __pyx_v_matched_length = __pyx_t_17;
 
-    /* "streaming_form_data/_parser.pyx":362
+    /* "streaming_form_data/_parser.pyx":367
  *                 self.ender_finder.matched_length()
  *             )
  *             match_start = idx - matched_length             # <<<<<<<<<<<<<<
@@ -6918,17 +6939,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
     __pyx_v_match_start = (__pyx_v_idx - __pyx_v_matched_length);
 
-    /* "streaming_form_data/_parser.pyx":364
+    /* "streaming_form_data/_parser.pyx":369
  *             match_start = idx - matched_length
  * 
  *             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:             # <<<<<<<<<<<<<<
  *                 try:
  *                     self.on_body(chunk[buffer_start: match_start])
  */
-    __pyx_t_6 = ((__pyx_v_match_start >= (__pyx_v_buffer_start + __pyx_e_19streaming_form_data_7_parser_MinFileBodyChunkSize)) != 0);
-    if (__pyx_t_6) {
+    __pyx_t_3 = ((__pyx_v_match_start >= (__pyx_v_buffer_start + __pyx_e_19streaming_form_data_7_parser_MinFileBodyChunkSize)) != 0);
+    if (__pyx_t_3) {
 
-      /* "streaming_form_data/_parser.pyx":365
+      /* "streaming_form_data/_parser.pyx":370
  * 
  *             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
  *                 try:             # <<<<<<<<<<<<<<
@@ -6944,20 +6965,20 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         __Pyx_XGOTREF(__pyx_t_14);
         /*try:*/ {
 
-          /* "streaming_form_data/_parser.pyx":366
+          /* "streaming_form_data/_parser.pyx":371
  *             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
  *                 try:
  *                     self.on_body(chunk[buffer_start: match_start])             # <<<<<<<<<<<<<<
  *                 except Exception:
  *                     self.mark_error()
  */
-          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_on_body); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 366, __pyx_L53_error)
+          __pyx_t_4 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_on_body); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 371, __pyx_L52_error)
           __Pyx_GOTREF(__pyx_t_4);
           if (unlikely(__pyx_v_chunk == Py_None)) {
             PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-            __PYX_ERR(0, 366, __pyx_L53_error)
+            __PYX_ERR(0, 371, __pyx_L52_error)
           }
-          __pyx_t_10 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_match_start); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 366, __pyx_L53_error)
+          __pyx_t_10 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_match_start); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 371, __pyx_L52_error)
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_t_7 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_4))) {
@@ -6972,12 +6993,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           __pyx_t_5 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_7, __pyx_t_10) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_10);
           __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 366, __pyx_L53_error)
+          if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 371, __pyx_L52_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
-          /* "streaming_form_data/_parser.pyx":365
+          /* "streaming_form_data/_parser.pyx":370
  * 
  *             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
  *                 try:             # <<<<<<<<<<<<<<
@@ -6988,15 +7009,15 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         __Pyx_XDECREF(__pyx_t_12); __pyx_t_12 = 0;
         __Pyx_XDECREF(__pyx_t_13); __pyx_t_13 = 0;
         __Pyx_XDECREF(__pyx_t_14); __pyx_t_14 = 0;
-        goto __pyx_L58_try_end;
-        __pyx_L53_error:;
+        goto __pyx_L57_try_end;
+        __pyx_L52_error:;
         __Pyx_XDECREF(__pyx_t_10); __pyx_t_10 = 0;
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
         __Pyx_XDECREF(__pyx_t_8); __pyx_t_8 = 0;
 
-        /* "streaming_form_data/_parser.pyx":367
+        /* "streaming_form_data/_parser.pyx":372
  *                 try:
  *                     self.on_body(chunk[buffer_start: match_start])
  *                 except Exception:             # <<<<<<<<<<<<<<
@@ -7006,23 +7027,23 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         __pyx_t_11 = __Pyx_PyErr_ExceptionMatches(((PyObject *)(&((PyTypeObject*)PyExc_Exception)[0])));
         if (__pyx_t_11) {
           __Pyx_AddTraceback("streaming_form_data._parser._Parser._parse", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_4, &__pyx_t_10) < 0) __PYX_ERR(0, 367, __pyx_L55_except_error)
+          if (__Pyx_GetException(&__pyx_t_5, &__pyx_t_4, &__pyx_t_10) < 0) __PYX_ERR(0, 372, __pyx_L54_except_error)
           __Pyx_GOTREF(__pyx_t_5);
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GOTREF(__pyx_t_10);
 
-          /* "streaming_form_data/_parser.pyx":368
+          /* "streaming_form_data/_parser.pyx":373
  *                     self.on_body(chunk[buffer_start: match_start])
  *                 except Exception:
  *                     self.mark_error()             # <<<<<<<<<<<<<<
  *                     raise
  * 
  */
-          __pyx_t_7 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 368, __pyx_L55_except_error)
+          __pyx_t_7 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->mark_error(__pyx_v_self); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 373, __pyx_L54_except_error)
           __Pyx_GOTREF(__pyx_t_7);
           __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-          /* "streaming_form_data/_parser.pyx":369
+          /* "streaming_form_data/_parser.pyx":374
  *                 except Exception:
  *                     self.mark_error()
  *                     raise             # <<<<<<<<<<<<<<
@@ -7034,12 +7055,12 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           __Pyx_XGIVEREF(__pyx_t_10);
           __Pyx_ErrRestoreWithState(__pyx_t_5, __pyx_t_4, __pyx_t_10);
           __pyx_t_5 = 0; __pyx_t_4 = 0; __pyx_t_10 = 0; 
-          __PYX_ERR(0, 369, __pyx_L55_except_error)
+          __PYX_ERR(0, 374, __pyx_L54_except_error)
         }
-        goto __pyx_L55_except_error;
-        __pyx_L55_except_error:;
+        goto __pyx_L54_except_error;
+        __pyx_L54_except_error:;
 
-        /* "streaming_form_data/_parser.pyx":365
+        /* "streaming_form_data/_parser.pyx":370
  * 
  *             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
  *                 try:             # <<<<<<<<<<<<<<
@@ -7051,10 +7072,10 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         __Pyx_XGIVEREF(__pyx_t_14);
         __Pyx_ExceptionReset(__pyx_t_12, __pyx_t_13, __pyx_t_14);
         goto __pyx_L1_error;
-        __pyx_L58_try_end:;
+        __pyx_L57_try_end:;
       }
 
-      /* "streaming_form_data/_parser.pyx":371
+      /* "streaming_form_data/_parser.pyx":376
  *                     raise
  * 
  *                 buffer_start = match_start             # <<<<<<<<<<<<<<
@@ -7063,7 +7084,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
       __pyx_v_buffer_start = __pyx_v_match_start;
 
-      /* "streaming_form_data/_parser.pyx":364
+      /* "streaming_form_data/_parser.pyx":369
  *             match_start = idx - matched_length
  * 
  *             if match_start >= buffer_start + Constants.MinFileBodyChunkSize:             # <<<<<<<<<<<<<<
@@ -7072,7 +7093,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
     }
 
-    /* "streaming_form_data/_parser.pyx":357
+    /* "streaming_form_data/_parser.pyx":362
  *             return ErrorGroup.Internal + 7
  * 
  *         if self.state == ParserState.PS_READING_BODY:             # <<<<<<<<<<<<<<
@@ -7081,17 +7102,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
   }
 
-  /* "streaming_form_data/_parser.pyx":373
+  /* "streaming_form_data/_parser.pyx":378
  *                 buffer_start = match_start
  * 
  *         if idx - buffer_start > 0:             # <<<<<<<<<<<<<<
  *             self._leftover_buffer = chunk[buffer_start: idx]
  * 
  */
-  __pyx_t_6 = (((__pyx_v_idx - __pyx_v_buffer_start) > 0) != 0);
-  if (__pyx_t_6) {
+  __pyx_t_3 = (((__pyx_v_idx - __pyx_v_buffer_start) > 0) != 0);
+  if (__pyx_t_3) {
 
-    /* "streaming_form_data/_parser.pyx":374
+    /* "streaming_form_data/_parser.pyx":379
  * 
  *         if idx - buffer_start > 0:
  *             self._leftover_buffer = chunk[buffer_start: idx]             # <<<<<<<<<<<<<<
@@ -7100,9 +7121,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
     if (unlikely(__pyx_v_chunk == Py_None)) {
       PyErr_SetString(PyExc_TypeError, "'NoneType' object is not subscriptable");
-      __PYX_ERR(0, 374, __pyx_L1_error)
+      __PYX_ERR(0, 379, __pyx_L1_error)
     }
-    __pyx_t_10 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_idx); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 374, __pyx_L1_error)
+    __pyx_t_10 = PySequence_GetSlice(__pyx_v_chunk, __pyx_v_buffer_start, __pyx_v_idx); if (unlikely(!__pyx_t_10)) __PYX_ERR(0, 379, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_10);
     __Pyx_GIVEREF(__pyx_t_10);
     __Pyx_GOTREF(__pyx_v_self->_leftover_buffer);
@@ -7110,7 +7131,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
     __pyx_v_self->_leftover_buffer = ((PyObject*)__pyx_t_10);
     __pyx_t_10 = 0;
 
-    /* "streaming_form_data/_parser.pyx":373
+    /* "streaming_form_data/_parser.pyx":378
  *                 buffer_start = match_start
  * 
  *         if idx - buffer_start > 0:             # <<<<<<<<<<<<<<
@@ -7119,7 +7140,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  */
   }
 
-  /* "streaming_form_data/_parser.pyx":376
+  /* "streaming_form_data/_parser.pyx":381
  *             self._leftover_buffer = chunk[buffer_start: idx]
  * 
  *         return 0             # <<<<<<<<<<<<<<
@@ -7158,7 +7179,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
   return __pyx_r;
 }
 
-/* "streaming_form_data/_parser.pyx":383
+/* "streaming_form_data/_parser.pyx":388
  *     # update Finder object states.
  * 
  *     cdef size_t rewind_fast_forward(             # <<<<<<<<<<<<<<
@@ -7177,7 +7198,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
   PyObject *__pyx_t_3 = NULL;
   __Pyx_RefNannySetupContext("rewind_fast_forward", 0);
 
-  /* "streaming_form_data/_parser.pyx":391
+  /* "streaming_form_data/_parser.pyx":396
  * 
  *         # we need at least 4 characters in buffer
  *         if pos_first + 3 > pos_last:             # <<<<<<<<<<<<<<
@@ -7187,7 +7208,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
   __pyx_t_1 = (((__pyx_v_pos_first + 3) > __pyx_v_pos_last) != 0);
   if (__pyx_t_1) {
 
-    /* "streaming_form_data/_parser.pyx":392
+    /* "streaming_form_data/_parser.pyx":397
  *         # we need at least 4 characters in buffer
  *         if pos_first + 3 > pos_last:
  *             return 0             # <<<<<<<<<<<<<<
@@ -7197,7 +7218,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
     __pyx_r = 0;
     goto __pyx_L0;
 
-    /* "streaming_form_data/_parser.pyx":391
+    /* "streaming_form_data/_parser.pyx":396
  * 
  *         # we need at least 4 characters in buffer
  *         if pos_first + 3 > pos_last:             # <<<<<<<<<<<<<<
@@ -7206,7 +7227,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
   }
 
-  /* "streaming_form_data/_parser.pyx":396
+  /* "streaming_form_data/_parser.pyx":401
  *         # calculate pointer to the first character of the buffer and the
  *         # pointer to a character after the end of the buffer
  *         ptr = chunk_ptr + pos_first + 3             # <<<<<<<<<<<<<<
@@ -7215,7 +7236,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
   __pyx_v_ptr = ((__pyx_v_chunk_ptr + __pyx_v_pos_first) + 3);
 
-  /* "streaming_form_data/_parser.pyx":397
+  /* "streaming_form_data/_parser.pyx":402
  *         # pointer to a character after the end of the buffer
  *         ptr = chunk_ptr + pos_first + 3
  *         ptr_end = chunk_ptr + pos_last + 1             # <<<<<<<<<<<<<<
@@ -7224,7 +7245,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
   __pyx_v_ptr_end = ((__pyx_v_chunk_ptr + __pyx_v_pos_last) + 1);
 
-  /* "streaming_form_data/_parser.pyx":398
+  /* "streaming_form_data/_parser.pyx":403
  *         ptr = chunk_ptr + pos_first + 3
  *         ptr_end = chunk_ptr + pos_last + 1
  *         skipped = 0             # <<<<<<<<<<<<<<
@@ -7233,7 +7254,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
   __pyx_v_skipped = 0;
 
-  /* "streaming_form_data/_parser.pyx":405
+  /* "streaming_form_data/_parser.pyx":410
  *         # is found.
  * 
  *         while True:             # <<<<<<<<<<<<<<
@@ -7242,7 +7263,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
   while (1) {
 
-    /* "streaming_form_data/_parser.pyx":406
+    /* "streaming_form_data/_parser.pyx":411
  * 
  *         while True:
  *             if ptr >= ptr_end:             # <<<<<<<<<<<<<<
@@ -7252,7 +7273,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
     __pyx_t_1 = ((__pyx_v_ptr >= __pyx_v_ptr_end) != 0);
     if (__pyx_t_1) {
 
-      /* "streaming_form_data/_parser.pyx":409
+      /* "streaming_form_data/_parser.pyx":414
  *                 # normalize pointer value because we could jump few characters
  *                 # past the buffer end
  *                 ptr = ptr_end - 1             # <<<<<<<<<<<<<<
@@ -7261,7 +7282,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
       __pyx_v_ptr = (__pyx_v_ptr_end - 1);
 
-      /* "streaming_form_data/_parser.pyx":414
+      /* "streaming_form_data/_parser.pyx":419
  *                 # keep up to 3 characters in the buffer until next chunk
  *                 # guess we will skip all characters in the buffer
  *                 skipped = pos_last - pos_first + 1             # <<<<<<<<<<<<<<
@@ -7270,7 +7291,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
       __pyx_v_skipped = ((__pyx_v_pos_last - __pyx_v_pos_first) + 1);
 
-      /* "streaming_form_data/_parser.pyx":416
+      /* "streaming_form_data/_parser.pyx":421
  *                 skipped = pos_last - pos_first + 1
  * 
  *                 if ptr[0] == Constants.CR:             # <<<<<<<<<<<<<<
@@ -7280,7 +7301,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
       __pyx_t_1 = (((__pyx_v_ptr[0]) == __pyx_e_19streaming_form_data_7_parser_CR) != 0);
       if (__pyx_t_1) {
 
-        /* "streaming_form_data/_parser.pyx":417
+        /* "streaming_form_data/_parser.pyx":422
  * 
  *                 if ptr[0] == Constants.CR:
  *                     skipped = skipped - 1             # <<<<<<<<<<<<<<
@@ -7289,7 +7310,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
         __pyx_v_skipped = (__pyx_v_skipped - 1);
 
-        /* "streaming_form_data/_parser.pyx":416
+        /* "streaming_form_data/_parser.pyx":421
  *                 skipped = pos_last - pos_first + 1
  * 
  *                 if ptr[0] == Constants.CR:             # <<<<<<<<<<<<<<
@@ -7299,7 +7320,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
         goto __pyx_L7;
       }
 
-      /* "streaming_form_data/_parser.pyx":418
+      /* "streaming_form_data/_parser.pyx":423
  *                 if ptr[0] == Constants.CR:
  *                     skipped = skipped - 1
  *                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:             # <<<<<<<<<<<<<<
@@ -7317,7 +7338,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
       __pyx_L8_bool_binop_done:;
       if (__pyx_t_1) {
 
-        /* "streaming_form_data/_parser.pyx":419
+        /* "streaming_form_data/_parser.pyx":424
  *                     skipped = skipped - 1
  *                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:
  *                     skipped = skipped - 2             # <<<<<<<<<<<<<<
@@ -7326,7 +7347,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
         __pyx_v_skipped = (__pyx_v_skipped - 2);
 
-        /* "streaming_form_data/_parser.pyx":418
+        /* "streaming_form_data/_parser.pyx":423
  *                 if ptr[0] == Constants.CR:
  *                     skipped = skipped - 1
  *                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:             # <<<<<<<<<<<<<<
@@ -7336,7 +7357,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
         goto __pyx_L7;
       }
 
-      /* "streaming_form_data/_parser.pyx":421
+      /* "streaming_form_data/_parser.pyx":426
  *                     skipped = skipped - 2
  *                 elif (
  *                     ptr[0] == Constants.Hyphen             # <<<<<<<<<<<<<<
@@ -7350,7 +7371,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
         goto __pyx_L10_bool_binop_done;
       }
 
-      /* "streaming_form_data/_parser.pyx":422
+      /* "streaming_form_data/_parser.pyx":427
  *                 elif (
  *                     ptr[0] == Constants.Hyphen
  *                     and ptr[-1] == Constants.LF             # <<<<<<<<<<<<<<
@@ -7364,7 +7385,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
         goto __pyx_L10_bool_binop_done;
       }
 
-      /* "streaming_form_data/_parser.pyx":423
+      /* "streaming_form_data/_parser.pyx":428
  *                     ptr[0] == Constants.Hyphen
  *                     and ptr[-1] == Constants.LF
  *                     and ptr[-2] == Constants.CR             # <<<<<<<<<<<<<<
@@ -7375,7 +7396,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
       __pyx_t_1 = __pyx_t_2;
       __pyx_L10_bool_binop_done:;
 
-      /* "streaming_form_data/_parser.pyx":420
+      /* "streaming_form_data/_parser.pyx":425
  *                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:
  *                     skipped = skipped - 2
  *                 elif (             # <<<<<<<<<<<<<<
@@ -7384,7 +7405,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
       if (__pyx_t_1) {
 
-        /* "streaming_form_data/_parser.pyx":425
+        /* "streaming_form_data/_parser.pyx":430
  *                     and ptr[-2] == Constants.CR
  *                 ):
  *                     skipped = skipped - 3             # <<<<<<<<<<<<<<
@@ -7393,7 +7414,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
         __pyx_v_skipped = (__pyx_v_skipped - 3);
 
-        /* "streaming_form_data/_parser.pyx":420
+        /* "streaming_form_data/_parser.pyx":425
  *                 elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:
  *                     skipped = skipped - 2
  *                 elif (             # <<<<<<<<<<<<<<
@@ -7403,7 +7424,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
       }
       __pyx_L7:;
 
-      /* "streaming_form_data/_parser.pyx":426
+      /* "streaming_form_data/_parser.pyx":431
  *                 ):
  *                     skipped = skipped - 3
  *                 break             # <<<<<<<<<<<<<<
@@ -7412,7 +7433,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
       goto __pyx_L5_break;
 
-      /* "streaming_form_data/_parser.pyx":406
+      /* "streaming_form_data/_parser.pyx":411
  * 
  *         while True:
  *             if ptr >= ptr_end:             # <<<<<<<<<<<<<<
@@ -7421,7 +7442,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
     }
 
-    /* "streaming_form_data/_parser.pyx":428
+    /* "streaming_form_data/_parser.pyx":433
  *                 break
  * 
  *             if ptr[0] != Constants.Hyphen:             # <<<<<<<<<<<<<<
@@ -7431,7 +7452,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
     __pyx_t_1 = (((__pyx_v_ptr[0]) != __pyx_e_19streaming_form_data_7_parser_Hyphen) != 0);
     if (__pyx_t_1) {
 
-      /* "streaming_form_data/_parser.pyx":429
+      /* "streaming_form_data/_parser.pyx":434
  * 
  *             if ptr[0] != Constants.Hyphen:
  *                 ptr += 2             # <<<<<<<<<<<<<<
@@ -7440,7 +7461,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
       __pyx_v_ptr = (__pyx_v_ptr + 2);
 
-      /* "streaming_form_data/_parser.pyx":428
+      /* "streaming_form_data/_parser.pyx":433
  *                 break
  * 
  *             if ptr[0] != Constants.Hyphen:             # <<<<<<<<<<<<<<
@@ -7450,7 +7471,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
       goto __pyx_L13;
     }
 
-    /* "streaming_form_data/_parser.pyx":431
+    /* "streaming_form_data/_parser.pyx":436
  *                 ptr += 2
  *             else:
  *                 if ptr[-1] != Constants.Hyphen:             # <<<<<<<<<<<<<<
@@ -7461,7 +7482,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
       __pyx_t_1 = (((__pyx_v_ptr[-1L]) != __pyx_e_19streaming_form_data_7_parser_Hyphen) != 0);
       if (__pyx_t_1) {
 
-        /* "streaming_form_data/_parser.pyx":432
+        /* "streaming_form_data/_parser.pyx":437
  *             else:
  *                 if ptr[-1] != Constants.Hyphen:
  *                     ptr += 1             # <<<<<<<<<<<<<<
@@ -7470,7 +7491,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
         __pyx_v_ptr = (__pyx_v_ptr + 1);
 
-        /* "streaming_form_data/_parser.pyx":431
+        /* "streaming_form_data/_parser.pyx":436
  *                 ptr += 2
  *             else:
  *                 if ptr[-1] != Constants.Hyphen:             # <<<<<<<<<<<<<<
@@ -7480,7 +7501,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
         goto __pyx_L14;
       }
 
-      /* "streaming_form_data/_parser.pyx":434
+      /* "streaming_form_data/_parser.pyx":439
  *                     ptr += 1
  *                 else:
  *                     if ptr[-2] == Constants.LF and ptr[-3] == Constants.CR:             # <<<<<<<<<<<<<<
@@ -7499,117 +7520,117 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
         __pyx_L16_bool_binop_done:;
         if (__pyx_t_1) {
 
-          /* "streaming_form_data/_parser.pyx":435
+          /* "streaming_form_data/_parser.pyx":440
  *                 else:
  *                     if ptr[-2] == Constants.LF and ptr[-3] == Constants.CR:
  *                         self.delimiter_finder.reset()             # <<<<<<<<<<<<<<
  *                         self.delimiter_finder.feed(Constants.CR)
  *                         self.delimiter_finder.feed(Constants.LF)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->reset(__pyx_v_self->delimiter_finder); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 435, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->reset(__pyx_v_self->delimiter_finder); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 440, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":436
+          /* "streaming_form_data/_parser.pyx":441
  *                     if ptr[-2] == Constants.LF and ptr[-3] == Constants.CR:
  *                         self.delimiter_finder.reset()
  *                         self.delimiter_finder.feed(Constants.CR)             # <<<<<<<<<<<<<<
  *                         self.delimiter_finder.feed(Constants.LF)
  *                         self.delimiter_finder.feed(Constants.Hyphen)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_CR, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 436, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_CR, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 441, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":437
+          /* "streaming_form_data/_parser.pyx":442
  *                         self.delimiter_finder.reset()
  *                         self.delimiter_finder.feed(Constants.CR)
  *                         self.delimiter_finder.feed(Constants.LF)             # <<<<<<<<<<<<<<
  *                         self.delimiter_finder.feed(Constants.Hyphen)
  *                         self.delimiter_finder.feed(Constants.Hyphen)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_LF, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 437, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_LF, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 442, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":438
+          /* "streaming_form_data/_parser.pyx":443
  *                         self.delimiter_finder.feed(Constants.CR)
  *                         self.delimiter_finder.feed(Constants.LF)
  *                         self.delimiter_finder.feed(Constants.Hyphen)             # <<<<<<<<<<<<<<
  *                         self.delimiter_finder.feed(Constants.Hyphen)
  * 
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 438, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 443, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":439
+          /* "streaming_form_data/_parser.pyx":444
  *                         self.delimiter_finder.feed(Constants.LF)
  *                         self.delimiter_finder.feed(Constants.Hyphen)
  *                         self.delimiter_finder.feed(Constants.Hyphen)             # <<<<<<<<<<<<<<
  * 
  *                         self.ender_finder.reset()
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 439, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->delimiter_finder->__pyx_vtab)->feed(__pyx_v_self->delimiter_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 444, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":441
+          /* "streaming_form_data/_parser.pyx":446
  *                         self.delimiter_finder.feed(Constants.Hyphen)
  * 
  *                         self.ender_finder.reset()             # <<<<<<<<<<<<<<
  *                         self.ender_finder.feed(Constants.CR)
  *                         self.ender_finder.feed(Constants.LF)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->reset(__pyx_v_self->ender_finder); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 441, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->reset(__pyx_v_self->ender_finder); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 446, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":442
+          /* "streaming_form_data/_parser.pyx":447
  * 
  *                         self.ender_finder.reset()
  *                         self.ender_finder.feed(Constants.CR)             # <<<<<<<<<<<<<<
  *                         self.ender_finder.feed(Constants.LF)
  *                         self.ender_finder.feed(Constants.Hyphen)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_CR, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 442, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_CR, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 447, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":443
+          /* "streaming_form_data/_parser.pyx":448
  *                         self.ender_finder.reset()
  *                         self.ender_finder.feed(Constants.CR)
  *                         self.ender_finder.feed(Constants.LF)             # <<<<<<<<<<<<<<
  *                         self.ender_finder.feed(Constants.Hyphen)
  *                         self.ender_finder.feed(Constants.Hyphen)
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_LF, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 443, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_LF, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 448, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":444
+          /* "streaming_form_data/_parser.pyx":449
  *                         self.ender_finder.feed(Constants.CR)
  *                         self.ender_finder.feed(Constants.LF)
  *                         self.ender_finder.feed(Constants.Hyphen)             # <<<<<<<<<<<<<<
  *                         self.ender_finder.feed(Constants.Hyphen)
  * 
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 444, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 449, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":445
+          /* "streaming_form_data/_parser.pyx":450
  *                         self.ender_finder.feed(Constants.LF)
  *                         self.ender_finder.feed(Constants.Hyphen)
  *                         self.ender_finder.feed(Constants.Hyphen)             # <<<<<<<<<<<<<<
  * 
  *                         skipped = (ptr - chunk_ptr) - pos_first + 1
  */
-          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 445, __pyx_L1_error)
+          __pyx_t_3 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser_Finder *)__pyx_v_self->ender_finder->__pyx_vtab)->feed(__pyx_v_self->ender_finder, __pyx_e_19streaming_form_data_7_parser_Hyphen, 0); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 450, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_3);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-          /* "streaming_form_data/_parser.pyx":447
+          /* "streaming_form_data/_parser.pyx":452
  *                         self.ender_finder.feed(Constants.Hyphen)
  * 
  *                         skipped = (ptr - chunk_ptr) - pos_first + 1             # <<<<<<<<<<<<<<
@@ -7618,7 +7639,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
           __pyx_v_skipped = (((__pyx_v_ptr - __pyx_v_chunk_ptr) - __pyx_v_pos_first) + 1);
 
-          /* "streaming_form_data/_parser.pyx":449
+          /* "streaming_form_data/_parser.pyx":454
  *                         skipped = (ptr - chunk_ptr) - pos_first + 1
  * 
  *                         break             # <<<<<<<<<<<<<<
@@ -7627,7 +7648,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
           goto __pyx_L5_break;
 
-          /* "streaming_form_data/_parser.pyx":434
+          /* "streaming_form_data/_parser.pyx":439
  *                     ptr += 1
  *                 else:
  *                     if ptr[-2] == Constants.LF and ptr[-3] == Constants.CR:             # <<<<<<<<<<<<<<
@@ -7636,7 +7657,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
  */
         }
 
-        /* "streaming_form_data/_parser.pyx":450
+        /* "streaming_form_data/_parser.pyx":455
  * 
  *                         break
  *                     ptr += 4             # <<<<<<<<<<<<<<
@@ -7651,7 +7672,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
   }
   __pyx_L5_break:;
 
-  /* "streaming_form_data/_parser.pyx":452
+  /* "streaming_form_data/_parser.pyx":457
  *                     ptr += 4
  * 
  *         return skipped             # <<<<<<<<<<<<<<
@@ -7661,7 +7682,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
   __pyx_r = __pyx_v_skipped;
   goto __pyx_L0;
 
-  /* "streaming_form_data/_parser.pyx":383
+  /* "streaming_form_data/_parser.pyx":388
  *     # update Finder object states.
  * 
  *     cdef size_t rewind_fast_forward(             # <<<<<<<<<<<<<<
@@ -7679,7 +7700,7 @@ static size_t __pyx_f_19streaming_form_data_7_parser_7_Parser_rewind_fast_forwar
   return __pyx_r;
 }
 
-/* "streaming_form_data/_parser.pyx":454
+/* "streaming_form_data/_parser.pyx":459
  *         return skipped
  * 
  *     cdef mark_error(self):             # <<<<<<<<<<<<<<
@@ -7696,7 +7717,7 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_mark_error(stru
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("mark_error", 0);
 
-  /* "streaming_form_data/_parser.pyx":455
+  /* "streaming_form_data/_parser.pyx":460
  * 
  *     cdef mark_error(self):
  *         self.state = ParserState.PS_ERROR             # <<<<<<<<<<<<<<
@@ -7705,21 +7726,21 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_mark_error(stru
  */
   __pyx_v_self->state = __pyx_e_19streaming_form_data_7_parser_PS_ERROR;
 
-  /* "streaming_form_data/_parser.pyx":457
+  /* "streaming_form_data/_parser.pyx":462
  *         self.state = ParserState.PS_ERROR
  * 
  *         if self.active_part:             # <<<<<<<<<<<<<<
  *             self.active_part.finish()
  */
-  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->active_part); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 457, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_IsTrue(__pyx_v_self->active_part); if (unlikely(__pyx_t_1 < 0)) __PYX_ERR(0, 462, __pyx_L1_error)
   if (__pyx_t_1) {
 
-    /* "streaming_form_data/_parser.pyx":458
+    /* "streaming_form_data/_parser.pyx":463
  * 
  *         if self.active_part:
  *             self.active_part.finish()             # <<<<<<<<<<<<<<
  */
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->active_part, __pyx_n_s_finish); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 458, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->active_part, __pyx_n_s_finish); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 463, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __pyx_t_4 = NULL;
     if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_3))) {
@@ -7733,12 +7754,12 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_mark_error(stru
     }
     __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 458, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 463, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "streaming_form_data/_parser.pyx":457
+    /* "streaming_form_data/_parser.pyx":462
  *         self.state = ParserState.PS_ERROR
  * 
  *         if self.active_part:             # <<<<<<<<<<<<<<
@@ -7746,7 +7767,7 @@ static PyObject *__pyx_f_19streaming_form_data_7_parser_7_Parser_mark_error(stru
  */
   }
 
-  /* "streaming_form_data/_parser.pyx":454
+  /* "streaming_form_data/_parser.pyx":459
  *         return skipped
  * 
  *     cdef mark_error(self):             # <<<<<<<<<<<<<<

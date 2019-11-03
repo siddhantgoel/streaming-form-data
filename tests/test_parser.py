@@ -624,7 +624,7 @@ Foo
         )
         parser.register('files', target)
 
-        parser.data_received(data)
+        self.assertRaises(ParseFailedException, parser.data_received, data)
 
         self.assertEqual(target.value, b'')
 

@@ -248,11 +248,16 @@ cdef class _Parser:
                     return ErrorGroup.PartHeaders + 1
 
                 value, params = cgi.parse_header(
-                    chunk[buffer_start: idx + 1].decode('utf-8'))
+                    chunk[buffer_start: idx + 1].decode('utf-8')
+                )
 
-                if value.startswith('Content-Disposition') and \
-                        value.endswith('form-data'):
+                if value.startswith('Content-Disposition:'):
+                    if not value.endswith('form-data'):
+                        self.mark_error()
+                        return ErrorGroup.PartHeaders + 1
+
                     name = params.get('name')
+
                     if name:
                         part = self._part_for(name) or self.default_part
                         self.set_active_part(part, params.get('filename'))
