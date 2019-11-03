@@ -96,6 +96,9 @@ class Part:
     def set_multipart_filename(self, value):
         self.target.multipart_filename = value
 
+    def set_multipart_content_type(self, value):
+        self.target.multipart_content_type = value
+
     def start(self):
         self.target.start()
 
@@ -261,6 +264,11 @@ cdef class _Parser:
                     if name:
                         part = self._part_for(name) or self.default_part
                         self.set_active_part(part, params.get('filename'))
+                elif value.startswith('Content-Type:'):
+                    if self.active_part:
+                        self.active_part.set_multipart_content_type(
+                            value.lstrip('Content-Type: ')
+                        )
 
                 buffer_start = idx + 1
 

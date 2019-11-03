@@ -786,3 +786,29 @@ Foo
 
         self.assertTrue(target._started)
         self.assertTrue(target._finished)
+
+    def test_content_type_passed_to_target(self):
+        filename = 'image-600x400.png'
+
+        with open_dataset(filename) as dataset_:
+            expected_data = dataset_.read()
+
+        target = ValueTarget()
+
+        with open_dataset(filename) as file_:
+            encoder = MultipartEncoder(
+                fields={
+                    filename: (filename, file_, 'image/png'),
+                }
+            )
+
+            parser = StreamingFormDataParser(
+                headers={'Content-Type': encoder.content_type}
+            )
+
+            parser.register(filename, target)
+
+            parser.data_received(encoder.to_string())
+
+            self.assertEqual(target.value, expected_data)
+            self.assertEqual(target.multipart_content_type, 'image/png')

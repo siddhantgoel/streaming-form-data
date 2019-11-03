@@ -9,6 +9,7 @@ class BaseTarget:
 
     def __init__(self, validator=None):
         self.multipart_filename = None
+        self.multipart_content_type = None
 
         self._started = False
         self._finished = False
