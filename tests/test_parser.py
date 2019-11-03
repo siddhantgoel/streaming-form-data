@@ -809,9 +809,7 @@ Foo
 
         with open_dataset(filename) as file_:
             encoder = MultipartEncoder(
-                fields={
-                    filename: (filename, file_, 'image/png'),
-                }
+                fields={filename: (filename, file_, 'image/png')}
             )
 
             parser = StreamingFormDataParser(
