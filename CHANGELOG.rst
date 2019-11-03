@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v1.5.1
+------
+- Update README
+
 v1.5.0
 ------
 - Make file :code:`content_type` (from the :code:`Content-Type` header) available
