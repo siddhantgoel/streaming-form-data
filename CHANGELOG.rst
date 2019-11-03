@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+v1.5.0
+------
+- Make file :code:`content_type` (from the :code:`Content-Type` header) available
+  as :code:`self.multipart_content_type` attribute in :code:`Target` classes
+- Build using Cython 0.29.14
+
 v1.4.0
 ------
 - Built using Cython 0.29.6
