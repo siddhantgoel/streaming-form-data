@@ -23,10 +23,10 @@ jobs:
         poetry install
     - name: Lint with flake8
       run: |
-        poetry run flake8
+        make lint-flake8
     - name: Lint with mypy
       run: |
-        poetry run mypy streaming_form_data/
+        make lint-mypy
     - name: Test with py.test
       run: |
-        poetry run py.test tests/
+        make test
