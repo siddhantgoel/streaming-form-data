@@ -11,7 +11,7 @@ Streaming multipart/form-data parser
     :target: https://streaming-form-data.readthedocs.io/en/latest/
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-    :target: https://github.com/ambv/black
+    :target: https://github.com/psf/black
 
 
 :code:`streaming_form_data` provides a Python parser for parsing
