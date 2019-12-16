@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v1.5.2
+------
+- Fix :code:`pyproject.toml`
+
 v1.5.1
 ------
 - Update README
