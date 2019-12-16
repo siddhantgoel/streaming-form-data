@@ -22,7 +22,6 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 include = ["LICENSE.txt"]
-url = "https://github.com/siddhantgoel/streaming-form-data"
 repository = "https://github.com/siddhantgoel/streaming-form-data"
 documentation = "https://streaming-form-data.readthedocs.io/en/latest/"
 
