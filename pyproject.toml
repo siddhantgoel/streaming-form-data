@@ -34,7 +34,7 @@ pytest = "^4.4"
 requests-toolbelt = "^0.9"
 cython = "^0.29"
 flake8 = "^3.7"
-black = {version = "^18.3-alpha.0",allows-prereleases = true,python = "^3.6"}
+black = {version = "^18.3-alpha.0",allow-prereleases = true,python = "^3.6"}
 mypy = "^0.720.0"
 
 [tool.black]
