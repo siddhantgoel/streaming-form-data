@@ -1,56 +1,58 @@
-from unittest import TestCase
+import pytest
 
 from streaming_form_data._parser import Finder
 
 
-class FinderTestCase(TestCase):
-    def test_invalid_init(self):
-        self.assertRaises(TypeError, Finder, None)
-        self.assertRaises(TypeError, Finder, 'abc')
-        self.assertRaises(TypeError, Finder, 123)
-        self.assertRaises(TypeError, Finder, 123.456)
-        self.assertRaises(TypeError, Finder, [123, 456])
-        self.assertRaises(TypeError, Finder, (123, 456))
+def test_invalid_init():
+    for value in (None, 'abc', 123, 123.456, [123, 456], (123, 456)):
+        with pytest.raises(TypeError):
+            Finder(value)
 
-        self.assertRaises(ValueError, Finder, b'')
+    with pytest.raises(ValueError):
+        Finder(b'')
 
-    def test_init(self):
-        finder = Finder(b'hello')
 
-        self.assertEqual(finder.target, b'hello')
-        self.assertTrue(finder.inactive())
-        self.assertFalse(finder.found())
+def test_init():
+    finder = Finder(b'hello')
 
-    def test_single_byte(self):
-        finder = Finder(b'-')
+    assert finder.target == b'hello'
+    assert finder.inactive()
+    assert not finder.found()
 
-        self.assertTrue(finder.inactive())
 
-        finder.feed(45)
-        self.assertTrue(finder.found())
+def test_single_byte():
+    finder = Finder(b'-')
 
-    def test_normal(self):
-        finder = Finder(b'hello')
+    assert finder.inactive()
 
-        self.assertTrue(finder.inactive())
+    finder.feed(45)
+    assert finder.found()
 
-        for byte in [104, 101, 108, 108]:
-            finder.feed(byte)
 
-            self.assertTrue(finder.active())
-            self.assertFalse(finder.found())
+def test_normal():
+    finder = Finder(b'hello')
 
-        finder.feed(111)
+    assert finder.inactive()
 
-        self.assertFalse(finder.active())
-        self.assertTrue(finder.found())
+    for byte in [104, 101, 108, 108]:
+        finder.feed(byte)
 
-    def test_wrong_byte(self):
-        finder = Finder(b'hello')
-        self.assertTrue(finder.inactive())
+        assert finder.active()
+        assert not finder.found()
 
-        finder.feed(104)
-        self.assertTrue(finder.active())
+    finder.feed(111)
 
-        finder.feed(42)
-        self.assertTrue(finder.inactive())
+    assert not finder.active()
+    assert finder.found()
+
+
+def test_wrong_byte():
+    finder = Finder(b'hello')
+
+    assert finder.inactive()
+
+    finder.feed(104)
+    assert finder.active()
+
+    finder.feed(42)
+    assert finder.inactive()
