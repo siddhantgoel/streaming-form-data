@@ -1,6 +1,7 @@
 import os.path
 import tempfile
-from unittest import TestCase
+
+import pytest
 
 from streaming_form_data.targets import (
     BaseTarget,
@@ -11,100 +12,103 @@ from streaming_form_data.targets import (
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
-class NullTargetTestCase(TestCase):
-    def test_basic(self):
-        target = NullTarget()
+def test_null_target_filename_not_set():
+    target = NullTarget()
 
-        target.multipart_filename = 'file001.txt'
-
-        target.start()
-        self.assertEqual(target.multipart_filename, 'file001.txt')
-
-        target.data_received(b'hello')
-
-        target.finish()
-
-        self.assertEqual(target.multipart_filename, 'file001.txt')
-
-    def test_not_sent(self):
-        target = NullTarget()
-        self.assertTrue(target.multipart_filename is None)
+    assert target.multipart_filename is None
 
 
-class ValueTargetTestCase(TestCase):
-    def test_basic(self):
-        target = ValueTarget()
-        self.assertEqual(target.value, b'')
+def test_null_target_basic():
+    target = NullTarget()
 
-        target.multipart_filename = None
+    target.multipart_filename = 'file001.txt'
 
-        target.start()
-        self.assertTrue(target.multipart_filename is None)
-        self.assertEqual(target.value, b'')
+    target.start()
+    assert target.multipart_filename == 'file001.txt'
 
-        target.data_received(b'hello')
-        target.data_received(b' ')
+    target.data_received(b'hello')
+    target.finish()
+
+    assert target.multipart_filename == 'file001.txt'
+
+
+def test_value_target_basic():
+    target = ValueTarget()
+
+    assert target.value == b''
+
+    target.multipart_filename = None
+
+    target.start()
+    assert target.multipart_filename is None
+    assert target.value == b''
+
+    target.data_received(b'hello')
+    target.data_received(b' ')
+    target.data_received(b'world')
+
+    target.finish()
+
+    assert target.multipart_filename is None
+    assert target.value == b'hello world'
+
+
+def test_value_target_not_set():
+    target = ValueTarget()
+
+    assert target.multipart_filename is None
+    assert target.value == b''
+
+
+def test_value_target_total_size_validator():
+    target = ValueTarget(validator=MaxSizeValidator(10))
+
+    assert target.value == b''
+
+    target.start()
+
+    target.data_received(b'hello')
+    target.data_received(b' ')
+
+    with pytest.raises(ValidationError):
         target.data_received(b'world')
 
-        target.finish()
 
-        self.assertTrue(target.multipart_filename is None)
-        self.assertEqual(target.value, b'hello world')
+def test_file_target_basic():
+    filename = os.path.join(tempfile.gettempdir(), 'file.txt')
 
-    def test_not_sent(self):
-        target = ValueTarget()
-        self.assertEqual(target.value, b'')
-        self.assertTrue(target.multipart_filename is None)
+    target = FileTarget(filename)
 
-    def test_total_size_validator(self):
-        target = ValueTarget(validator=MaxSizeValidator(10))
+    target.multipart_filename = 'file001.txt'
 
-        self.assertEqual(target.value, b'')
+    target.start()
 
-        target.start()
+    assert target.filename == filename
+    assert target.multipart_filename == 'file001.txt'
+    assert os.path.exists(filename)
 
-        target.data_received(b'hello')
-        target.data_received(b' ')
+    target.data_received(b'hello')
+    target.data_received(b' ')
+    target.data_received(b'world')
 
-        self.assertRaises(ValidationError, target.data_received, b'world')
+    target.finish()
+
+    assert target.filename == filename
+    assert target.multipart_filename == 'file001.txt'
+    assert os.path.exists(filename)
+
+    with open(filename, 'rb') as file_:
+        assert file_.read() == b'hello world'
 
 
-class FileTargetTestCase(TestCase):
-    def test_basic(self):
-        filename = os.path.join(tempfile.gettempdir(), 'file.txt')
+def test_file_target_not_set():
+    filename = os.path.join(tempfile.gettempdir(), 'file_not_sent.txt')
 
-        target = FileTarget(filename)
+    target = FileTarget(filename)
 
-        target.multipart_filename = 'file001.txt'
-
-        target.start()
-        self.assertEqual(target.filename, filename)
-        self.assertEqual(target.multipart_filename, 'file001.txt')
-        self.assertTrue(os.path.exists(filename))
-
-        target.data_received(b'hello')
-        target.data_received(b' ')
-        target.data_received(b'world')
-
-        target.finish()
-
-        self.assertTrue(os.path.exists(filename))
-
-        self.assertEqual(target.filename, filename)
-        self.assertEqual(target.multipart_filename, 'file001.txt')
-
-        with open(filename, 'rb') as file_:
-            self.assertEqual(file_.read(), b'hello world')
-
-    def test_not_sent(self):
-        filename = os.path.join(tempfile.gettempdir(), 'file_not_sent.txt')
-
-        target = FileTarget(filename)
-
-        self.assertFalse(os.path.exists(filename))
-
-        self.assertEqual(target.filename, filename)
-        self.assertTrue(target.multipart_filename is None)
+    assert not os.path.exists(filename)
+    assert target.filename == filename
+    assert target.multipart_filename is None
 
 
 class CustomTarget(BaseTarget):
@@ -126,36 +130,40 @@ class CustomTarget(BaseTarget):
         return b' '.join(self._values)
 
 
-class CustomTargetTestCase(TestCase):
-    def test_basic(self):
-        target = CustomTarget()
-        self.assertEqual(target.value, b'')
+def test_custom_target_basic():
+    target = CustomTarget()
 
-        target.multipart_filename = 'file.txt'
-        self.assertEqual(target._started, False)
-        self.assertEqual(target._finished, False)
+    assert target.value == b''
 
-        target.start()
-        target._started = True
-        self.assertEqual(target.multipart_filename, 'file.txt')
-        self.assertEqual(target.value, b'[start]')
+    target.multipart_filename = 'file.txt'
 
-        target.data_received(b'chunk1')
-        target.data_received(b'chunk2')
-        self.assertEqual(target.value, b'[start] chunk1 chunk2')
-        target.data_received(b'chunk3')
+    assert not target._started
+    assert not target._finished
 
-        target.finish()
-        target._finished = True
+    target.start()
+    target._started = True
 
-        self.assertEqual(target.multipart_filename, 'file.txt')
-        self.assertEqual(
-            target.value, b'[start] chunk1 chunk2 chunk3 [finish]'
-        )
-        self.assertEqual(target._started, True)
-        self.assertEqual(target._finished, True)
+    assert target.multipart_filename == 'file.txt'
+    assert target.value == b'[start]'
 
-    def test_not_sent(self):
-        target = CustomTarget()
-        self.assertEqual(target.value, b'')
-        self.assertTrue(target.multipart_filename is None)
+    target.data_received(b'chunk1')
+    target.data_received(b'chunk2')
+
+    assert target.value == b'[start] chunk1 chunk2'
+
+    target.data_received(b'chunk3')
+
+    target.finish()
+    target._finished = True
+
+    assert target.multipart_filename == 'file.txt'
+    assert target.value == b'[start] chunk1 chunk2 chunk3 [finish]'
+    assert target._started
+    assert target._finished
+
+
+def test_custom_target_not_sent():
+    target = CustomTarget()
+
+    assert target.value == b''
+    assert target.multipart_filename is None
