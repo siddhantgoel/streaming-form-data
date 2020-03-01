@@ -85,20 +85,19 @@ cdef class Finder:
         return self.index
 
 
-class Part:
+cdef class Part:
     """One part of a multipart/form-data request
     """
 
-    def __init__(self, name, target):
+    cdef public str name
+    cdef list targets
+
+    def __init__(self, str name, object target):
         self.name = name
         self.targets = [target]
 
-    def add_target(self, target):
+    def add_target(self, object target):
         self.targets.append(target)
-
-    def set_multipart_filename(self, value):
-        for target in self.targets:
-            target.multipart_filename = value
 
     def set_multipart_filename(self, value):
         for target in self.targets:
@@ -112,7 +111,7 @@ class Part:
         for target in self.targets:
             target.start()
 
-    def data_received(self, chunk):
+    def data_received(self, bytes chunk):
         for target in self.targets:
             target.data_received(chunk)
 
