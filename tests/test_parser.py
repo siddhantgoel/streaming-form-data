@@ -1,12 +1,18 @@
 from contextlib import contextmanager
 from io import BytesIO
+import hashlib
 
 from numpy import random
 import pytest
 from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import ParseFailedException, StreamingFormDataParser
-from streaming_form_data.targets import BaseTarget, FileTarget, ValueTarget
+from streaming_form_data.targets import (
+    BaseTarget,
+    FileTarget,
+    SHA256Target,
+    ValueTarget,
+)
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
@@ -840,3 +846,33 @@ def test_content_type_passed_to_target():
 
         assert target.value == expected_data
         assert target.multipart_content_type == 'image/png'
+
+
+def test_multiple_targets():
+    filename = 'image-600x400.png'
+
+    with open_dataset(filename) as dataset_:
+        expected_data = dataset_.read()
+
+    value_target = ValueTarget()
+    sha256_target = SHA256Target()
+
+    with open_dataset(filename) as file_:
+        encoder = MultipartEncoder(
+            fields={filename: (filename, file_, 'image/png')}
+        )
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': encoder.content_type}
+        )
+
+        parser.register(filename, value_target)
+        parser.register(filename, sha256_target)
+
+        assert not value_target.value
+        assert sha256_target.value == hashlib.sha256(b'').hexdigest()
+
+        parser.data_received(encoder.to_string())
+
+        assert value_target.value == expected_data
+        assert sha256_target.value == hashlib.sha256(expected_data).hexdigest()

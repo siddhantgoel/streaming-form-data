@@ -91,22 +91,34 @@ class Part:
 
     def __init__(self, name, target):
         self.name = name
-        self.target = target
+        self.targets = [target]
+
+    def add_target(self, target):
+        self.targets.append(target)
 
     def set_multipart_filename(self, value):
-        self.target.multipart_filename = value
+        for target in self.targets:
+            target.multipart_filename = value
+
+    def set_multipart_filename(self, value):
+        for target in self.targets:
+            target.multipart_filename = value
 
     def set_multipart_content_type(self, value):
-        self.target.multipart_content_type = value
+        for target in self.targets:
+            target.multipart_content_type = value
 
     def start(self):
-        self.target.start()
+        for target in self.targets:
+            target.start()
 
     def data_received(self, chunk):
-        self.target.data_received(chunk)
+        for target in self.targets:
+            target.data_received(chunk)
 
     def finish(self):
-        self.target.finish()
+        for target in self.targets:
+            target.finish()
 
 
 cdef enum ParserState:
@@ -130,8 +142,10 @@ cdef enum ParserState:
 
 cdef class _Parser:
     cdef ParserState state
+
     cdef Finder delimiter_finder, ender_finder
     cdef size_t delimiter_length, ender_length
+
     cdef object expected_parts
     cdef object active_part, default_part
 
@@ -154,7 +168,11 @@ cdef class _Parser:
         self._leftover_buffer = None
 
     def register(self, str name, object target):
-        if not self._part_for(name):
+        part = self._part_for(name)
+
+        if part:
+            part.add_target(target)
+        else:
             self.expected_parts.append(Part(name, target))
 
     def set_active_part(self, part, filename):

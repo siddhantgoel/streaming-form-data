@@ -48,7 +48,7 @@ class StreamingFormDataParser:
     def register(self, name: str, target: Type[BaseTarget]):
         if self._running:
             raise ParseFailedException(
-                'Registering parts not allowed when parser is running'
+                'Registering parts not allowed while parser is running'
             )
 
         self._parser.register(name, target)
