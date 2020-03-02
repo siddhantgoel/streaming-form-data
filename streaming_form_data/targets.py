@@ -2,9 +2,18 @@ import hashlib
 
 
 class BaseTarget:
-    """Targets determine what to do with some input once the parser is done with
-    it. Any new Target should inherit from this class and override
-    data_received.
+    """
+    Targets determine what to do with some input once the parser is done
+    processing it. Any new Target should inherit from this base class and
+    override the :code:`data_received` function.
+
+    Attributes:
+        multipart_filename: the name of the file advertised by the user,
+            extracted from the :code:`Content-Disposition` header. Please note
+            that this value comes directly from the user input and is not
+            sanitized, so be careful in using it directly.
+        multipart_content_type: MIME Content-Type of the file, extracted from
+            the :code:`Content-Type` HTTP header
     """
 
     def __init__(self, validator=None):
@@ -14,19 +23,6 @@ class BaseTarget:
         self._started = False
         self._finished = False
         self._validator = validator
-
-    # 'multipart_filename ' is filled before start() call.
-    # It contains optional 'filename' value from 'Content-Disposition' header
-    # Default value is None in case 'filename' is not present.
-    #
-    # NOTE! You should be very careful with this value
-    #       because it comes from the user.
-    #       You should never use it without filtering
-    #       to construct filename on disk.
-    #
-    #       Example library for filtering user strings
-    #       for use in URLs, filenames:
-    #       https://github.com/un33k/python-slugify
 
     def _validate(self, chunk: bytes):
         if self._validator:
@@ -55,11 +51,23 @@ class BaseTarget:
 
 
 class NullTarget(BaseTarget):
+    """NullTarget ignores whatever input is passed in.
+
+    This is mostly useful for internal use and should (normally) not be
+    required by external users.
+    """
+
     def on_data_received(self, chunk: bytes):
         pass
 
 
 class ValueTarget(BaseTarget):
+    """ValueTarget stores the input in an in-memory list of bytes.
+
+    This is useful in case you'd like to have the value contained in an
+    in-memory string.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -74,6 +82,9 @@ class ValueTarget(BaseTarget):
 
 
 class FileTarget(BaseTarget):
+    """FileTarget writes (streams) the input to an on-disk file.
+    """
+
     def __init__(self, filename, allow_overwrite=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -93,6 +104,9 @@ class FileTarget(BaseTarget):
 
 
 class SHA256Target(BaseTarget):
+    """SHA256Target calculates the SHA256 hash of the given input.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
