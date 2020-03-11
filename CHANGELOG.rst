@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.6.0
+------
+- Support registering multiple targets per same part
+- Built using Cython 0.29.15
+
 v1.5.2
 ------
 - Fix :code:`pyproject.toml`
