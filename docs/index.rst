@@ -85,6 +85,19 @@ this to the parser as follows.
     >>> parser.register('name', name_target)
     >>> parser.register('file', file_target)
 
+Registering multiple targets is also supported.
+
+.. code-block:: python
+
+    >>> name_target = ValueTarget()
+    >>> sha256_target = SHA256Target()
+    >>>
+    >>> parser.register('file', name_target)
+    >>> parser.register('file', sha256_target)
+
+In this case, the contents of the :code:`file` field would be streamed to both
+the :code:`ValueTarget` as well as the :code:`SHA256Target`.
+
 3. Streaming data
 ~~~~~~~~~~~~~~~~~
 
