@@ -8,11 +8,12 @@ from streaming_form_data.targets import NullTarget
 ctypedef unsigned char Byte  # noqa: E999
 
 
-cdef enum Constants:
-    Hyphen = 45
-    CR = 13
-    LF = 10
-    MinFileBodyChunkSize = 1024
+# useful constants
+
+cdef int c_hyphen = 45
+cdef int c_cr = 13
+cdef int c_lf = 10
+cdef int c_min_file_body_chunk_size = 1024
 
 
 cdef enum FinderState:
@@ -225,23 +226,23 @@ cdef class _Parser:
             byte = chunk_ptr[idx]
 
             if self.state == ParserState.PS_START:
-                if byte != Constants.Hyphen:
+                if byte != c_hyphen:
                     self.mark_error()
                     return ErrorGroup.Delimiting + 1
 
                 self.state = ParserState.PS_STARTING_BOUNDARY
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
-                if byte != Constants.Hyphen:
+                if byte != c_hyphen:
                     self.mark_error()
                     return ErrorGroup.Delimiting + 2
 
                 self.state = ParserState.PS_READING_BOUNDARY
             elif self.state == ParserState.PS_READING_BOUNDARY:
-                if byte == Constants.CR:
+                if byte == c_cr:
                     self.state = ParserState.PS_ENDING_BOUNDARY
 
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
-                if byte != Constants.LF:
+                if byte != c_lf:
                     self.mark_error()
                     return ErrorGroup.Delimiting + 3
 
@@ -259,11 +260,11 @@ cdef class _Parser:
 
                 self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
-                if byte == Constants.CR:
+                if byte == c_cr:
                     self.state = ParserState.PS_ENDING_HEADER
 
             elif self.state == ParserState.PS_ENDING_HEADER:
-                if byte != Constants.LF:
+                if byte != c_lf:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 1
 
@@ -291,13 +292,13 @@ cdef class _Parser:
 
                 self.state = ParserState.PS_ENDED_HEADER
             elif self.state == ParserState.PS_ENDED_HEADER:
-                if byte == Constants.CR:
+                if byte == c_cr:
                     self.state = ParserState.PS_ENDING_ALL_HEADERS
                 else:
                     self.state = ParserState.PS_READING_HEADER
 
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
-                if byte != Constants.LF:
+                if byte != c_lf:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 2
 
@@ -391,7 +392,7 @@ cdef class _Parser:
             )
             match_start = idx - matched_length
 
-            if match_start >= buffer_start + Constants.MinFileBodyChunkSize:
+            if match_start >= buffer_start + c_min_file_body_chunk_size:
                 try:
                     self.on_body(chunk[buffer_start: match_start])
                 except Exception:
@@ -443,36 +444,36 @@ cdef class _Parser:
                 # guess we will skip all characters in the buffer
                 skipped = pos_last - pos_first + 1
 
-                if ptr[0] == Constants.CR:
+                if ptr[0] == c_cr:
                     skipped = skipped - 1
-                elif ptr[0] == Constants.LF and ptr[-1] == Constants.CR:
+                elif ptr[0] == c_lf and ptr[-1] == c_cr:
                     skipped = skipped - 2
                 elif (
-                    ptr[0] == Constants.Hyphen
-                    and ptr[-1] == Constants.LF
-                    and ptr[-2] == Constants.CR
+                    ptr[0] == c_hyphen
+                    and ptr[-1] == c_lf
+                    and ptr[-2] == c_cr
                 ):
                     skipped = skipped - 3
                 break
 
-            if ptr[0] != Constants.Hyphen:
+            if ptr[0] != c_hyphen:
                 ptr += 2
             else:
-                if ptr[-1] != Constants.Hyphen:
+                if ptr[-1] != c_hyphen:
                     ptr += 1
                 else:
-                    if ptr[-2] == Constants.LF and ptr[-3] == Constants.CR:
+                    if ptr[-2] == c_lf and ptr[-3] == c_cr:
                         self.delimiter_finder.reset()
-                        self.delimiter_finder.feed(Constants.CR)
-                        self.delimiter_finder.feed(Constants.LF)
-                        self.delimiter_finder.feed(Constants.Hyphen)
-                        self.delimiter_finder.feed(Constants.Hyphen)
+                        self.delimiter_finder.feed(c_cr)
+                        self.delimiter_finder.feed(c_lf)
+                        self.delimiter_finder.feed(c_hyphen)
+                        self.delimiter_finder.feed(c_hyphen)
 
                         self.ender_finder.reset()
-                        self.ender_finder.feed(Constants.CR)
-                        self.ender_finder.feed(Constants.LF)
-                        self.ender_finder.feed(Constants.Hyphen)
-                        self.ender_finder.feed(Constants.Hyphen)
+                        self.ender_finder.feed(c_cr)
+                        self.ender_finder.feed(c_lf)
+                        self.ender_finder.feed(c_hyphen)
+                        self.ender_finder.feed(c_hyphen)
 
                         skipped = (ptr - chunk_ptr) - pos_first + 1
 
