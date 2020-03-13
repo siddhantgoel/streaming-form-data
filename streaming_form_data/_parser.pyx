@@ -100,11 +100,11 @@ cdef class Part:
     def add_target(self, object target):
         self.targets.append(target)
 
-    def set_multipart_filename(self, value):
+    def set_multipart_filename(self, str value):
         for target in self.targets:
             target.multipart_filename = value
 
-    def set_multipart_content_type(self, value):
+    def set_multipart_content_type(self, str value):
         for target in self.targets:
             target.multipart_content_type = value
 
@@ -151,7 +151,7 @@ cdef class _Parser:
 
     cdef bytes _leftover_buffer
 
-    def __init__(self, delimiter, ender):
+    def __init__(self, bytes delimiter, bytes ender):
         self.delimiter_finder = Finder(delimiter)
         self.ender_finder = Finder(ender)
 
@@ -175,7 +175,7 @@ cdef class _Parser:
         else:
             self.expected_parts.append(Part(name, target))
 
-    def set_active_part(self, part, filename):
+    def set_active_part(self, part, str filename):
         self.active_part = part
         self.active_part.set_multipart_filename(filename)
         self.active_part.start()
@@ -189,7 +189,7 @@ cdef class _Parser:
         if self.active_part and len(value) > 0:
             self.active_part.data_received(value)
 
-    cdef _part_for(self, name):
+    cdef _part_for(self, str name):
         for part in self.expected_parts:
             if part.name == name:
                 return part
@@ -306,7 +306,6 @@ cdef class _Parser:
 
                 self.state = ParserState.PS_READING_BODY
             elif self.state == ParserState.PS_READING_BODY:
-
                 self.delimiter_finder.feed(byte)
                 self.ender_finder.feed(byte)
 
