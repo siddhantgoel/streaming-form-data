@@ -876,3 +876,29 @@ def test_multiple_targets():
 
         assert value_target.value == expected_data
         assert sha256_target.value == hashlib.sha256(expected_data).hexdigest()
+
+
+def test_extra_headers():
+    # example from https://tools.ietf.org/html/rfc2388
+
+    data = b'''\
+--1234
+Content-Disposition: form-data; name="files"
+Content-Type: text/plain;charset=windows-1250
+Content-Transfer-Encoding: quoted-printable
+
+Joe owes =80100.
+--1234--'''.replace(
+        b'\n', b'\r\n'
+    )
+
+    target = ValueTarget()
+
+    parser = StreamingFormDataParser(
+        headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+    )
+    parser.register('files', target)
+
+    parser.data_received(data)
+
+    assert target.value == b'Joe owes =80100.'
