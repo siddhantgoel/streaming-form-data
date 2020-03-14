@@ -902,3 +902,34 @@ Joe owes =80100.
     parser.data_received(data)
 
     assert target.value == b'Joe owes =80100.'
+
+
+def test_case_insensitive_content_disposition_header():
+    content_disposition_header = 'Content-Disposition'
+
+    for header in (
+        content_disposition_header,
+        content_disposition_header.lower(),
+        content_disposition_header.upper(),
+    ):
+        data = b'''\
+--1234
+{header}: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--'''.replace(
+            b'\n', b'\r\n'
+        ).replace(
+            b'{header}', header.encode('utf-8')
+        )
+
+        target = ValueTarget()
+
+        parser = StreamingFormDataParser(
+            headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+        )
+        parser.register('files', target)
+
+        parser.data_received(data)
+
+        assert target.value == b'Foo'

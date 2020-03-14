@@ -272,7 +272,9 @@ cdef class _Parser:
                     chunk[buffer_start: idx + 1].decode('utf-8')
                 )
 
-                if value.startswith('Content-Disposition:'):
+                value = value.lower()
+
+                if value.startswith('content-disposition:'):
                     if not value.endswith('form-data'):
                         self.mark_error()
                         return ErrorGroup.PartHeaders + 1
@@ -282,10 +284,10 @@ cdef class _Parser:
                     if name:
                         part = self._part_for(name) or self.default_part
                         self.set_active_part(part, params.get('filename'))
-                elif value.startswith('Content-Type:'):
+                elif value.startswith('content-type:'):
                     if self.active_part:
                         self.active_part.set_multipart_content_type(
-                            value.lstrip('Content-Type: ')
+                            value.lstrip('content-type: ')
                         )
 
                 buffer_start = idx + 1
