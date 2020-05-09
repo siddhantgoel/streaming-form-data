@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "streaming-form-data"
-version = "1.6.0"
+version = "1.7.0"
 description = "Streaming parser for multipart/form-data"
 readme = "README.rst"
 authors = ["Siddhant Goel <me@sgoel.org>"]
