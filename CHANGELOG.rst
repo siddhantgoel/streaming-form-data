@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v1.7.0
+------
+- Support Python 3.8
+- Built using Cython 0.29.17
+
 v1.6.0
 ------
 - Support registering multiple targets per same part
