@@ -1,4 +1,5 @@
 import hashlib
+from typing import Callable, Optional
 
 
 class BaseTarget:
@@ -16,7 +17,7 @@ class BaseTarget:
             the :code:`Content-Type` HTTP header
     """
 
-    def __init__(self, validator=None):
+    def __init__(self, validator: Optional[Callable] = None):
         self.multipart_filename = None
         self.multipart_content_type = None
 
@@ -85,7 +86,9 @@ class FileTarget(BaseTarget):
     """FileTarget writes (streams) the input to an on-disk file.
     """
 
-    def __init__(self, filename, allow_overwrite=True, *args, **kwargs):
+    def __init__(
+        self, filename: str, allow_overwrite: bool = True, *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
 
         self.filename = filename
@@ -97,10 +100,12 @@ class FileTarget(BaseTarget):
         self._fd = open(self.filename, self._mode)
 
     def on_data_received(self, chunk: bytes):
-        self._fd.write(chunk)
+        if self._fd:
+            self._fd.write(chunk)
 
     def on_finish(self):
-        self._fd.close()
+        if self._fd:
+            self._fd.close()
 
 
 class SHA256Target(BaseTarget):
