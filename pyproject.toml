@@ -31,13 +31,13 @@ documentation = "https://streaming-form-data.readthedocs.io/en/latest/"
 python = "^3.5"
 
 [tool.poetry.dev-dependencies]
-numpy = "^1.16"
-pytest = "^4.4"
+numpy = "^1.18"
+pytest = "^5.4"
 requests-toolbelt = "^0.9"
 cython = "^0.29"
 flake8 = "^3.7"
 black = {version = "^18.3-alpha.0",allow-prereleases = true,python = "^3.6"}
-mypy = "^0.720.0"
+mypy = "^0.770"
 
 [tool.black]
 line-length = 79
