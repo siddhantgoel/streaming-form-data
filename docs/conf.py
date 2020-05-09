@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'streaming-form-data'
-copyright = '2019, Siddhant Goel'
+copyright = '2017 - 2020, Siddhant Goel'
 author = 'Siddhant Goel'
 
 # The version info for the project you're documenting, acts as replacement for
