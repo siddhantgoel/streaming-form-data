@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v1.7.1
+------
+- Fix build issues related to PEP 517
+
 v1.7.0
 ------
 - Support Python 3.8

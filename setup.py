@@ -11,7 +11,7 @@ with open(here.joinpath('README.rst')) as fd:
 
 setup(
     name='streaming-form-data',
-    version='1.7.0',
+    version='1.7.1',
     description='Streaming parser for multipart/form-data',
     long_description=long_description,
     long_description_content_type='text/x-rst',
