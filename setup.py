@@ -14,6 +14,7 @@ setup(
     version='1.7.0',
     description='Streaming parser for multipart/form-data',
     long_description=long_description,
+    long_description_content_type='text/x-rst',
     packages=find_packages(),
     ext_modules=[
         Extension(
