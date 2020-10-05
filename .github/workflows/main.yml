@@ -35,3 +35,7 @@ jobs:
     - name: Test with py.test
       run: |
         make test
+    - name: Check packages
+      run: |
+        python setup.py sdist
+        twine check dist/*.tar.gz
