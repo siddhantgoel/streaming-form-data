@@ -58,7 +58,10 @@ Up-to-date documentation is available on `Read the Docs`_.
 Development
 -----------
 
-Please make sure you have Python 3.5+ and `pip-tools`_ installed.
+Please make sure you have Python 3.6+ and `pip-tools`_ installed. Additionally,
+this package includes a C extension, so please make sure you have a working C
+compiler available. On Debian-based distros this means installing the
+:code:`build-essentials` package.
 
 1. Git clone the repository -
    :code:`git clone https://github.com/siddhantgoel/streaming-form-data`
