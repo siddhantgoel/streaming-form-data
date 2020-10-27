@@ -13,7 +13,7 @@ cffi==1.14.3              # via cryptography
 chardet==3.0.4            # via requests
 click==7.1.2              # via black
 colorama==0.4.3           # via twine
-cryptography==3.1.1       # via secretstorage
+cryptography==3.2         # via secretstorage
 cython==0.29.17           # via -r requirements-dev.in
 docutils==0.16            # via readme-renderer
 entrypoints==0.3          # via flake8
