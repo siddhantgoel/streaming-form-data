@@ -799,7 +799,7 @@ Foo
     assert target._finished
 
 
-def test_file_target_exceeds_max_size():
+def test_file_target_exceeds_max_size(tmp_path):
     data = b'''\
 --1234
 Content-Disposition: form-data; name="files"; filename="ab.txt"
@@ -809,7 +809,7 @@ Foo
         b'\n', b'\r\n'
     )
 
-    target = FileTarget('/tmp/file.txt', validator=MaxSizeValidator(1))
+    target = FileTarget(tmp_path / 'file.txt', validator=MaxSizeValidator(1))
 
     parser = StreamingFormDataParser(
         headers={'Content-Type': 'multipart/form-data; boundary=1234'}
