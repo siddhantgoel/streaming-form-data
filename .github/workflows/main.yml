@@ -43,5 +43,5 @@ jobs:
 
     - name: Check packages
       run: |
-        python setup.py sdist
-        twine check dist/*.tar.gz
+        python setup.py sdist bdist_wheel
+        twine check dist/*
