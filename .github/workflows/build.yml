@@ -1,6 +1,9 @@
 name: build
 
-on: [push]
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build_source:
