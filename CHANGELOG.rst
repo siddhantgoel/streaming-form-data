@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v1.8.0
+------
+- Build and publish binary wheels for Linux, macOS and Windows
+
 v1.7.1
 ------
 - Fix build issues related to PEP 517
