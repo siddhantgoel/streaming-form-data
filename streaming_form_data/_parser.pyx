@@ -287,7 +287,7 @@ cdef class _Parser:
                 elif value.startswith('content-type:'):
                     if self.active_part:
                         self.active_part.set_multipart_content_type(
-                            value.lstrip('content-type: ')
+                            value.replace('content-type: ', '')
                         )
 
                 buffer_start = idx + 1

@@ -824,28 +824,28 @@ Foo
 
 
 def test_content_type_passed_to_target():
-    filename = 'image-600x400.png'
+    files = [('image-600x400.png', 'image/png'), ('file.txt', 'text/plain')]
+    for filename, content_type in files:
+        with open_dataset(filename) as dataset_:
+            expected_data = dataset_.read()
 
-    with open_dataset(filename) as dataset_:
-        expected_data = dataset_.read()
+        target = ValueTarget()
 
-    target = ValueTarget()
+        with open_dataset(filename) as file_:
+            encoder = MultipartEncoder(
+                fields={filename: (filename, file_, content_type)}
+            )
 
-    with open_dataset(filename) as file_:
-        encoder = MultipartEncoder(
-            fields={filename: (filename, file_, 'image/png')}
-        )
+            parser = StreamingFormDataParser(
+                headers={'Content-Type': encoder.content_type}
+            )
 
-        parser = StreamingFormDataParser(
-            headers={'Content-Type': encoder.content_type}
-        )
+            parser.register(filename, target)
 
-        parser.register(filename, target)
+            parser.data_received(encoder.to_string())
 
-        parser.data_received(encoder.to_string())
-
-        assert target.value == expected_data
-        assert target.multipart_content_type == 'image/png'
+            assert target.value == expected_data
+            assert target.multipart_content_type == content_type
 
 
 def test_multiple_targets():
