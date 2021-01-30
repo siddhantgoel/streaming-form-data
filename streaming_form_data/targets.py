@@ -83,8 +83,7 @@ class ValueTarget(BaseTarget):
 
 
 class FileTarget(BaseTarget):
-    """FileTarget writes (streams) the input to an on-disk file.
-    """
+    """FileTarget writes (streams) the input to an on-disk file."""
 
     def __init__(
         self, filename: str, allow_overwrite: bool = True, *args, **kwargs
@@ -109,8 +108,7 @@ class FileTarget(BaseTarget):
 
 
 class SHA256Target(BaseTarget):
-    """SHA256Target calculates the SHA256 hash of the given input.
-    """
+    """SHA256Target calculates the SHA256 hash of the given input."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
