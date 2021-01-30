@@ -5,7 +5,7 @@ import pathlib
 here = pathlib.Path(__file__).parent.resolve()
 
 
-with open(here.joinpath('README.rst')) as fd:
+with open(here.joinpath('README.md')) as fd:
     long_description = fd.read()
 
 
@@ -14,7 +14,7 @@ setup(
     version='1.8.0',
     description='Streaming parser for multipart/form-data',
     long_description=long_description,
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     packages=find_packages(),
     ext_modules=[
         Extension(
