@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.8.1
+- Fix `Content-Type` header parsing bug (thanks [@raethlein])
+- Build using Cython 0.29.21
+
 ## v1.8.0
 - Build and publish binary wheels for Linux, macOS and Windows
 
@@ -111,3 +115,4 @@
 - Initial release
 
 [@kolomenkin]: https://github.com/kolomenkin
+[@raethlein]: https://github.com/raethlein
