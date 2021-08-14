@@ -16,6 +16,9 @@ compile:
 pip-compile:
 	pip-compile requirements-dev.in > requirements-dev.txt
 
+pip-sync:
+	pip-sync requirements-dev.txt
+
 # lint
 
 fmt-black:
@@ -49,7 +52,7 @@ speed-test:
 
 .PHONY: clean \
 	annotate compile \
-	pip-compile \
+	pip-compile pip-sync \
 	lint-black lint-flake8 lint-mypy lint \
 	test-pytest test \
 	speed-test profile
