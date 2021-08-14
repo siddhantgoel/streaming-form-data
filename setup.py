@@ -11,7 +11,7 @@ with open(here.joinpath('README.md')) as fd:
 
 setup(
     name='streaming-form-data',
-    version='1.8.1',
+    version='1.9.0',
     description='Streaming parser for multipart/form-data',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -38,6 +38,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3 :: Only',
     ],
     keywords='form-data, forms, http, multipart, web',
