@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.9.0
+- Support Python 3.9
+- Build using Cython 0.29.24
+
 ## v1.8.1
 - Fix `Content-Type` header parsing bug (thanks [@raethlein])
 - Build using Cython 0.29.21
