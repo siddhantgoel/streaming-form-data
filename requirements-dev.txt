@@ -52,7 +52,7 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
-numpy==1.21.1
+numpy==1.19.5
     # via -r requirements-dev.in
 packaging==21.0
     # via
