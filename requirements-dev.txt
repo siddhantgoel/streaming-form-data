@@ -24,7 +24,7 @@ colorama==0.4.4
     # via twine
 cryptography==3.4.7
     # via secretstorage
-cython==0.29.21
+cython==0.29.24
     # via -r requirements-dev.in
 docutils==0.17.1
     # via readme-renderer
