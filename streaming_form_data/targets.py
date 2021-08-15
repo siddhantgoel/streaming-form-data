@@ -1,4 +1,5 @@
 import hashlib
+from pathlib import Path
 from typing import Callable, Optional
 
 
@@ -111,11 +112,11 @@ class DirectoryTarget(BaseTarget):
     """DirectoryTarget writes (streams) the different input to an on-disk directory."""
 
     def __init__(
-        self, directorypath: str, allow_overwrite: bool = True, *args, **kwargs
+        self, directory_path: str, allow_overwrite: bool = True, *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
 
-        self.directorypath = directorypath
+        self.directory_path = directory_path
 
         self._mode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
@@ -123,7 +124,9 @@ class DirectoryTarget(BaseTarget):
         self.multipart_content_types = []
 
     def on_start(self):
-        self._fd = open(self.directorypath.joinpath(self.multipart_filename), self._mode)
+        file_path = Path(self.directory_path).joinpath(self.multipart_filename).resolve()
+        if file_path.is_relative_to(Path(self.directory_path)):
+            self._fd = open(file_path, self._mode)
 
     def on_data_received(self, chunk: bytes):
         if self._fd:
