@@ -113,17 +113,18 @@ def test_file_target_not_set():
 
 
 def test_directory_target_basic():
-    directorypath = tempfile.gettempdir()
+    directory_path = tempfile.gettempdir()
 
-    target = DirectoryTarget(directorypath)
+    target = DirectoryTarget(directory_path)
 
+    first_path = os.path.join(directory_path, 'file001.txt')
     target.multipart_filename = 'file001.txt'
 
     target.start()
 
-    assert target.directorypath == directorypath
+    assert target.directory_path == directory_path
     assert target.multipart_filename == 'file001.txt'
-    assert os.path.exists(directorypath.joinpath('file001.txt'))
+    assert os.path.exists(first_path)
 
     target.data_received(b'first')
     target.data_received(b' ')
@@ -131,13 +132,14 @@ def test_directory_target_basic():
 
     target.finish()
 
+    second_path = os.path.join(directory_path, 'file002.txt')
     target.multipart_filename = 'file002.txt'
 
     target.start()
 
-    assert target.directorypath == directorypath
+    assert target.directory_path == directory_path
     assert target.multipart_filename == 'file002.txt'
-    assert os.path.exists(directorypath.joinpath('file002.txt'))
+    assert os.path.exists(second_path)
 
     target.data_received(b'second')
     target.data_received(b' ')
@@ -145,26 +147,25 @@ def test_directory_target_basic():
 
     target.finish()
 
-    assert target.directorypath == directorypath
+    assert target.directory_path == directory_path
     assert target.multipart_filenames == ['file001.txt', 'file002.txt']
-    assert os.path.exists(directorypath.joinpath('file001.txt'))
-    assert os.path.exists(directorypath.joinpath('file002.txt'))
+    assert os.path.exists(first_path)
+    assert os.path.exists(second_path)
 
-    with open(directorypath.joinpath('file001.txt'), 'rb') as file_:
+    with open(first_path, 'rb') as file_:
         assert file_.read() == b'first file'
 
-    with open(directorypath.joinpath('file002.txt'), 'rb') as file_:
+    with open(second_path, 'rb') as file_:
         assert file_.read() == b'second file'
 
 
 def test_directory_target_not_set():
-    filename = os.path.join(tempfile.gettempdir(), 'file_not_sent.txt')
+    directory_path = tempfile.gettempdir()
 
-    target = FileTarget(filename)
+    target = DirectoryTarget(directory_path)
 
-    assert not os.path.exists(filename)
-    assert target.filename == filename
-    assert target.multipart_filename is None
+    assert target.directory_path == directory_path
+    assert not target.multipart_filenames
 
 
 class CustomTarget(BaseTarget):
