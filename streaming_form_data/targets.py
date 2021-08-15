@@ -107,6 +107,35 @@ class FileTarget(BaseTarget):
             self._fd.close()
 
 
+class DirectoryTarget(BaseTarget):
+    """DirectoryTarget writes (streams) the different input to an on-disk directory."""
+
+    def __init__(
+        self, directorypath: str, allow_overwrite: bool = True, *args, **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+
+        self.directorypath = directorypath
+
+        self._mode = 'wb' if allow_overwrite else 'xb'
+        self._fd = None
+        self.multipart_filenames = []
+        self.multipart_content_types = []
+
+    def on_start(self):
+        self._fd = open(self.directorypath.joinpath(self.multipart_filename), self._mode)
+
+    def on_data_received(self, chunk: bytes):
+        if self._fd:
+            self._fd.write(chunk)
+
+    def on_finish(self):
+        self.multipart_filenames.append(self.multipart_filename)
+        self.multipart_content_types.append(self.multipart_content_type)
+        if self._fd:
+            self._fd.close()
+
+            
 class SHA256Target(BaseTarget):
     """SHA256Target calculates the SHA256 hash of the given input."""
 
