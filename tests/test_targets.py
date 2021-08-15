@@ -6,6 +6,7 @@ import pytest
 from streaming_form_data.targets import (
     BaseTarget,
     FileTarget,
+    DirectoryTarget,
     NullTarget,
     ValueTarget,
 )
@@ -102,6 +103,61 @@ def test_file_target_basic():
 
 
 def test_file_target_not_set():
+    filename = os.path.join(tempfile.gettempdir(), 'file_not_sent.txt')
+
+    target = FileTarget(filename)
+
+    assert not os.path.exists(filename)
+    assert target.filename == filename
+    assert target.multipart_filename is None
+
+
+def test_directory_target_basic():
+    directorypath = tempfile.gettempdir()
+
+    target = DirectoryTarget(directorypath)
+
+    target.multipart_filename = 'file001.txt'
+
+    target.start()
+
+    assert target.directorypath == directorypath
+    assert target.multipart_filename == 'file001.txt'
+    assert os.path.exists(directorypath.joinpath('file001.txt'))
+
+    target.data_received(b'first')
+    target.data_received(b' ')
+    target.data_received(b'file')
+
+    target.finish()
+
+    target.multipart_filename = 'file002.txt'
+
+    target.start()
+
+    assert target.directorypath == directorypath
+    assert target.multipart_filename == 'file002.txt'
+    assert os.path.exists(directorypath.joinpath('file002.txt'))
+
+    target.data_received(b'second')
+    target.data_received(b' ')
+    target.data_received(b'file')
+
+    target.finish()
+
+    assert target.directorypath == directorypath
+    assert target.multipart_filenames == ['file001.txt', 'file002.txt']
+    assert os.path.exists(directorypath.joinpath('file001.txt'))
+    assert os.path.exists(directorypath.joinpath('file002.txt'))
+
+    with open(directorypath.joinpath('file001.txt'), 'rb') as file_:
+        assert file_.read() == b'first file'
+
+    with open(directorypath.joinpath('file002.txt'), 'rb') as file_:
+        assert file_.read() == b'second file'
+
+
+def test_directory_target_not_set():
     filename = os.path.join(tempfile.gettempdir(), 'file_not_sent.txt')
 
     target = FileTarget(filename)
