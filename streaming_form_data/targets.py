@@ -116,7 +116,7 @@ class DirectoryTarget(BaseTarget):
     ):
         super().__init__(*args, **kwargs)
 
-        self.directory_path = directory_path
+        self.directory_path = Path(directory_path)
 
         self._mode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
@@ -124,9 +124,8 @@ class DirectoryTarget(BaseTarget):
         self.multipart_content_types = []
 
     def on_start(self):
-        file_path = Path(self.directory_path).joinpath(self.multipart_filename).resolve()
-        if file_path.is_relative_to(Path(self.directory_path)):
-            self._fd = open(file_path, self._mode)
+        self.multipart_filename = Path(self.multipart_filename).name
+        self._fd = open(self.directory_path / self.multipart_filename, self._mode)
 
     def on_data_received(self, chunk: bytes):
         if self._fd:
@@ -138,7 +137,7 @@ class DirectoryTarget(BaseTarget):
         if self._fd:
             self._fd.close()
 
-            
+
 class SHA256Target(BaseTarget):
     """SHA256Target calculates the SHA256 hash of the given input."""
 
