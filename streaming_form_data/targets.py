@@ -112,7 +112,11 @@ class DirectoryTarget(BaseTarget):
     """DirectoryTarget writes (streams) the different input to an on-disk directory."""
 
     def __init__(
-        self, directory_path: str, allow_overwrite: bool = True, *args, **kwargs
+        self,
+        directory_path: str,
+        allow_overwrite: bool = True,
+        *args,
+        **kwargs
     ):
         super().__init__(*args, **kwargs)
 
@@ -125,7 +129,9 @@ class DirectoryTarget(BaseTarget):
 
     def on_start(self):
         self.multipart_filename = Path(self.multipart_filename).name
-        self._fd = open(Path(self.directory_path) / self.multipart_filename, self._mode)
+        self._fd = open(
+            Path(self.directory_path) / self.multipart_filename, self._mode
+        )
 
     def on_data_received(self, chunk: bytes):
         if self._fd:
