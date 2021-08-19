@@ -116,7 +116,7 @@ class DirectoryTarget(BaseTarget):
     ):
         super().__init__(*args, **kwargs)
 
-        self.directory_path = Path(directory_path)
+        self.directory_path = directory_path
 
         self._mode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
@@ -125,7 +125,7 @@ class DirectoryTarget(BaseTarget):
 
     def on_start(self):
         self.multipart_filename = Path(self.multipart_filename).name
-        self._fd = open(self.directory_path / self.multipart_filename, self._mode)
+        self._fd = open(Path(self.directory_path) / self.multipart_filename, self._mode)
 
     def on_data_received(self, chunk: bytes):
         if self._fd:
