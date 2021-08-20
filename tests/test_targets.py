@@ -168,6 +168,37 @@ def test_directory_target_not_set():
     assert not target.multipart_filenames
 
 
+def test_directory_target_path_traversal():
+    directory_path = tempfile.gettempdir()
+
+    target = DirectoryTarget(directory_path)
+
+    right_path = os.path.join(directory_path, 'file_path_traversal.txt')
+    wrong_path = os.path.join(directory_path, '../file_path_traversal.txt')
+    target.multipart_filename = '../file_path_traversal.txt'
+
+    target.start()
+
+    assert target.directory_path == directory_path
+    assert target.multipart_filename == 'file_path_traversal.txt'
+    assert os.path.exists(right_path)
+    assert not os.path.exists(wrong_path)
+
+    target.data_received(b'my')
+    target.data_received(b' ')
+    target.data_received(b'file')
+
+    target.finish()
+
+    assert target.directory_path == directory_path
+    assert target.multipart_filenames == ['file_path_traversal.txt']
+    assert os.path.exists(right_path)
+    assert not os.path.exists(wrong_path)
+
+    with open(right_path, 'rb') as file_:
+        assert file_.read() == b'my file'
+
+
 class CustomTarget(BaseTarget):
     def __init__(self):
         super().__init__()

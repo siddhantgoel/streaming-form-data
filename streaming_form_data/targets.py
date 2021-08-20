@@ -109,7 +109,8 @@ class FileTarget(BaseTarget):
 
 
 class DirectoryTarget(BaseTarget):
-    """DirectoryTarget writes (streams) the different input to an on-disk directory."""
+    """DirectoryTarget writes (streams) the different inputs to an on-disk
+    directory."""
 
     def __init__(
         self,
@@ -124,10 +125,11 @@ class DirectoryTarget(BaseTarget):
 
         self._mode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
-        self.multipart_filenames = []
-        self.multipart_content_types = []
+        self.multipart_filenames: list[str] = []
+        self.multipart_content_types: list[str] = []
 
     def on_start(self):
+        # Path().name only keeps the file name and prevents path traversal
         self.multipart_filename = Path(self.multipart_filename).name
         self._fd = open(
             Path(self.directory_path) / self.multipart_filename, self._mode
