@@ -1,6 +1,6 @@
 import hashlib
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 
 class BaseTarget:
@@ -125,12 +125,12 @@ class DirectoryTarget(BaseTarget):
 
         self._mode = 'wb' if allow_overwrite else 'xb'
         self._fd = None
-        self.multipart_filenames: list[str] = []
-        self.multipart_content_types: list[str] = []
+        self.multipart_filenames: List[str] = []
+        self.multipart_content_types: List[str] = []
 
     def on_start(self):
-        # Path().name only keeps the file name and prevents path traversal
-        self.multipart_filename = Path(self.multipart_filename).name
+        # Path().resolve().name only keeps file name to prevent path traversal
+        self.multipart_filename = Path(self.multipart_filename).resolve().name
         self._fd = open(
             Path(self.directory_path) / self.multipart_filename, self._mode
         )
