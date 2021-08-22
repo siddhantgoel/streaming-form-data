@@ -147,6 +147,15 @@ what to do with the data.
 
     >>> target = FileTarget('/tmp/file.txt')
 
+:code:`DirectoryTarget`
+``````````````````
+
+:code:`DirectoryTarget` objects stream the contents to a directory on-disk.
+
+.. code-block:: python
+
+    >>> target = DirectoryTarget('/tmp/uploads/')
+
 :code:`SHA256Target`
 ````````````````````
 

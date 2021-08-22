@@ -10,6 +10,7 @@ from streaming_form_data import ParseFailedException, StreamingFormDataParser
 from streaming_form_data.targets import (
     BaseTarget,
     FileTarget,
+    DirectoryTarget,
     SHA256Target,
     ValueTarget,
 )
@@ -526,6 +527,41 @@ Foo
 
     assert target.multipart_filename == 'ab.txt'
     assert target.value == b'Foo'
+    assert target._started
+    assert target._finished
+
+
+def test_directory_upload(tmp_path):
+    data = b'''\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234
+Content-Disposition: form-data; name="files"; filename="cd.txt"
+
+Bar
+--1234--'''.replace(
+        b'\n', b'\r\n'
+    )
+
+    target = DirectoryTarget(tmp_path)
+
+    parser = StreamingFormDataParser(
+        headers={'Content-Type': 'multipart/form-data; boundary=1234'}
+    )
+    parser.register('files', target)
+
+    parser.data_received(data)
+
+    with open(tmp_path / 'ab.txt') as file:
+        assert file.read() == 'Foo'
+
+    with open(tmp_path / 'cd.txt') as file:
+        assert file.read() == 'Bar'
+
+    assert target.multipart_filenames == ['ab.txt', 'cd.txt']
+    assert tmp_path
     assert target._started
     assert target._finished
 

@@ -1,5 +1,6 @@
 import hashlib
-from typing import Callable, Optional
+from pathlib import Path
+from typing import Callable, List, Optional
 
 
 class BaseTarget:
@@ -103,6 +104,44 @@ class FileTarget(BaseTarget):
             self._fd.write(chunk)
 
     def on_finish(self):
+        if self._fd:
+            self._fd.close()
+
+
+class DirectoryTarget(BaseTarget):
+    """DirectoryTarget writes (streams) the different inputs to an on-disk
+    directory."""
+
+    def __init__(
+        self,
+        directory_path: str,
+        allow_overwrite: bool = True,
+        *args,
+        **kwargs
+    ):
+        super().__init__(*args, **kwargs)
+
+        self.directory_path = directory_path
+
+        self._mode = 'wb' if allow_overwrite else 'xb'
+        self._fd = None
+        self.multipart_filenames: List[str] = []
+        self.multipart_content_types: List[str] = []
+
+    def on_start(self):
+        # Path().resolve().name only keeps file name to prevent path traversal
+        self.multipart_filename = Path(self.multipart_filename).resolve().name
+        self._fd = open(
+            Path(self.directory_path) / self.multipart_filename, self._mode
+        )
+
+    def on_data_received(self, chunk: bytes):
+        if self._fd:
+            self._fd.write(chunk)
+
+    def on_finish(self):
+        self.multipart_filenames.append(self.multipart_filename)
+        self.multipart_content_types.append(self.multipart_content_type)
         if self._fd:
             self._fd.close()
 
