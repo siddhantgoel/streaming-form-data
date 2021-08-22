@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.10.0
+- Add `DirectoryTarget` for streaming different input files to an on-disk
+  directory (thanks [@NteRySin])
+
 ## v1.9.0
 - Support Python 3.9
 - Build using Cython 0.29.24
@@ -119,4 +123,5 @@
 - Initial release
 
 [@kolomenkin]: https://github.com/kolomenkin
+[@NteRySin]: https://github.com/NteRySin
 [@raethlein]: https://github.com/raethlein
