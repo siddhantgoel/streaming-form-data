@@ -129,6 +129,10 @@ class DirectoryTarget(BaseTarget):
         self.multipart_content_types: List[str] = []
 
     def on_start(self):
+        # Properly handle the case where user does not upload a file
+        if not self.multipart_filename:
+            return
+
         # Path().resolve().name only keeps file name to prevent path traversal
         self.multipart_filename = Path(self.multipart_filename).resolve().name
         self._fd = open(
