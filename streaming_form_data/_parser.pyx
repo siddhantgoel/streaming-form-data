@@ -123,6 +123,7 @@ cdef class Part:
 
 cdef enum ParserState:
     PS_START,
+    PS_START_CR,
 
     PS_STARTING_BOUNDARY,
     PS_READING_BOUNDARY,
@@ -226,11 +227,22 @@ cdef class _Parser:
             byte = chunk_ptr[idx]
 
             if self.state == ParserState.PS_START:
-                if byte != c_hyphen:
+                if byte == c_hyphen:
+                    buffer_start = idx
+                    self.state = ParserState.PS_STARTING_BOUNDARY
+                elif byte == c_cr:
+                    self.state = ParserState.PS_START_CR
+                else:
                     self.mark_error()
                     return ErrorGroup.Delimiting + 1
 
-                self.state = ParserState.PS_STARTING_BOUNDARY
+            elif self.state == ParserState.PS_START_CR:
+                if byte == c_lf:
+                    self.state = ParserState.PS_START
+                else:
+                    self.mark_error()
+                    return ErrorGroup.Delimiting + 4
+
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != c_hyphen:
                     self.mark_error()
@@ -245,10 +257,6 @@ cdef class _Parser:
                 if byte != c_lf:
                     self.mark_error()
                     return ErrorGroup.Delimiting + 3
-
-                if buffer_start != 0:
-                    self.mark_error()
-                    return ErrorGroup.Delimiting + 4
 
                 # ensure we have read correct starting delimiter
                 if b'\r\n' + chunk[buffer_start: idx + 1] != \
