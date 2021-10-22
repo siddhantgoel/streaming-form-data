@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.10.1
+- Handle the case when a user does not provide any file with `DirectoryTarget`
+  (thanks [@ibrewster])
+- Handle leading CRLF when needed (thanks [@mephi42])
+
 ## v1.10.0
 - Add `DirectoryTarget` for streaming different input files to an on-disk
   directory (thanks [@NteRySin])
@@ -122,6 +127,8 @@
 ## v0.3.0
 - Initial release
 
+[@ibrewster]: https://github.com/ibrewster
 [@kolomenkin]: https://github.com/kolomenkin
+[@mephi42]: https://github.com/mephi42
 [@NteRySin]: https://github.com/NteRySin
 [@raethlein]: https://github.com/raethlein
