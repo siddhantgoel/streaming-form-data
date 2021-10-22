@@ -969,3 +969,18 @@ Foo
         parser.data_received(data)
 
         assert target.value == b'Foo'
+
+
+def test_leading_crlf():
+    target = ValueTarget()
+
+    encoder = MultipartEncoder(fields={'value': 'hello world'})
+
+    parser = StreamingFormDataParser(
+        headers={'Content-Type': encoder.content_type}
+    )
+    parser.register('value', target)
+
+    parser.data_received(b'\r\n\r\n' + encoder.to_string())
+
+    assert target.value == b'hello world'
