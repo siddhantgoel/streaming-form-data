@@ -4,37 +4,7 @@ import cgi
 
 from streaming_form_data.targets import NullTarget
 
-
-ctypedef unsigned char Byte  # noqa: E999
-
-
-# useful constants
-
-cdef int c_hyphen = 45
-cdef int c_cr = 13
-cdef int c_lf = 10
-cdef int c_min_file_body_chunk_size = 1024
-
-
-cdef enum FinderState:
-    FS_START, FS_WORKING, FS_END
-
-
-# 100..199: internal program errors (asserts)
-# 200..299: problems with delimiting multipart stream into parts
-# 300..399: problems with parsing particular part headers
-cpdef enum ErrorGroup:
-    Internal = 100
-    Delimiting = 200
-    PartHeaders = 300
-
-
 cdef class Finder:
-    cdef bytes target
-    cdef const Byte *target_ptr
-    cdef size_t target_len, index
-    cdef FinderState state
-
     def __init__(self, target):
         if len(target) < 1:
             raise ValueError('Empty values not allowed')
@@ -89,11 +59,7 @@ cdef class Finder:
 cdef class Part:
     """One part of a multipart/form-data request
     """
-
-    cdef public str name
-    cdef list targets
-
-    def __init__(self, str name, object target):
+    def __init__(self, bytes name, object target):
         self.name = name
         self.targets = [target]
 
@@ -120,38 +86,7 @@ cdef class Part:
         for target in self.targets:
             target.finish()
 
-
-cdef enum ParserState:
-    PS_START,
-    PS_START_CR,
-
-    PS_STARTING_BOUNDARY,
-    PS_READING_BOUNDARY,
-    PS_ENDING_BOUNDARY,
-
-    PS_READING_HEADER,
-    PS_ENDING_HEADER,
-    PS_ENDED_HEADER,
-    PS_ENDING_ALL_HEADERS,
-
-    PS_READING_BODY,
-
-    PS_END,
-
-    PS_ERROR
-
-
 cdef class _Parser:
-    cdef ParserState state
-
-    cdef Finder delimiter_finder, ender_finder
-    cdef size_t delimiter_length, ender_length
-
-    cdef object expected_parts
-    cdef object active_part, default_part
-
-    cdef bytes _leftover_buffer
-
     def __init__(self, bytes delimiter, bytes ender):
         self.delimiter_finder = Finder(delimiter)
         self.ender_finder = Finder(ender)
@@ -168,7 +103,7 @@ cdef class _Parser:
 
         self._leftover_buffer = None
 
-    def register(self, str name, object target):
+    def register(self, bytes name, object target):
         part = self._part_for(name)
 
         if part:
@@ -190,7 +125,7 @@ cdef class _Parser:
         if self.active_part and len(value) > 0:
             self.active_part.data_received(value)
 
-    cdef _part_for(self, str name):
+    cdef _part_for(self, bytes name):
         for part in self.expected_parts:
             if part.name == name:
                 return part
