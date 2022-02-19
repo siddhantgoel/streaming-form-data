@@ -8,13 +8,13 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler, stream_request_body
 
 
-one_gb = 100 * 1024 * 1024 * 1024
+one_hundred_gb = 100 * 1024 * 1024 * 1024
 
 
 @stream_request_body
 class UploadHandler(RequestHandler):
     def prepare(self):
-        self.request.connection.set_max_body_size(one_gb)
+        self.request.connection.set_max_body_size(one_hundred_gb)
 
         name = 'uploaded-file-tornado-{}.dat'.format(int(time()))
 
