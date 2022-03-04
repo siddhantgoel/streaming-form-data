@@ -13,6 +13,12 @@
 input chunks (the encoding used when submitting data over HTTP through HTML
 forms).
 
+## Testimonials
+
+> "[_this speeds up file uploads to my Flask app by **more than factor 10**_](https://github.com/pallets/werkzeug/issues/875#issuecomment-429287766)"
+
+> "[_Thanks a lot for your fix with streaming-form-data. I can finally upload gigabyte sized files at good speed and without memory filling up!_](https://github.com/pallets/werkzeug/issues/875#issuecomment-530020990)"
+
 ## Installation
 
 ```bash
