@@ -59,7 +59,7 @@ cdef class Finder:
 cdef class Part:
     """One part of a multipart/form-data request
     """
-    def __init__(self, bytes name, object target):
+    def __init__(self, str name, object target):
         self.name = name
         self.targets = [target]
 
@@ -103,7 +103,7 @@ cdef class _Parser:
 
         self._leftover_buffer = None
 
-    def register(self, bytes name, object target):
+    def register(self, str name, object target):
         part = self._part_for(name)
 
         if part:
@@ -125,7 +125,7 @@ cdef class _Parser:
         if self.active_part and len(value) > 0:
             self.active_part.data_received(value)
 
-    cdef _part_for(self, bytes name):
+    cdef _part_for(self, str name):
         for part in self.expected_parts:
             if part.name == name:
                 return part

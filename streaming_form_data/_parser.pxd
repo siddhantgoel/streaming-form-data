@@ -1,3 +1,5 @@
+# cython: language_level=3
+
 ctypedef unsigned char Byte # noqa: E999
 
 # useful constants
@@ -32,7 +34,7 @@ cdef class Finder:
     cdef size_t matched_length(self)
 
 cdef class Part:
-    cdef public bytes name
+    cdef public str name
     cdef list targets
 
 cdef enum ParserState:
@@ -65,7 +67,7 @@ cdef class _Parser:
 
     cdef bytes _leftover_buffer
 
-    cdef _part_for(self, bytes name)
+    cdef _part_for(self, str name)
     
     cdef size_t rewind_fast_forward(
         self, const Byte *chunk_ptr, size_t pos_first, size_t pos_last
