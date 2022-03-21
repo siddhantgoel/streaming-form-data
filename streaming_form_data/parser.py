@@ -1,5 +1,5 @@
 import cgi
-from typing import Mapping, Type
+from typing import Mapping
 
 from streaming_form_data._parser import ErrorGroup, _Parser  # type: ignore
 from streaming_form_data.targets import BaseTarget
