@@ -1,5 +1,5 @@
 import cgi
-from typing import Mapping, Type
+from typing import Mapping
 
 from streaming_form_data._parser import ErrorGroup, _Parser  # type: ignore
 from streaming_form_data.targets import BaseTarget
@@ -45,7 +45,7 @@ class StreamingFormDataParser:
 
         self._running = False
 
-    def register(self, name: str, target: Type[BaseTarget]):
+    def register(self, name: str, target: BaseTarget):
         if self._running:
             raise ParseFailedException(
                 'Registering parts not allowed while parser is running'
