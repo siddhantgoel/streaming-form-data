@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.10.2
+- Fix type annotation for Target objects (thanks [@Wouterkoorn])
+- Fix constant name in Tornado example (thanks [@remram44])
+
 ## v1.10.1
 - Handle the case when a user does not provide any file with `DirectoryTarget`
   (thanks [@ibrewster])
@@ -132,3 +136,5 @@
 [@mephi42]: https://github.com/mephi42
 [@NteRySin]: https://github.com/NteRySin
 [@raethlein]: https://github.com/raethlein
+[@remram44]: https://github.com/remram44
+[@Wouterkoorn]: https://github.com/Wouterkoorn
