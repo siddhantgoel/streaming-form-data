@@ -61,13 +61,13 @@ Since this package includes a C extension, please make sure you have a working C
 compiler available. On Debian-based distros this usually means installing the
 `build-essentials` package.
 
-1. Git clone the repository -
+1. Git clone the repository:
    `git clone https://github.com/siddhantgoel/streaming-form-data`
 
-2. Install the packages required for development -
-   `pip install -r requirements-dev.txt`
+2. Install the packages required for development:
+   `make pip-sync`
 
-3. That's basically it. You should now be able to run the test suite -
+3. That's basically it. You should now be able to run the test suite:
    `make test`.
 
 Please note that `tests/test_parser_stress.py` stress tests the parser with

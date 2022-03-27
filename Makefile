@@ -14,10 +14,10 @@ compile:
 	cython $(cython-file)
 
 pip-compile:
-	pip-compile requirements-dev.in > requirements-dev.txt
+	pip-compile requirements.in > requirements.txt
 
 pip-sync:
-	pip-sync requirements-dev.txt
+	pip-sync requirements.txt
 
 # lint
 
