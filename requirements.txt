@@ -9,7 +9,7 @@ appdirs==1.4.4
 attrs==21.2.0
     # via pytest
 black==21.7b0
-    # via -r requirements-dev.in
+    # via -r requirements.in
 bleach==4.0.0
     # via readme-renderer
 certifi==2021.5.30
@@ -25,11 +25,11 @@ colorama==0.4.4
 cryptography==3.4.7
     # via secretstorage
 cython==0.29.24
-    # via -r requirements-dev.in
+    # via -r requirements.in
 docutils==0.17.1
     # via readme-renderer
 flake8==3.9.2
-    # via -r requirements-dev.in
+    # via -r requirements.in
 idna==3.2
     # via requests
 importlib-metadata==4.6.4
@@ -47,13 +47,13 @@ keyring==23.0.1
 mccabe==0.6.1
     # via flake8
 mypy==0.910
-    # via -r requirements-dev.in
+    # via -r requirements.in
 mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
-numpy==1.19.5
-    # via -r requirements-dev.in
+numpy==1.21.0
+    # via -r requirements.in
 packaging==21.0
     # via
     #   bleach
@@ -77,7 +77,7 @@ pygments==2.9.0
 pyparsing==2.4.7
     # via packaging
 pytest==6.2.4
-    # via -r requirements-dev.in
+    # via -r requirements.in
 readme-renderer==29.0
     # via twine
 regex==2021.8.3
@@ -88,7 +88,7 @@ requests==2.26.0
     #   twine
 requests-toolbelt==0.9.1
     # via
-    #   -r requirements-dev.in
+    #   -r requirements.in
     #   twine
 rfc3986==1.5.0
     # via twine
@@ -107,7 +107,7 @@ tomli==1.2.1
 tqdm==4.62.0
     # via twine
 twine==3.4.2
-    # via -r requirements-dev.in
+    # via -r requirements.in
 typing-extensions==3.10.0.0
     # via mypy
 urllib3==1.26.6
@@ -115,6 +115,6 @@ urllib3==1.26.6
 webencodings==0.5.1
     # via bleach
 wheel==0.37.0
-    # via -r requirements-dev.in
+    # via -r requirements.in
 zipp==3.5.0
     # via importlib-metadata
