@@ -26,7 +26,7 @@ $ pip install streaming-form-data
 ```
 
 In case you prefer cloning the Github repository and installing manually, please
-note that `develop` is the development branch, so `stable` is what you should be
+note that `master` is the development branch, so `stable` is what you should be
 working with.
 
 ## Usage
