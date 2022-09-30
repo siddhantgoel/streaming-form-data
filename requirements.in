@@ -2,7 +2,7 @@ black==21.7b0
 cython==0.29.24
 flake8==3.9.2
 mypy==0.910
-numpy==1.21.5
+numpy==1.22.0
 pytest==6.2.4
 requests-toolbelt==0.9.1
 twine==3.4.2
