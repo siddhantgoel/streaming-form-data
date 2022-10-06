@@ -1,5 +1,5 @@
 black==22.8.0
-cython==0.29.24
+cython==0.29.32
 flake8==5.0.4
 mypy==0.982
 pytest==7.1.3
