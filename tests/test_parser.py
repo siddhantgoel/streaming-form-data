@@ -1,8 +1,7 @@
-from contextlib import contextmanager
 from io import BytesIO
 import hashlib
+import os
 
-from numpy import random
 import pytest
 from requests_toolbelt import MultipartEncoder
 
@@ -17,59 +16,32 @@ from streaming_form_data.targets import (
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
-@contextmanager
-def local_seed(seed):
-    state = random.get_state()
-
-    try:
-        random.seed(seed)
-        yield
-    finally:
-        random.set_state(state)
-
-
-def get_random_bytes(size, seed):
-    with local_seed(seed):
-        return random.bytes(size)
+dataset = {
+    'file.txt': b'this is a txt file\r\n' * 10,
+    'image-600x400.png': os.urandom(1780),
+    'image-2560x1600.png': os.urandom(11742),
+    'image-500k.png': os.urandom(437814),
+    'image-high-res.jpg': os.urandom(9450866),
+    'empty.html': b'',
+    'hyphen-hyphen.txt': b'--',
+    'LF.txt': b'\n',
+    'CRLF.txt': b'\r\n',
+    '1M.dat': os.urandom(1024 * 1024),
+    '1M-1.dat': os.urandom(1024 * 1024 - 1),
+    '1M+1.dat': os.urandom(1024 * 1024 + 1),
+}
 
 
 def open_dataset(filename):
-    if filename == 'file.txt':
-        filedata = b'this is a txt file\r\n' * 10
-    elif filename == 'image-600x400.png':
-        filedata = get_random_bytes(1780, 600)
-    elif filename == 'image-2560x1600.png':
-        filedata = get_random_bytes(11742, 2560)
-    elif filename == 'image-500k.png':
-        filedata = get_random_bytes(437814, 500)
-    elif filename == 'image-high-res.jpg':
-        filedata = get_random_bytes(9450866, 945)
-    elif filename == 'empty.html':
-        filedata = b''
-    elif filename == 'hyphen-hyphen.txt':
-        filedata = b'--'
-    elif filename == 'LF.txt':
-        filedata = b'\n'
-    elif filename == 'CRLF.txt':
-        filedata = b'\r\n'
-    elif filename == '1M.dat':
-        filedata = get_random_bytes(1024 * 1024, 1024)
-    elif filename == '1M-1.dat':
-        filedata = get_random_bytes(1024 * 1024 - 1, 1024 - 1)
-    elif filename == '1M+1.dat':
-        filedata = get_random_bytes(1024 * 1024 + 1, 1024 + 1)
-    else:
-        raise Exception('Unknown file name: ' + filename)
-    return BytesIO(filedata)
+    return BytesIO(dataset[filename])
 
 
 def encoded_dataset(filename):
-    with open_dataset(filename) as dataset_:
-        fields = {filename: (filename, dataset_, 'text/plain')}
+    fields = {filename: (filename, dataset[filename], 'text/plain')}
 
-        encoder = MultipartEncoder(fields=fields)
+    encoder = MultipartEncoder(fields=fields)
 
-        return (encoder.content_type, encoder.to_string())
+    return (encoder.content_type, encoder.to_string())
 
 
 def test_smoke():
