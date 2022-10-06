@@ -3,6 +3,7 @@ import os
 from io import BytesIO
 from itertools import chain
 from unittest import TestCase
+import random
 
 from requests_toolbelt import MultipartEncoder
 
