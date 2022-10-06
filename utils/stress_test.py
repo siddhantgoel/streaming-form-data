@@ -13,10 +13,7 @@ from streaming_form_data.targets import ValueTarget
 def get_random_bytes(size, seed):
     random.seed(seed)
 
-    try:
-        return random.bytes(size)
-    except AttributeError:
-        return os.urandom(size)
+    return os.urandom(size)
 
 
 def get_hyphens_crlfs(size, seed):

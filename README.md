@@ -70,9 +70,5 @@ compiler available. On Debian-based distros this usually means installing the
 3. That's basically it. You should now be able to run the test suite:
    `make test`.
 
-Please note that `tests/test_parser_stress.py` stress tests the parser with
-large inputs, which can take a while. As an alternative, pass the filename as an
-argument to `py.test` to run tests selectively.
-
 [pip-tools]: https://pypi.org/project/pip-tools/
 [Read the Docs]: https://streaming-form-data.readthedocs.io/
