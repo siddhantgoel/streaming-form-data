@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.11.0
+- Support Python 3.10
+- Build using Cython 0.29.24
+
 ## v1.10.2
 - Fix type annotation for Target objects (thanks [@Wouterkoorn])
 - Fix constant name in Tornado example (thanks [@remram44])
