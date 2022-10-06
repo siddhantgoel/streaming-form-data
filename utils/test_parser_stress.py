@@ -1,9 +1,9 @@
 import math
+import os
 from io import BytesIO
 from itertools import chain
 from unittest import TestCase
 
-from numpy import random
 from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import StreamingFormDataParser
@@ -12,7 +12,11 @@ from streaming_form_data.targets import ValueTarget
 
 def get_random_bytes(size, seed):
     random.seed(seed)
-    return random.bytes(size)
+
+    try:
+        return random.bytes(size)
+    except AttributeError:
+        return os.urandom(size)
 
 
 def get_hyphens_crlfs(size, seed):
