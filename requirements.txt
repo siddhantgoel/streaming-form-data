@@ -6,7 +6,7 @@
 #
 attrs==22.1.0
     # via pytest
-black==22.8.0
+black==22.10.0
     # via -r requirements.in
 bleach==5.0.1
     # via readme-renderer
@@ -22,21 +22,25 @@ cython==0.29.32
     # via -r requirements.in
 docutils==0.19
     # via readme-renderer
-flake8==5.0.4
+exceptiongroup==1.0.4
+    # via pytest
+flake8==6.0.0
     # via -r requirements.in
 idna==3.4
     # via requests
-importlib-metadata==5.0.0
-    # via twine
+importlib-metadata==5.1.0
+    # via
+    #   keyring
+    #   twine
 iniconfig==1.1.1
     # via pytest
 jaraco-classes==3.2.3
     # via keyring
-keyring==23.9.3
+keyring==23.11.0
     # via twine
 mccabe==0.7.0
     # via flake8
-more-itertools==8.14.0
+more-itertools==9.0.0
     # via jaraco-classes
 mypy==0.982
     # via -r requirements.in
@@ -46,19 +50,17 @@ mypy-extensions==0.4.3
     #   mypy
 packaging==21.3
     # via pytest
-pathspec==0.10.1
+pathspec==0.10.2
     # via black
-pkginfo==1.8.3
+pkginfo==1.9.2
     # via twine
-platformdirs==2.5.2
+platformdirs==2.5.4
     # via black
 pluggy==1.0.0
     # via pytest
-py==1.11.0
-    # via pytest
-pycodestyle==2.9.1
+pycodestyle==2.10.0
     # via flake8
-pyflakes==2.5.0
+pyflakes==3.0.1
     # via flake8
 pygments==2.13.0
     # via
@@ -66,15 +68,15 @@ pygments==2.13.0
     #   rich
 pyparsing==3.0.9
     # via packaging
-pytest==7.1.3
+pytest==7.2.0
     # via -r requirements.in
-readme-renderer==37.2
+readme-renderer==37.3
     # via twine
 requests==2.28.1
     # via
     #   requests-toolbelt
     #   twine
-requests-toolbelt==0.9.1
+requests-toolbelt==0.10.1
     # via
     #   -r requirements.in
     #   twine
@@ -89,17 +91,17 @@ tomli==2.0.1
     #   black
     #   mypy
     #   pytest
-twine==4.0.1
+twine==4.0.2
     # via -r requirements.in
-typing-extensions==4.3.0
+typing-extensions==4.4.0
     # via mypy
-urllib3==1.26.12
+urllib3==1.26.13
     # via
     #   requests
     #   twine
 webencodings==0.5.1
     # via bleach
-wheel==0.37.1
+wheel==0.38.4
     # via -r requirements.in
-zipp==3.8.1
+zipp==3.11.0
     # via importlib-metadata
