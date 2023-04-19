@@ -66,14 +66,13 @@ compiler available. On Debian-based distros this usually means installing the
 2. Install the packages required for development:
    `make pip-sync`
 
-3. Compile the C extensions in `streaming_form_data`:
-   `make compile`
-
-4. Install `streaming_form_data` itself:
+3. Install `streaming_form_data` itself:
    `pip install .`
 
-5. That's basically it. You should now be able to run the test suite:
+4. That's basically it. You should now be able to run the test suite:
    `make test`
+
+Note that if you make any changes to Cython files (`.pyx, .pxd, .pxi`), you'll need to re-compile (`make compile`) and re-install `streaming_form_data` before you can test your changes.
 
 [pip-tools]: https://pypi.org/project/pip-tools/
 [Read the Docs]: https://streaming-form-data.readthedocs.io/
