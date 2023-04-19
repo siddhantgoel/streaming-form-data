@@ -18,7 +18,8 @@ setup(
     packages=find_packages(),
     ext_modules=[
         Extension(
-            'streaming_form_data._parser', ['streaming_form_data/_parser.c'],
+            'streaming_form_data._parser',
+            ['streaming_form_data/_parser.c'],
         )
     ],
     url='https://github.com/siddhantgoel/streaming-form-data',
@@ -38,6 +39,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3 :: Only',
     ],
     keywords='form-data, forms, http, multipart, web',
