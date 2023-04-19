@@ -8,7 +8,6 @@
 
 [![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-
 `streaming_form_data` provides a Python parser for parsing `multipart/form-data`
 input chunks (the encoding used when submitting data over HTTP through HTML
 forms).
@@ -55,7 +54,7 @@ Up-to-date documentation is available on [Read the Docs].
 
 ## Development
 
-Please make sure you have Python 3.6+ and [pip-tools] installed.
+Please make sure you have Python 3.8+ and [pip-tools] installed.
 
 Since this package includes a C extension, please make sure you have a working C
 compiler available. On Debian-based distros this usually means installing the
@@ -67,8 +66,14 @@ compiler available. On Debian-based distros this usually means installing the
 2. Install the packages required for development:
    `make pip-sync`
 
-3. That's basically it. You should now be able to run the test suite:
-   `make test`.
+3. Compile the C extensions in `streaming_form_data`:
+   `make compile`
+
+4. Install `streaming_form_data` itself:
+   `pip install .`
+
+5. That's basically it. You should now be able to run the test suite:
+   `make test`
 
 [pip-tools]: https://pypi.org/project/pip-tools/
 [Read the Docs]: https://streaming-form-data.readthedocs.io/
