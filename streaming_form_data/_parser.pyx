@@ -277,23 +277,23 @@ cdef class _Parser:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 1
                 
-                m = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
+                message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
 
-                if 'content-disposition' in m:
-                    if not m.get_content_disposition() == 'form-data':
+                if 'content-disposition' in message:
+                    if not message.get_content_disposition() == 'form-data':
                         self.mark_error()
                         return ErrorGroup.PartHeaders + 1
 
-                    params = m['content-disposition'].params
+                    params = message['content-disposition'].params
                     name = params.get('name')
 
                     if name:
                         part = self._part_for(name) or self.default_part
                         self.set_active_part(part, params.get('filename'))
-                elif 'content-type' in m:
+                elif 'content-type' in message:
                     if self.active_part:
                         self.active_part.set_multipart_content_type(
-                            m.get_content_type()
+                            message.get_content_type()
                         )
 
                 buffer_start = idx + 1

@@ -5958,7 +5958,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
   size_t __pyx_v_matched_length;
   __pyx_t_19streaming_form_data_7_parser_Byte __pyx_v_byte;
   __pyx_t_19streaming_form_data_7_parser_Byte const *__pyx_v_chunk_ptr;
-  PyObject *__pyx_v_m = NULL;
+  PyObject *__pyx_v_message = NULL;
   PyObject *__pyx_v_params = NULL;
   PyObject *__pyx_v_name = NULL;
   PyObject *__pyx_v_part = NULL;
@@ -6541,7 +6541,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     self.mark_error()
  *                     return ErrorGroup.PartHeaders + 1             # <<<<<<<<<<<<<<
  * 
- *                 m = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
+ *                 message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
  */
         __Pyx_XDECREF(__pyx_r);
         __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_PartHeaders + 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 278, __pyx_L1_error)
@@ -6562,9 +6562,9 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       /* "streaming_form_data/_parser.pyx":280
  *                     return ErrorGroup.PartHeaders + 1
  * 
- *                 m = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))             # <<<<<<<<<<<<<<
+ *                 message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))             # <<<<<<<<<<<<<<
  * 
- *                 if 'content-disposition' in m:
+ *                 if 'content-disposition' in message:
  */
       __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_Parser); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 280, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
@@ -6603,28 +6603,28 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 280, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-      __Pyx_XDECREF_SET(__pyx_v_m, __pyx_t_5);
+      __Pyx_XDECREF_SET(__pyx_v_message, __pyx_t_5);
       __pyx_t_5 = 0;
 
       /* "streaming_form_data/_parser.pyx":282
- *                 m = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
+ *                 message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
  * 
- *                 if 'content-disposition' in m:             # <<<<<<<<<<<<<<
- *                     if not m.get_content_disposition() == 'form-data':
+ *                 if 'content-disposition' in message:             # <<<<<<<<<<<<<<
+ *                     if not message.get_content_disposition() == 'form-data':
  *                         self.mark_error()
  */
-      __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_kp_u_content_disposition, __pyx_v_m, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
+      __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_kp_u_content_disposition, __pyx_v_message, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 282, __pyx_L1_error)
       __pyx_t_3 = (__pyx_t_6 != 0);
       if (__pyx_t_3) {
 
         /* "streaming_form_data/_parser.pyx":283
  * 
- *                 if 'content-disposition' in m:
- *                     if not m.get_content_disposition() == 'form-data':             # <<<<<<<<<<<<<<
+ *                 if 'content-disposition' in message:
+ *                     if not message.get_content_disposition() == 'form-data':             # <<<<<<<<<<<<<<
  *                         self.mark_error()
  *                         return ErrorGroup.PartHeaders + 1
  */
-        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_get_content_disposition); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
+        __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_v_message, __pyx_n_s_get_content_disposition); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 283, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __pyx_t_8 = NULL;
         if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_7))) {
@@ -6647,8 +6647,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         if (__pyx_t_6) {
 
           /* "streaming_form_data/_parser.pyx":284
- *                 if 'content-disposition' in m:
- *                     if not m.get_content_disposition() == 'form-data':
+ *                 if 'content-disposition' in message:
+ *                     if not message.get_content_disposition() == 'form-data':
  *                         self.mark_error()             # <<<<<<<<<<<<<<
  *                         return ErrorGroup.PartHeaders + 1
  * 
@@ -6658,11 +6658,11 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
 
           /* "streaming_form_data/_parser.pyx":285
- *                     if not m.get_content_disposition() == 'form-data':
+ *                     if not message.get_content_disposition() == 'form-data':
  *                         self.mark_error()
  *                         return ErrorGroup.PartHeaders + 1             # <<<<<<<<<<<<<<
  * 
- *                     params = m['content-disposition'].params
+ *                     params = message['content-disposition'].params
  */
           __Pyx_XDECREF(__pyx_r);
           __pyx_t_5 = __Pyx_PyInt_From_long((__pyx_e_19streaming_form_data_7_parser_PartHeaders + 1)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 285, __pyx_L1_error)
@@ -6673,8 +6673,8 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
 
           /* "streaming_form_data/_parser.pyx":283
  * 
- *                 if 'content-disposition' in m:
- *                     if not m.get_content_disposition() == 'form-data':             # <<<<<<<<<<<<<<
+ *                 if 'content-disposition' in message:
+ *                     if not message.get_content_disposition() == 'form-data':             # <<<<<<<<<<<<<<
  *                         self.mark_error()
  *                         return ErrorGroup.PartHeaders + 1
  */
@@ -6683,11 +6683,11 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         /* "streaming_form_data/_parser.pyx":287
  *                         return ErrorGroup.PartHeaders + 1
  * 
- *                     params = m['content-disposition'].params             # <<<<<<<<<<<<<<
+ *                     params = message['content-disposition'].params             # <<<<<<<<<<<<<<
  *                     name = params.get('name')
  * 
  */
-        __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_m, __pyx_kp_u_content_disposition); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
+        __pyx_t_5 = __Pyx_PyObject_Dict_GetItem(__pyx_v_message, __pyx_kp_u_content_disposition); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 287, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
         __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_params); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 287, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
@@ -6697,7 +6697,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
 
         /* "streaming_form_data/_parser.pyx":288
  * 
- *                     params = m['content-disposition'].params
+ *                     params = message['content-disposition'].params
  *                     name = params.get('name')             # <<<<<<<<<<<<<<
  * 
  *                     if name:
@@ -6737,7 +6737,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     if name:
  *                         part = self._part_for(name) or self.default_part             # <<<<<<<<<<<<<<
  *                         self.set_active_part(part, params.get('filename'))
- *                 elif 'content-type' in m:
+ *                 elif 'content-type' in message:
  */
           if (!(likely(PyUnicode_CheckExact(__pyx_v_name))||((__pyx_v_name) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "unicode", Py_TYPE(__pyx_v_name)->tp_name), 0))) __PYX_ERR(0, 291, __pyx_L1_error)
           __pyx_t_5 = ((struct __pyx_vtabstruct_19streaming_form_data_7_parser__Parser *)__pyx_v_self->__pyx_vtab)->_part_for(__pyx_v_self, ((PyObject*)__pyx_v_name)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 291, __pyx_L1_error)
@@ -6761,7 +6761,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
  *                     if name:
  *                         part = self._part_for(name) or self.default_part
  *                         self.set_active_part(part, params.get('filename'))             # <<<<<<<<<<<<<<
- *                 elif 'content-type' in m:
+ *                 elif 'content-type' in message:
  *                     if self.active_part:
  */
           __pyx_t_5 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_set_active_part); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 292, __pyx_L1_error)
@@ -6842,10 +6842,10 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
         }
 
         /* "streaming_form_data/_parser.pyx":282
- *                 m = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
+ *                 message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
  * 
- *                 if 'content-disposition' in m:             # <<<<<<<<<<<<<<
- *                     if not m.get_content_disposition() == 'form-data':
+ *                 if 'content-disposition' in message:             # <<<<<<<<<<<<<<
+ *                     if not message.get_content_disposition() == 'form-data':
  *                         self.mark_error()
  */
         goto __pyx_L13;
@@ -6854,29 +6854,29 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
       /* "streaming_form_data/_parser.pyx":293
  *                         part = self._part_for(name) or self.default_part
  *                         self.set_active_part(part, params.get('filename'))
- *                 elif 'content-type' in m:             # <<<<<<<<<<<<<<
+ *                 elif 'content-type' in message:             # <<<<<<<<<<<<<<
  *                     if self.active_part:
  *                         self.active_part.set_multipart_content_type(
  */
-      __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_kp_u_content_type, __pyx_v_m, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 293, __pyx_L1_error)
+      __pyx_t_6 = (__Pyx_PySequence_ContainsTF(__pyx_kp_u_content_type, __pyx_v_message, Py_EQ)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 293, __pyx_L1_error)
       __pyx_t_3 = (__pyx_t_6 != 0);
       if (__pyx_t_3) {
 
         /* "streaming_form_data/_parser.pyx":294
  *                         self.set_active_part(part, params.get('filename'))
- *                 elif 'content-type' in m:
+ *                 elif 'content-type' in message:
  *                     if self.active_part:             # <<<<<<<<<<<<<<
  *                         self.active_part.set_multipart_content_type(
- *                             m.get_content_type()
+ *                             message.get_content_type()
  */
         __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_v_self->active_part); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 294, __pyx_L1_error)
         if (__pyx_t_3) {
 
           /* "streaming_form_data/_parser.pyx":295
- *                 elif 'content-type' in m:
+ *                 elif 'content-type' in message:
  *                     if self.active_part:
  *                         self.active_part.set_multipart_content_type(             # <<<<<<<<<<<<<<
- *                             m.get_content_type()
+ *                             message.get_content_type()
  *                         )
  */
           __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_self->active_part, __pyx_n_s_set_multipart_content_type); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 295, __pyx_L1_error)
@@ -6885,11 +6885,11 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
           /* "streaming_form_data/_parser.pyx":296
  *                     if self.active_part:
  *                         self.active_part.set_multipart_content_type(
- *                             m.get_content_type()             # <<<<<<<<<<<<<<
+ *                             message.get_content_type()             # <<<<<<<<<<<<<<
  *                         )
  * 
  */
-          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_m, __pyx_n_s_get_content_type); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 296, __pyx_L1_error)
+          __pyx_t_8 = __Pyx_PyObject_GetAttrStr(__pyx_v_message, __pyx_n_s_get_content_type); if (unlikely(!__pyx_t_8)) __PYX_ERR(0, 296, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_8);
           __pyx_t_4 = NULL;
           if (CYTHON_UNPACK_METHODS && likely(PyMethod_Check(__pyx_t_8))) {
@@ -6926,17 +6926,17 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
 
           /* "streaming_form_data/_parser.pyx":294
  *                         self.set_active_part(part, params.get('filename'))
- *                 elif 'content-type' in m:
+ *                 elif 'content-type' in message:
  *                     if self.active_part:             # <<<<<<<<<<<<<<
  *                         self.active_part.set_multipart_content_type(
- *                             m.get_content_type()
+ *                             message.get_content_type()
  */
         }
 
         /* "streaming_form_data/_parser.pyx":293
  *                         part = self._part_for(name) or self.default_part
  *                         self.set_active_part(part, params.get('filename'))
- *                 elif 'content-type' in m:             # <<<<<<<<<<<<<<
+ *                 elif 'content-type' in message:             # <<<<<<<<<<<<<<
  *                     if self.active_part:
  *                         self.active_part.set_multipart_content_type(
  */
@@ -8199,7 +8199,7 @@ static PyObject *__pyx_pf_19streaming_form_data_7_parser_7_Parser_12_parse(struc
   __Pyx_AddTraceback("streaming_form_data._parser._Parser._parse", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
-  __Pyx_XDECREF(__pyx_v_m);
+  __Pyx_XDECREF(__pyx_v_message);
   __Pyx_XDECREF(__pyx_v_params);
   __Pyx_XDECREF(__pyx_v_name);
   __Pyx_XDECREF(__pyx_v_part);

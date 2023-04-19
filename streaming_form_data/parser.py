@@ -20,13 +20,13 @@ def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
     if not content_type:
         raise ParseFailedException('Missing Content-Type header')
 
-    m = EmailMessage()
-    m['content-type'] = content_type
+    message = EmailMessage()
+    message['content-type'] = content_type
 
-    if m.get_content_type() != 'multipart/form-data':
+    if message.get_content_type() != 'multipart/form-data':
         raise ParseFailedException('Content-Type is not multipart/form-data')
 
-    boundary = m.get_boundary()
+    boundary = message.get_boundary()
     if not boundary:
         raise ParseFailedException('Boundary not found')
 
