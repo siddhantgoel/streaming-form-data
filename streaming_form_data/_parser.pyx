@@ -1,6 +1,7 @@
 # cython: language_level=3
 
-import cgi
+from email.policy import HTTP
+from email.parser import Parser
 
 from streaming_form_data.targets import NullTarget
 
@@ -275,27 +276,24 @@ cdef class _Parser:
                 if byte != c_lf:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 1
+                
+                message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
 
-                value, params = cgi.parse_header(
-                    chunk[buffer_start: idx + 1].decode('utf-8')
-                )
-
-                value = value.lower()
-
-                if value.startswith('content-disposition:'):
-                    if not value.endswith('form-data'):
+                if 'content-disposition' in message:
+                    if not message.get_content_disposition() == 'form-data':
                         self.mark_error()
                         return ErrorGroup.PartHeaders + 1
 
+                    params = message['content-disposition'].params
                     name = params.get('name')
 
                     if name:
                         part = self._part_for(name) or self.default_part
                         self.set_active_part(part, params.get('filename'))
-                elif value.startswith('content-type:'):
+                elif 'content-type' in message:
                     if self.active_part:
                         self.active_part.set_multipart_content_type(
-                            value.replace('content-type: ', '')
+                            message.get_content_type()
                         )
 
                 buffer_start = idx + 1

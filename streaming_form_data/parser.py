@@ -1,4 +1,4 @@
-import cgi
+from email.message import EmailMessage
 from typing import Mapping
 
 from streaming_form_data._parser import ErrorGroup, _Parser  # type: ignore
@@ -20,12 +20,13 @@ def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
     if not content_type:
         raise ParseFailedException('Missing Content-Type header')
 
-    value, params = cgi.parse_header(content_type)
+    message = EmailMessage()
+    message['content-type'] = content_type
 
-    if not value or value.lower() != 'multipart/form-data':
+    if message.get_content_type() != 'multipart/form-data':
         raise ParseFailedException('Content-Type is not multipart/form-data')
 
-    boundary = params.get('boundary')
+    boundary = message.get_boundary()
     if not boundary:
         raise ParseFailedException('Boundary not found')
 
