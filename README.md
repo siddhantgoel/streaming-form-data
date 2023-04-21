@@ -1,6 +1,6 @@
 # Streaming multipart/form-data parser
 
-[![image](https://github.com/siddhantgoel/streaming-form-data/workflows/streaming-form-data/badge.svg)](https://github.com/siddhantgoel/streaming-form-data/workflows/streaming-form-data/badge.svg)
+[![image](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/test.yml/badge.svg)](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/test.yml) [![image](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/build.yml/badge.svg)](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/build.yml)
 
 [![image](https://img.shields.io/pypi/v/streaming-form-data.svg)](https://pypi.python.org/pypi/streaming-form-data)
 
