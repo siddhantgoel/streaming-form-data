@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v1.11.1
+- Replace deprecated `cgi` module usage with `email` (thanks [@jasopolis])
+- Add support for Python 3.11 (thanks [@jasopolis])
+- Build using Cython 0.29.34
+
 ## v1.11.0
 - Support Python 3.10
 - Build using Cython 0.29.24
@@ -135,10 +140,11 @@
 ## v0.3.0
 - Initial release
 
+[@NteRySin]: https://github.com/NteRySin
+[@Wouterkoorn]: https://github.com/Wouterkoorn
 [@ibrewster]: https://github.com/ibrewster
+[@jasopolis]: https://github.com/jasopolis
 [@kolomenkin]: https://github.com/kolomenkin
 [@mephi42]: https://github.com/mephi42
-[@NteRySin]: https://github.com/NteRySin
 [@raethlein]: https://github.com/raethlein
 [@remram44]: https://github.com/remram44
-[@Wouterkoorn]: https://github.com/Wouterkoorn
