@@ -1,8 +1,8 @@
-black==22.10.0
-cython==0.29.32
+black==23.3.0
+cython==0.29.34
 flake8==6.0.0
-mypy==0.982
-pytest==7.2.0
+mypy==1.2.0
+pytest==7.3.1
 requests-toolbelt==0.10.1
 twine==4.0.2
-wheel==0.38.4
+wheel==0.40.0
