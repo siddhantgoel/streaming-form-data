@@ -276,7 +276,7 @@ cdef class _Parser:
                 if byte != c_lf:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 1
-                
+
                 message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
 
                 if 'content-disposition' in message:
