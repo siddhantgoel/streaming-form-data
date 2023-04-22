@@ -304,7 +304,6 @@ class StressMatrixTestCase(ParserTestCaseBase):
 
         idx = 0
         for file_size in chain([0], useful_numbers):
-
             original_data = data[0:file_size]
             with BytesIO(data[0:file_size]) as dataset_:
                 fields = {
