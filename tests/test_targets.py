@@ -9,7 +9,12 @@ from streaming_form_data.targets import (
     DirectoryTarget,
     NullTarget,
     ValueTarget,
+    S3Target
 )
+from moto import mock_s3
+import boto3
+from unittest import TestCase
+
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
 
@@ -255,3 +260,43 @@ def test_custom_target_not_sent():
 
     assert target.value == b''
     assert target.multipart_filename is None
+
+
+class TestS3TargetUpload(TestCase):
+
+    mock_s3 = mock_s3()
+    bucket_name = "test-bucket"
+    client = boto3.client(service_name='s3')
+
+    def setUp(self):
+        self.mock_s3.start()
+
+        # you can use boto3.client("s3") if you prefer
+        self.client.create_bucket(Bucket=self.bucket_name)
+
+    def tearDown(self):
+        self.mock_s3.stop()
+
+    def test(self):
+        test_key = 'test.txt'
+        path = f"s3://{self.bucket_name}/{test_key}"
+        target = S3Target(
+            path,
+            'wb',
+            transport_params={'client': self.client},
+        )
+
+        target.start()
+
+        target.data_received(b'my test')
+        target.data_received(b' ')
+        target.data_received(b'file')
+
+        target.finish()
+
+        resp = self.client.get_object(
+            Bucket=self.bucket_name,
+            Key=test_key
+        )['Body'].read().decode('utf-8')
+
+        self.assertEqual(resp, 'my test file')
