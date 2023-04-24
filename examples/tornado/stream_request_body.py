@@ -43,7 +43,7 @@ class IndexHandler(RequestHandler):
 def main():
     handlers = [(r'/', IndexHandler), (r'/upload', UploadHandler)]
 
-    settings = dict(debug=True, template_path=os.path.dirname(__file__))
+    settings = {'debug': True, 'template_path': os.path.dirname(__file__)}
 
     app = Application(handlers, **settings)
     app.listen(9999, address='localhost')

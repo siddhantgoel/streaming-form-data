@@ -27,13 +27,13 @@ fmt-black:
 lint-black:
 	black --check streaming_form_data/*.py tests/ utils/ examples/**/*.py
 
-lint-flake8:
-	flake8 streaming_form_data/*.py tests/ utils/ examples/**/*.py
+lint-ruff:
+	ruff --select=B,C4,C9,E,F,PLC,PLE,PLW,W .
 
 lint-mypy:
 	mypy streaming_form_data/
 
-lint: lint-black lint-flake8 lint-mypy
+lint: lint-ruff lint-black lint-mypy
 
 # test
 
