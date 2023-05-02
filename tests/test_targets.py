@@ -2,6 +2,8 @@ import os.path
 import tempfile
 
 import pytest
+from moto import mock_s3
+import boto3
 
 from streaming_form_data.targets import (
     BaseTarget,
@@ -11,11 +13,10 @@ from streaming_form_data.targets import (
     ValueTarget,
     S3Target
 )
-from moto import mock_s3
-import boto3
-from unittest import TestCase
 
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
+
+BUCKET_NAME = 'test-bucket'
 
 
 def test_null_target_filename_not_set():
@@ -262,41 +263,34 @@ def test_custom_target_not_sent():
     assert target.multipart_filename is None
 
 
-class TestS3TargetUpload(TestCase):
+@pytest.fixture()
+def mock_client():
+    with mock_s3():
+        client = boto3.client(service_name='s3')
+        client.create_bucket(Bucket=BUCKET_NAME)
+        yield client
 
-    mock_s3 = mock_s3()
-    bucket_name = "test-bucket"
-    client = boto3.client(service_name='s3')
 
-    def setUp(self):
-        self.mock_s3.start()
+def test_s3_upload(mock_client):
+    test_key = 'test.txt'
+    path = f"s3://{BUCKET_NAME}/{test_key}"
+    target = S3Target(
+        path,
+        'wb',
+        transport_params={'client': mock_client},
+    )
 
-        # you can use boto3.client("s3") if you prefer
-        self.client.create_bucket(Bucket=self.bucket_name)
+    target.start()
 
-    def tearDown(self):
-        self.mock_s3.stop()
+    target.data_received(b'my test')
+    target.data_received(b' ')
+    target.data_received(b'file')
 
-    def test(self):
-        test_key = 'test.txt'
-        path = f"s3://{self.bucket_name}/{test_key}"
-        target = S3Target(
-            path,
-            'wb',
-            transport_params={'client': self.client},
-        )
+    target.finish()
 
-        target.start()
+    resp = mock_client.get_object(
+        Bucket=BUCKET_NAME,
+        Key=test_key
+    )['Body'].read().decode('utf-8')
 
-        target.data_received(b'my test')
-        target.data_received(b' ')
-        target.data_received(b'file')
-
-        target.finish()
-
-        resp = self.client.get_object(
-            Bucket=self.bucket_name,
-            Key=test_key
-        )['Body'].read().decode('utf-8')
-
-        self.assertEqual(resp, 'my test file')
+    assert resp == 'my test file'
