@@ -177,21 +177,19 @@ class S3Target(BaseTarget):
         self._file_path = file_path
         self._mode = mode
         self._transport_params = transport_params
-        self.data_received_size = 0
-        self._f_out = None
+        self._fd = None
 
     def on_start(self):
-        self._f_out = smart_open.open(
+        self._fd = smart_open.open(
             self._file_path,
             self._mode,
             transport_params=self._transport_params
         )
 
     def on_data_received(self, chunk: bytes):
-        if self._f_out:
-            self._f_out.write(chunk)
-            self.data_received_size += len(chunk)
+        if self._fd:
+            self._fd.write(chunk)
 
     def on_finish(self):
-        if self._f_out:
-            self._f_out.close()
+        if self._fd:
+            self._fd.close()
