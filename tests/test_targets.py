@@ -11,7 +11,7 @@ from streaming_form_data.targets import (
     DirectoryTarget,
     NullTarget,
     ValueTarget,
-    S3Target
+    S3Target,
 )
 
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
@@ -288,9 +288,10 @@ def test_s3_upload(mock_client):
 
     target.finish()
 
-    resp = mock_client.get_object(
-        Bucket=BUCKET_NAME,
-        Key=test_key
-    )['Body'].read().decode('utf-8')
+    resp = (
+        mock_client.get_object(Bucket=BUCKET_NAME, Key=test_key)['Body']
+        .read()
+        .decode('utf-8')
+    )
 
     assert resp == 'my test file'

@@ -183,7 +183,7 @@ class S3Target(BaseTarget):
         self._fd = smart_open.open(
             self._file_path,
             self._mode,
-            transport_params=self._transport_params
+            transport_params=self._transport_params,
         )
 
     def on_data_received(self, chunk: bytes):
