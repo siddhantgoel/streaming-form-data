@@ -88,7 +88,7 @@ class FileTarget(BaseTarget):
     """FileTarget writes (streams) the input to an on-disk file."""
 
     def __init__(
-            self, filename: str, allow_overwrite: bool = True, *args, **kwargs
+        self, filename: str, allow_overwrite: bool = True, *args, **kwargs
     ):
         super().__init__(*args, **kwargs)
 
@@ -114,11 +114,11 @@ class DirectoryTarget(BaseTarget):
     directory."""
 
     def __init__(
-            self,
-            directory_path: str,
-            allow_overwrite: bool = True,
-            *args,
-            **kwargs
+        self,
+        directory_path: str,
+        allow_overwrite: bool = True,
+        *args,
+        **kwargs
     ):
         super().__init__(*args, **kwargs)
 
