@@ -20,8 +20,6 @@ docutils==0.19
     # via readme-renderer
 exceptiongroup==1.1.1
     # via pytest
-flake8==6.0.0
-    # via -r requirements.in
 idna==3.4
     # via requests
 importlib-metadata==6.5.1
@@ -36,8 +34,6 @@ keyring==23.13.1
     # via twine
 markdown-it-py==2.2.0
     # via rich
-mccabe==0.7.0
-    # via flake8
 mdurl==0.1.2
     # via markdown-it-py
 more-itertools==9.1.0
@@ -60,10 +56,6 @@ platformdirs==3.2.0
     # via black
 pluggy==1.0.0
     # via pytest
-pycodestyle==2.10.0
-    # via flake8
-pyflakes==3.0.1
-    # via flake8
 pygments==2.15.1
     # via
     #   readme-renderer
@@ -84,6 +76,8 @@ rfc3986==2.0.0
     # via twine
 rich==13.3.4
     # via twine
+ruff==0.0.262
+    # via -r requirements.in
 six==1.16.0
     # via bleach
 tomli==2.0.1

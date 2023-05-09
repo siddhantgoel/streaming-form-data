@@ -22,10 +22,10 @@ jobs:
           pip-sync requirements.txt
           pip install .
    
+      - name: Lint with ruff
+        run: make lint-ruff
       - name: Lint with black
         run: make lint-black
-      - name: Lint with flake8
-        run: make lint-flake8
       - name: Lint with mypy
         run: make lint-mypy
    
