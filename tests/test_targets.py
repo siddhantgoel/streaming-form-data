@@ -2,6 +2,8 @@ import os.path
 import tempfile
 
 import pytest
+from moto import mock_s3
+import boto3
 
 from streaming_form_data.targets import (
     BaseTarget,
@@ -9,8 +11,12 @@ from streaming_form_data.targets import (
     DirectoryTarget,
     NullTarget,
     ValueTarget,
+    S3Target,
 )
+
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
+
+BUCKET_NAME = 'test-bucket'
 
 
 def test_null_target_filename_not_set():
@@ -255,3 +261,37 @@ def test_custom_target_not_sent():
 
     assert target.value == b''
     assert target.multipart_filename is None
+
+
+@pytest.fixture()
+def mock_client():
+    with mock_s3():
+        client = boto3.client(service_name='s3')
+        client.create_bucket(Bucket=BUCKET_NAME)
+        yield client
+
+
+def test_s3_upload(mock_client):
+    test_key = 'test.txt'
+    path = f"s3://{BUCKET_NAME}/{test_key}"
+    target = S3Target(
+        path,
+        'wb',
+        transport_params={'client': mock_client},
+    )
+
+    target.start()
+
+    target.data_received(b'my test')
+    target.data_received(b' ')
+    target.data_received(b'file')
+
+    target.finish()
+
+    resp = (
+        mock_client.get_object(Bucket=BUCKET_NAME, Key=test_key)['Body']
+        .read()
+        .decode('utf-8')
+    )
+
+    assert resp == 'my test file'

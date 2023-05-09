@@ -1,5 +1,6 @@
 import hashlib
 from pathlib import Path
+import smart_open  # type: ignore
 from typing import Callable, List, Optional
 
 
@@ -164,3 +165,32 @@ class SHA256Target(BaseTarget):
     @property
     def value(self):
         return self._hash.hexdigest()
+
+
+class S3Target(BaseTarget):
+    """
+    S3Target implemented using smart_open library.
+    Chunked upload to the S3 target.
+    """
+
+    def __init__(self, file_path, mode, transport_params=None, **kwargs):
+        super().__init__(**kwargs)
+        self._file_path = file_path
+        self._mode = mode
+        self._transport_params = transport_params
+        self._fd = None
+
+    def on_start(self):
+        self._fd = smart_open.open(
+            self._file_path,
+            self._mode,
+            transport_params=self._transport_params,
+        )
+
+    def on_data_received(self, chunk: bytes):
+        if self._fd:
+            self._fd.write(chunk)
+
+    def on_finish(self):
+        if self._fd:
+            self._fd.close()

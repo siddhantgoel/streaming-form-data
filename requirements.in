@@ -6,3 +6,5 @@ requests-toolbelt==0.10.1
 ruff==0.0.262
 twine==4.0.2
 wheel==0.40.0
+smart-open==6.3.0
+moto==4.1.8
