@@ -13,24 +13,24 @@ def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
     content_type = None
 
     for key in headers.keys():
-        if key.lower() == 'content-type':
+        if key.lower() == "content-type":
             content_type = headers.get(key)
             break
 
     if not content_type:
-        raise ParseFailedException('Missing Content-Type header')
+        raise ParseFailedException("Missing Content-Type header")
 
     message = EmailMessage()
-    message['content-type'] = content_type
+    message["content-type"] = content_type
 
-    if message.get_content_type() != 'multipart/form-data':
-        raise ParseFailedException('Content-Type is not multipart/form-data')
+    if message.get_content_type() != "multipart/form-data":
+        raise ParseFailedException("Content-Type is not multipart/form-data")
 
     boundary = message.get_boundary()
     if not boundary:
-        raise ParseFailedException('Boundary not found')
+        raise ParseFailedException("Boundary not found")
 
-    return boundary.encode('utf-8')
+    return boundary.encode("utf-8")
 
 
 class StreamingFormDataParser:
@@ -39,8 +39,8 @@ class StreamingFormDataParser:
 
         raw_boundary = parse_content_boundary(headers)
 
-        delimiter = b'\r\n--' + raw_boundary + b'\r\n'
-        ender = b'\r\n--' + raw_boundary + b'--'
+        delimiter = b"\r\n--" + raw_boundary + b"\r\n"
+        ender = b"\r\n--" + raw_boundary + b"--"
 
         self._parser = _Parser(delimiter, ender)
 
@@ -49,7 +49,7 @@ class StreamingFormDataParser:
     def register(self, name: str, target: BaseTarget):
         if self._running:
             raise ParseFailedException(
-                'Registering parts not allowed while parser is running'
+                "Registering parts not allowed while parser is running"
             )
 
         self._parser.register(name, target)
@@ -62,12 +62,12 @@ class StreamingFormDataParser:
 
         if result > 0:
             if ErrorGroup.Internal <= result < ErrorGroup.Delimiting:
-                message = 'internal errors'
+                message = "internal errors"
             elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
-                message = 'delimiting multipart stream into parts'
+                message = "delimiting multipart stream into parts"
             elif ErrorGroup.PartHeaders <= result:
-                message = 'parsing specific part headers'
+                message = "parsing specific part headers"
 
             raise ParseFailedException(
-                '_parser.data_received failed with {}'.format(message)
+                "_parser.data_received failed with {}".format(message)
             )

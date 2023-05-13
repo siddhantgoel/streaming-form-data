@@ -19,9 +19,7 @@ def get_random_bytes(size, seed):
 
 def get_hyphens_crlfs(size, seed):
     random.seed(seed)
-    return random.choice(
-        [b'\r', b'\n', b'-'], size, p=[0.25, 0.25, 0.5]
-    ).tobytes()
+    return random.choice([b"\r", b"\n", b"-"], size, p=[0.25, 0.25, 0.5]).tobytes()
 
 
 def is_prime(n):
@@ -39,10 +37,7 @@ def is_power_of(x, base):
             return False
         n /= base
     raise Exception(
-        'is_power_of: unexpected result with x = '
-        + str(x)
-        + ' and base = '
-        + str(base)
+        "is_power_of: unexpected result with x = " + str(x) + " and base = " + str(base)
     )
 
 
@@ -73,18 +68,10 @@ def is_useful_number(n):
     if is_power_of(n, 10) or is_power_of(n - 1, 10) or is_power_of(n + 1, 10):
         return True
 
-    if (
-        is_multiple(n, 1024)
-        or is_multiple(n - 1, 1024)
-        or is_multiple(n + 1, 1024)
-    ):
+    if is_multiple(n, 1024) or is_multiple(n - 1, 1024) or is_multiple(n + 1, 1024):
         return True
 
-    if (
-        is_multiple(n, 1000)
-        or is_multiple(n - 1, 1000)
-        or is_multiple(n + 1, 1000)
-    ):
+    if is_multiple(n, 1000) or is_multiple(n - 1, 1000) or is_multiple(n + 1, 1000):
         return True
 
     if is_square(n):
@@ -111,18 +98,10 @@ def is_more_useful_number(n):
     if is_power_of(n, 10) or is_power_of(n - 1, 10) or is_power_of(n + 1, 10):
         return True
 
-    if (
-        is_multiple(n, 4 * 1024)
-        or is_multiple(n - 1, 1024)
-        or is_multiple(n + 1, 1024)
-    ):
+    if is_multiple(n, 4 * 1024) or is_multiple(n - 1, 1024) or is_multiple(n + 1, 1024):
         return True
 
-    if (
-        is_multiple(n, 5 * 1000)
-        or is_multiple(n - 1, 1000)
-        or is_multiple(n + 1, 1000)
-    ):
+    if is_multiple(n, 5 * 1000) or is_multiple(n - 1, 1000) or is_multiple(n + 1, 1000):
         return True
 
     if is_square(n) and n <= 100:
@@ -167,20 +146,18 @@ class ParserTestCaseBase(TestCase):
     ):
         print(
             test_idx,
-            '; name: ',
+            "; name: ",
             test_name,
-            '; data_size: ',
+            "; data_size: ",
             len(original_data),
-            '; chunksize: ',
+            "; chunksize: ",
             chunksize,
         )
 
-        parser = StreamingFormDataParser(
-            headers={'Content-Type': content_type}
-        )
+        parser = StreamingFormDataParser(headers={"Content-Type": content_type})
 
         target = ValueTarget()
-        parser.register('file', target)
+        parser.register("file", target)
 
         remaining = len(multipart_data)
         offset = 0
@@ -204,31 +181,31 @@ class ParserTestCaseBase(TestCase):
 class DifferentChunksTestCase(ParserTestCaseBase):
     def test_basic_last_attach(self):
         data = get_random_bytes(1024 * 1024, 159)
-        self.do_test(data, 'random_bytes', True)
+        self.do_test(data, "random_bytes", True)
 
     def test_basic_first_attach(self):
         data = get_random_bytes(1024 * 1024, 259)
-        self.do_test(data, 'random_bytes', False)
+        self.do_test(data, "random_bytes", False)
 
     def test_special_chars_last_attach(self):
         data = get_hyphens_crlfs(1024 * 1024, 359)
-        self.do_test(data, 'hyphens_crlfs', True)
+        self.do_test(data, "hyphens_crlfs", True)
 
     def test_special_chars_first_attach(self):
         data = get_hyphens_crlfs(1024 * 1024, 459)
-        self.do_test(data, 'hyphens_crlfs', False)
+        self.do_test(data, "hyphens_crlfs", False)
 
     def do_test(self, original_data, dataset_name, last_part):
         with BytesIO(original_data) as dataset_:
             if last_part:
                 fields = {
-                    'name': 'hello world',
-                    'file': ('file.dat', dataset_, 'binary/octet-stream'),
+                    "name": "hello world",
+                    "file": ("file.dat", dataset_, "binary/octet-stream"),
                 }
             else:
                 fields = {
-                    'file': ('file.dat', dataset_, 'binary/octet-stream'),
-                    'name': 'hello world',
+                    "file": ("file.dat", dataset_, "binary/octet-stream"),
+                    "name": "hello world",
                 }
 
             encoder = MultipartEncoder(fields=fields)
@@ -244,12 +221,12 @@ class DifferentChunksTestCase(ParserTestCaseBase):
 
             self.subTest(
                 idx,
-                'DifferentChunks.' + dataset_name,
+                "DifferentChunks." + dataset_name,
                 chunksize,
                 original_data,
                 content_type,
                 multipart_data,
-                'file.dat',
+                "file.dat",
             )
 
         self.assertEqual(idx, len(useful_numbers))
@@ -258,11 +235,11 @@ class DifferentChunksTestCase(ParserTestCaseBase):
 class DifferentFileSizesTestCase(ParserTestCaseBase):
     def test_basic(self):
         data = get_random_bytes(get_max_useful_number(), 137)
-        self.do_test(data, 'random_bytes')
+        self.do_test(data, "random_bytes")
 
     def test_special_chars(self):
         data = get_hyphens_crlfs(get_max_useful_number(), 237)
-        self.do_test(data, 'hyphens_crlfs')
+        self.do_test(data, "hyphens_crlfs")
 
     def do_test(self, data, dataset_name):
         useful_numbers = get_useful_numbers()
@@ -273,21 +250,19 @@ class DifferentFileSizesTestCase(ParserTestCaseBase):
 
             original_data = data[0:file_size]
             with BytesIO(data[0:file_size]) as dataset_:
-                fields = {
-                    'file': ('file.dat', dataset_, 'binary/octet-stream')
-                }
+                fields = {"file": ("file.dat", dataset_, "binary/octet-stream")}
                 encoder = MultipartEncoder(fields=fields)
                 content_type = encoder.content_type
                 multipart_data = encoder.to_string()
 
             self.subTest(
                 idx,
-                'DifferentFileSizes.' + dataset_name,
+                "DifferentFileSizes." + dataset_name,
                 1024,
                 original_data,
                 content_type,
                 multipart_data,
-                'file.dat',
+                "file.dat",
             )
 
         self.assertEqual(idx, len(useful_numbers) + 1)
@@ -296,7 +271,7 @@ class DifferentFileSizesTestCase(ParserTestCaseBase):
 class StressMatrixTestCase(ParserTestCaseBase):
     def test_basic(self):
         data = get_random_bytes(get_max_useful_number(), 171)
-        self.do_test(data, 'random_bytes')
+        self.do_test(data, "random_bytes")
 
     def do_test(self, data, dataset_name):
         useful_numbers = get_useful_numbers(short_list=True)
@@ -306,9 +281,7 @@ class StressMatrixTestCase(ParserTestCaseBase):
         for file_size in chain([0], useful_numbers):
             original_data = data[0:file_size]
             with BytesIO(data[0:file_size]) as dataset_:
-                fields = {
-                    'file': ('file.dat', dataset_, 'binary/octet-stream')
-                }
+                fields = {"file": ("file.dat", dataset_, "binary/octet-stream")}
                 encoder = MultipartEncoder(fields=fields)
                 content_type = encoder.content_type
                 multipart_data = encoder.to_string()
@@ -320,14 +293,12 @@ class StressMatrixTestCase(ParserTestCaseBase):
 
                 self.subTest(
                     idx,
-                    'StressMatrixTest.' + dataset_name,
+                    "StressMatrixTest." + dataset_name,
                     chunksize,
                     original_data,
                     content_type,
                     multipart_data,
-                    'file.dat',
+                    "file.dat",
                 )
 
-        self.assertEqual(
-            idx, len(useful_numbers) * (len(useful_numbers) + 1) / 2
-        )
+        self.assertEqual(idx, len(useful_numbers) * (len(useful_numbers) + 1) / 2)

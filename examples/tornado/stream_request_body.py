@@ -16,41 +16,39 @@ class UploadHandler(RequestHandler):
     def prepare(self):
         self.request.connection.set_max_body_size(one_hundred_gb)
 
-        name = 'uploaded-file-tornado-{}.dat'.format(int(time()))
+        name = "uploaded-file-tornado-{}.dat".format(int(time()))
 
         self.value = ValueTarget()
         self.file_ = FileTarget(os.path.join(tempfile.gettempdir(), name))
 
         self._parser = StreamingFormDataParser(headers=self.request.headers)
 
-        self._parser.register('name', self.value)
-        self._parser.register('file', self.file_)
+        self._parser.register("name", self.value)
+        self._parser.register("file", self.file_)
 
     def data_received(self, chunk):
         self._parser.data_received(chunk)
 
     def post(self):
-        self.render(
-            'upload.html', name=self.value.value, filename=self.file_.filename
-        )
+        self.render("upload.html", name=self.value.value, filename=self.file_.filename)
 
 
 class IndexHandler(RequestHandler):
     def get(self):
-        self.render('index.html')
+        self.render("index.html")
 
 
 def main():
-    handlers = [(r'/', IndexHandler), (r'/upload', UploadHandler)]
+    handlers = [(r"/", IndexHandler), (r"/upload", UploadHandler)]
 
-    settings = {'debug': True, 'template_path': os.path.dirname(__file__)}
+    settings = {"debug": True, "template_path": os.path.dirname(__file__)}
 
     app = Application(handlers, **settings)
-    app.listen(9999, address='localhost')
+    app.listen(9999, address="localhost")
 
     IOLoop().current().start()
 
 
-if __name__ == '__main__':
-    print('Listening on localhost:9999')
+if __name__ == "__main__":
+    print("Listening on localhost:9999")
     main()

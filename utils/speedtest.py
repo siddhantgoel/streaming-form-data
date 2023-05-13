@@ -16,20 +16,20 @@ class DummyTarget(BaseTarget):
 
     def start(self):
         if self._print_report:
-            print('DummyTarget: start')
+            print("DummyTarget: start")
 
     def data_received(self, chunk):
         if self._print_report:
-            print('DummyTarget: data_received:', len(chunk), 'bytes')
+            print("DummyTarget: data_received:", len(chunk), "bytes")
         if self._gather_data:
             self._values.append(chunk)
 
     def finish(self):
         if self._print_report:
-            print('DummyTarget: finish')
+            print("DummyTarget: finish")
 
     def get_result(self):
-        return b''.join(self._values)
+        return b"".join(self._values)
 
 
 def fill_bytes_random(size):
@@ -38,7 +38,7 @@ def fill_bytes_random(size):
 
 
 def main():
-    print('Prepare data...')
+    print("Prepare data...")
     begin_time = time()
 
     kibibyte = 1024
@@ -48,10 +48,10 @@ def main():
     filedata = fill_bytes_random(filedata_size)
 
     with BytesIO(filedata) as fd:
-        content_type = 'binary/octet-stream'
+        content_type = "binary/octet-stream"
 
-        encoder = MultipartEncoder(fields={'file': ('file', fd, content_type)})
-        headers = {'Content-Type': encoder.content_type}
+        encoder = MultipartEncoder(fields={"file": ("file", fd, content_type)})
+        headers = {"Content-Type": encoder.content_type}
         body = encoder.to_string()
 
     print_report = False
@@ -63,9 +63,9 @@ def main():
     target = DummyTarget(print_report=print_report, gather_data=gather_data)
 
     parser = StreamingFormDataParser(headers)
-    parser.register('name', NullTarget())
-    parser.register('lines', NullTarget())
-    parser.register('file', target)
+    parser.register("name", NullTarget())
+    parser.register("lines", NullTarget())
+    parser.register("file", target)
 
     defaultChunksize = 32 * kibibyte
     position = 0
@@ -73,10 +73,10 @@ def main():
     remaining = body_length
 
     end_time = time()
-    print('Data prepared')
+    print("Data prepared")
     time_diff = end_time - begin_time
     print(
-        'Preparation took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB'
+        "Preparation took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB"
         % (
             time_diff,
             (body_length / time_diff / mebibyte if time_diff > 0 else 0),
@@ -84,7 +84,7 @@ def main():
         )
     )
 
-    print('Begin test...')
+    print("Begin test...")
 
     begin_time = time()
 
@@ -96,27 +96,27 @@ def main():
 
     end_time = time()
 
-    print('End test')
+    print("End test")
 
     if gather_data:
         result = target.get_result()
         if result != filedata:
-            print('-------------------------------------------')
+            print("-------------------------------------------")
             print(
-                'ERROR! Decoded data mismatch! Orig size: ',
+                "ERROR! Decoded data mismatch! Orig size: ",
                 len(filedata),
-                '; got size:',
+                "; got size:",
                 len(result),
             )
-            print('-------------------------------------------')
+            print("-------------------------------------------")
         if not target._finished:
-            print('-------------------------------------------')
-            print('ERROR! Data decoding is not complete!')
-            print('-------------------------------------------')
+            print("-------------------------------------------")
+            print("ERROR! Data decoding is not complete!")
+            print("-------------------------------------------")
 
     time_diff = end_time - begin_time
     print(
-        'Test took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB'
+        "Test took: %.3f sec; speed: %.3f MB/s; body size: %.3f MB"
         % (
             time_diff,
             (body_length / time_diff / mebibyte if time_diff > 0 else 0),
@@ -125,5 +125,5 @@ def main():
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -12,5 +12,5 @@ class MaxSizeValidator:
 
         if self.so_far > self.max_size:
             raise ValidationError(
-                'Size must not be greater than {}'.format(self.max_size)
+                "Size must not be greater than {}".format(self.max_size)
             )

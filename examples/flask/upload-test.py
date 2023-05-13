@@ -15,7 +15,7 @@ app = Flask(__name__)
 
 
 page = dedent(
-    '''
+    """
     <!doctype html>
     <head>
         <title>Upload new File</title>
@@ -27,18 +27,18 @@ page = dedent(
           <input type="submit" value="Upload">
         </form>
     </body>
-'''
+    """
 )
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/", methods=["GET", "POST"])
 def upload_file():
-    if request.method == 'POST':
-        file_ = FileTarget(os.path.join(tempfile.gettempdir(), 'test'))
+    if request.method == "POST":
+        file_ = FileTarget(os.path.join(tempfile.gettempdir(), "test"))
 
         parser = StreamingFormDataParser(headers=request.headers)
 
-        parser.register('file', file_)
+        parser.register("file", file_)
 
         time_start = time.perf_counter()
 
@@ -51,7 +51,7 @@ def upload_file():
         time_finish = time.perf_counter()
 
         response = dedent(
-            '''
+            """
             <!doctype html>
             <head>
                 <title>Done!</title>
@@ -64,7 +64,7 @@ def upload_file():
                     Time spent on file reception: {duration}s
                 </h2>
             </body>
-        '''.format(
+        """.format(
                 file_name=file_.multipart_filename,
                 content_type=file_.multipart_content_type,
                 duration=(time_finish - time_start),
@@ -75,5 +75,5 @@ def upload_file():
     return page
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")
