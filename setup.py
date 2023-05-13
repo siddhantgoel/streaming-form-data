@@ -44,4 +44,5 @@ setup(
     ],
     keywords='form-data, forms, http, multipart, web',
     python_requires='>=3.8',
+    install_requires=["smart_open>=6.0"],
 )
