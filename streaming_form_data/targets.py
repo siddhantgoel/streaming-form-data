@@ -169,12 +169,11 @@ class SHA256Target(BaseTarget):
 
 class S3Target(BaseTarget):
     """
-    S3Target implemented using smart_open library.
-    Chunked upload to the S3 target.
-    """
+    S3Target enables chunked uploads to S3 buckets (using smart_open)"""
 
     def __init__(self, file_path, mode, transport_params=None, **kwargs):
         super().__init__(**kwargs)
+
         self._file_path = file_path
         self._mode = mode
         self._transport_params = transport_params
