@@ -148,7 +148,7 @@ what to do with the data.
     >>> target = FileTarget('/tmp/file.txt')
 
 :code:`DirectoryTarget`
-``````````````````
+```````````````````````
 
 :code:`DirectoryTarget` objects stream the contents to a directory on-disk.
 
@@ -167,13 +167,22 @@ and hold the result in memory.
     >>> target = SHA256Target()
 
 :code:`NullTarget`
-````````````````````
+``````````````````
 
 :code:`NullTarget` objects discard the input completely.
 
 .. code-block:: python
 
     >>> target = NullTarget()
+
+:code:`S3Target`
+````````````````
+
+:code:`S3Target` objects stream the contents of a file to an S3 bucket.
+
+.. code-block:: python
+
+    >>> target = S3Target("s3://<bucket>/path/to/key", "wb")
 
 Custom :code:`Target` classes
 `````````````````````````````
@@ -188,7 +197,7 @@ the :code:`streaming_form_data.targets.BaseTarget` class and overriding the
     >>>
     >>> class CustomTarget(BaseTarget):
     ...     def on_data_received(self, chunk):
-    ...         do_something_with(chunk)
+    ...         do_something(chunk)
 
 If the :code:`Content-Disposition` header included the :code:`filename`
 directive, this value will be available as the :code:`self.multipart_filename`
