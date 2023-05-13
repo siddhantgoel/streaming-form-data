@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.12.0
+- Add `S3Target` for streaming files directly to S3 (thanks [@tokicnikolaus])
+
 ## v1.11.1
 - Replace deprecated `cgi` module usage with `email` (thanks [@jasopolis])
 - Add support for Python 3.11 (thanks [@jasopolis])
@@ -148,3 +151,4 @@
 [@mephi42]: https://github.com/mephi42
 [@raethlein]: https://github.com/raethlein
 [@remram44]: https://github.com/remram44
+[@tokicnikolaus]: https://github.com/tokicnikolaus
