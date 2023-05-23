@@ -25,7 +25,7 @@ def test_single_byte():
 
     assert finder.inactive()
 
-    finder.feed(45)
+    finder.feed(ord("-"))
     assert finder.found()
 
 
@@ -34,13 +34,13 @@ def test_normal():
 
     assert finder.inactive()
 
-    for byte in [104, 101, 108, 108]:
+    for byte in [ord("h"), ord("e"), ord("l"), ord("l")]:
         finder.feed(byte)
 
         assert finder.active()
         assert not finder.found()
 
-    finder.feed(111)
+    finder.feed(ord("o"))
 
     assert not finder.active()
     assert finder.found()
@@ -51,7 +51,7 @@ def test_wrong_byte():
 
     assert finder.inactive()
 
-    finder.feed(104)
+    finder.feed(ord("h"))
     assert finder.active()
 
     finder.feed(42)
