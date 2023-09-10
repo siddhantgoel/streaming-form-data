@@ -14,9 +14,11 @@ forms).
 
 ## Testimonials
 
-> "[_this speeds up file uploads to my Flask app by **more than factor 10**_](https://github.com/pallets/werkzeug/issues/875#issuecomment-429287766)"
+> [_this speeds up file uploads to my Flask app by **more than factor 10**_](https://github.com/pallets/werkzeug/issues/875#issuecomment-429287766)
 
-> "[_Thanks a lot for your fix with streaming-form-data. I can finally upload gigabyte sized files at good speed and without memory filling up!_](https://github.com/pallets/werkzeug/issues/875#issuecomment-530020990)"
+> [_Thanks a lot for your fix with streaming-form-data. I can finally upload gigabyte sized files at good speed and without memory filling up!_](https://github.com/pallets/werkzeug/issues/875#issuecomment-530020990)
+
+> [huge thanks to @siddhantgoel with his "streaming-form-data" that saves me from the slow file reads I get with @FastAPI!](https://twitter.com/bebenzrr/status/1654952147132248064)
 
 ## Installation
 
