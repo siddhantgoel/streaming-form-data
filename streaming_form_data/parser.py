@@ -8,6 +8,11 @@ from streaming_form_data.targets import BaseTarget
 class ParseFailedException(Exception):
     pass
 
+class UnregisteredPartException(ParseFailedException):
+    def __init__(self, message, part_name):
+        super().__init__(message)
+        self.part_name = part_name
+
 
 def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
     content_type = None
@@ -34,7 +39,7 @@ def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
 
 
 class StreamingFormDataParser:
-    def __init__(self, headers: Mapping[str, str]):
+    def __init__(self, headers: Mapping[str, str], strict: bool = False):
         self.headers = headers
 
         raw_boundary = parse_content_boundary(headers)
@@ -42,7 +47,7 @@ class StreamingFormDataParser:
         delimiter = b"\r\n--" + raw_boundary + b"\r\n"
         ender = b"\r\n--" + raw_boundary + b"--"
 
-        self._parser = _Parser(delimiter, ender)
+        self._parser = _Parser(delimiter, ender, strict)
 
         self._running = False
 
@@ -65,8 +70,12 @@ class StreamingFormDataParser:
                 message = "internal errors"
             elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
                 message = "delimiting multipart stream into parts"
-            elif ErrorGroup.PartHeaders <= result:
+            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnregisteredPart:
                 message = "parsing specific part headers"
+            elif ErrorGroup.UnregisteredPart <= result:
+                raise UnregisteredPartException(
+                        f"parsing unregistered part '{self._parser.unknown_part}' in strict mode",
+                        self._parser.unknown_part)
 
             raise ParseFailedException(
                 "_parser.data_received failed with {}".format(message)
