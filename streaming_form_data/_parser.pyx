@@ -29,7 +29,7 @@ cpdef enum ErrorGroup:
     Internal = 100
     Delimiting = 200
     PartHeaders = 300
-    UnregisteredPart = 400
+    UnexpectedPart = 400
 
 
 cdef class Finder:
@@ -156,7 +156,7 @@ cdef class _Parser:
     cdef bytes _leftover_buffer
 
     cdef bint strict
-    cdef public str unknown_part
+    cdef public str unexpected_part_name
 
     def __init__(self, bytes delimiter, bytes ender, bint strict):
         self.delimiter_finder = Finder(delimiter)
@@ -175,7 +175,7 @@ cdef class _Parser:
         self._leftover_buffer = None
 
         self.strict = strict
-        self.unknown_part = ''
+        self.unexpected_part_name = ''
 
     def register(self, str name, object target):
         part = self._part_for(name)
@@ -300,9 +300,9 @@ cdef class _Parser:
                         if part is None:
                             part = self.default_part
                             if self.strict:
-                                self.unknown_part = name
+                                self.unexpected_part_name = name
                                 self.mark_error()
-                                return ErrorGroup.UnregisteredPart
+                                return ErrorGroup.UnexpectedPart
 
                         self.set_active_part(part, params.get('filename'))
                 elif 'content-type' in message:

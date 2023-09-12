@@ -8,7 +8,8 @@ from streaming_form_data.targets import BaseTarget
 class ParseFailedException(Exception):
     pass
 
-class UnregisteredPartException(ParseFailedException):
+
+class UnexpectedPartException(ParseFailedException):
     def __init__(self, message, part_name):
         super().__init__(message)
         self.part_name = part_name
@@ -70,12 +71,13 @@ class StreamingFormDataParser:
                 message = "internal errors"
             elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
                 message = "delimiting multipart stream into parts"
-            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnregisteredPart:
+            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnexpectedPart:
                 message = "parsing specific part headers"
-            elif ErrorGroup.UnregisteredPart <= result:
-                raise UnregisteredPartException(
-                        f"parsing unregistered part '{self._parser.unknown_part}' in strict mode",
-                        self._parser.unknown_part)
+            elif ErrorGroup.UnexpectedPart == result:
+                part = self._parser.unexpected_part_name
+                raise UnexpectedPartException(
+                    f"parsing unexpected part '{part}' in strict mode", part
+                )
 
             raise ParseFailedException(
                 "_parser.data_received failed with {}".format(message)
