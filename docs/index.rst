@@ -61,6 +61,11 @@ The :code:`StreamingFormDataParser` class expects a dictionary of HTTP request
 headers when being instantiated. These headers are used to determine the input
 :code:`Content-Type` and a few other metadata.
 
+Optionally, you can enable strict mode in the parser by setting the :code:`strict`
+keyword argument to :code:`True`. In strict mode, the parser throws
+:code:`UnexpectedPartException` if it starts to parse a field whose name has not
+been registered. When not in strict mode, unexpected parts are silently ignored.
+
 2. Input Registration
 ~~~~~~~~~~~~~~~~~~~~~
 
@@ -118,9 +123,10 @@ API
 :code:`StreamingFormDataParser`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This class is the main entry point, and expects a dictionary of HTTP request
-:code:`headers`. These headers are used to determine the input
-:code:`Content-Type` and a few other metadata.
+This class is the main entry point. It expects a dictionary of HTTP request
+:code:`headers` and has a keyword argument :code:`strict`. The headers are used
+to determine the input :code:`Content-Type` and a few other metadata. The strict
+flag is used to enable or disable the strict mode.
 
 :code:`Target` classes
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -223,6 +229,28 @@ snippet.
     >>> from streaming_form_data.targets import ValueTarget
     >>>
     >>> target = ValueTarget(validator=MaxSizeValidator(100))
+
+
+Exceptions
+~~~~~~~~~~
+
+:code:`ParseFailedException`
+````````````````````````````
+This exception is the base class of the :code:`streaming_form_data` exceptions.
+It can be raised during initialization, registering parts or reading chunks.
+
+:code:`UnexpectedPartException`
+```````````````````````````````
+This exception is raised when the parser is in strict mode and starts to parse
+an unexpected part. It contains :code:`part_name` attribute to check the name of
+the unexpected part. In can only be raised from :code:`data_received`.
+
+.. code-block:: python
+    >>> try:
+    >>>    parser.data_received(chunk)
+    >>> except streaming_form_data.parser.UnexpectedPartException as e:
+    >>>    print(e.part_name)
+    >>>    raise
 
 
 Examples
