@@ -24,10 +24,12 @@ cdef enum FinderState:
 # 100..199: internal program errors (asserts)
 # 200..299: problems with delimiting multipart stream into parts
 # 300..399: problems with parsing particular part headers
+# 400..499: problems with unregistered parts
 cpdef enum ErrorGroup:
     Internal = 100
     Delimiting = 200
     PartHeaders = 300
+    UnexpectedPart = 400
 
 
 cdef class Finder:
@@ -153,7 +155,10 @@ cdef class _Parser:
 
     cdef bytes _leftover_buffer
 
-    def __init__(self, bytes delimiter, bytes ender):
+    cdef bint strict
+    cdef public str unexpected_part_name
+
+    def __init__(self, bytes delimiter, bytes ender, bint strict):
         self.delimiter_finder = Finder(delimiter)
         self.ender_finder = Finder(ender)
 
@@ -168,6 +173,9 @@ cdef class _Parser:
         self.default_part = Part('_default', NullTarget())
 
         self._leftover_buffer = None
+
+        self.strict = strict
+        self.unexpected_part_name = ''
 
     def register(self, str name, object target):
         part = self._part_for(name)
@@ -288,7 +296,14 @@ cdef class _Parser:
                     name = params.get('name')
 
                     if name:
-                        part = self._part_for(name) or self.default_part
+                        part = self._part_for(name)
+                        if part is None:
+                            part = self.default_part
+                            if self.strict:
+                                self.unexpected_part_name = name
+                                self.mark_error()
+                                return ErrorGroup.UnexpectedPart
+
                         self.set_active_part(part, params.get('filename'))
                 elif 'content-type' in message:
                     if self.active_part:
