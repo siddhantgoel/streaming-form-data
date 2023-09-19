@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.13.0
+- Introduce `strict` mode for raising an exception in case a non-registered target is
+  passed (thanks [@hbusul])
+
 ## v1.12.0
 - Add `S3Target` for streaming files directly to S3 (thanks [@tokicnikolaus])
 
@@ -145,6 +149,7 @@
 
 [@NteRySin]: https://github.com/NteRySin
 [@Wouterkoorn]: https://github.com/Wouterkoorn
+[@hbusul]: https://github.com/hbusul
 [@ibrewster]: https://github.com/ibrewster
 [@jasopolis]: https://github.com/jasopolis
 [@kolomenkin]: https://github.com/kolomenkin
