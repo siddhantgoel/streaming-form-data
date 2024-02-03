@@ -190,6 +190,15 @@ and hold the result in memory.
 
     >>> target = S3Target("s3://<bucket>/path/to/key", "wb")
 
+:code:`CSVTarget`
+````````````````
+
+:code:`CSVTarget` objects process and release CSV lines in chunks.
+
+.. code-block:: python
+
+    >>> target = CSVTarget()
+
 Custom :code:`Target` classes
 `````````````````````````````
 
