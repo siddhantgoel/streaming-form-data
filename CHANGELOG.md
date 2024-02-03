@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.14.0
+- Add `CSVTarget` for processing CSV files (thanks [@gabrielcedran])
+
 ## v1.13.0
 - Introduce `strict` mode for raising an exception in case a non-registered target is
   passed (thanks [@hbusul])
@@ -149,6 +152,7 @@
 
 [@NteRySin]: https://github.com/NteRySin
 [@Wouterkoorn]: https://github.com/Wouterkoorn
+[@gabrielcedran]: https://github.com/gabrielcedran
 [@hbusul]: https://github.com/hbusul
 [@ibrewster]: https://github.com/ibrewster
 [@jasopolis]: https://github.com/jasopolis
