@@ -12,6 +12,7 @@ from streaming_form_data.targets import (
     NullTarget,
     ValueTarget,
     S3Target,
+    CSVTarget,
 )
 
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
@@ -295,3 +296,78 @@ def test_s3_upload(mock_client):
     )
 
     assert resp == "my test file"
+
+
+def test_csv_upload__incomplete_line_gets_completed_next_chunk__pop_between_chunks():
+    target = CSVTarget()
+    target.start()
+
+    target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
+    assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
+    assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
+
+    target.data_received(b"nt,33\nMary,Bel,22\n")
+
+    assert target.get_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
+    assert target.pop_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
+
+    assert not target.pop_lines(include_partial_line=True)
+    assert not target.get_lines(include_partial_line=True)
+
+    target.finish()
+
+
+def test_csv_upload__complete_line_in_the_end_of_chunk():
+    target = CSVTarget()
+    target.start()
+
+    target.data_received(b"Odin,Grand,1029\nRachel,Ced,44\n")
+
+    assert target.get_lines() == ["Odin,Grand,1029", "Rachel,Ced,44"]
+    assert target.pop_lines() == ["Odin,Grand,1029", "Rachel,Ced,44"]
+
+    assert not target.get_lines(include_partial_line=True)
+    assert not target.pop_lines(include_partial_line=True)
+
+    target.finish()
+
+
+def test_csv_upload__incomplete_line_in_the_end_of_chunk():
+    target = CSVTarget()
+    target.start()
+
+    target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
+
+    assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
+    assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
+
+    assert target.get_lines(include_partial_line=True) == ["Gabe,Sai"]
+    assert target.pop_lines(include_partial_line=True) == ["Gabe,Sai"]
+
+    assert not target.get_lines(include_partial_line=True)
+    assert not target.pop_lines(include_partial_line=True)
+
+    target.finish()
+
+
+def test_csv_upload__incomplete_line_in_the_end_of_chunk__include_partial():
+    target = CSVTarget()
+    target.start()
+
+    target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
+
+    assert target.get_lines(include_partial_line=True) == [
+        "name,surname,age",
+        "Don,Bob,99",
+        "Gabe,Sai",
+    ]
+    assert target.pop_lines(include_partial_line=True) == [
+        "name,surname,age",
+        "Don,Bob,99",
+        "Gabe,Sai",
+    ]
+
+    assert not target.get_lines(include_partial_line=True)
+    assert not target.pop_lines(include_partial_line=True)
+
+    target.finish()

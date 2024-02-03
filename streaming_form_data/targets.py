@@ -185,3 +185,54 @@ class S3Target(BaseTarget):
     def on_finish(self):
         if self._fd:
             self._fd.close()
+
+
+class CSVTarget(BaseTarget):
+    """
+    CSVTarget enables the processing and release of csv lines as soon as they are
+    completed by a chunk.
+    It enables developers to apply their own logic (e.g save to a db or send the
+    entry to another api) to each line
+    and free it from the memory in sequence, without the need to wait for the
+    whole file and/or save the file locally.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._lines = []
+        self._previous_partial_line = ""
+
+    def on_data_received(self, chunk: bytes):
+        # join the previous partial line with the new chunk
+        combined = self._previous_partial_line + chunk.decode("utf-8")
+
+        # split the combined string into lines
+        lines = combined.splitlines(keepends=True)
+
+        # process all lines except the last one (which may be partial)
+        for line in lines[:-1]:
+            self._lines.append(line.replace("\n", ""))
+
+        # if the last line ends with a newline, it is complete
+        if lines[-1].endswith("\n"):
+            self._lines.append(lines[-1].replace("\n", ""))
+            self._previous_partial_line = ""
+        else:
+            # otherwise, it is partial, and we save it for later
+            self._previous_partial_line = lines[-1]
+
+    def pop_lines(self, include_partial_line: bool = False):
+        # this clears the lines to keep memory usage low
+        lines = self._lines
+        if include_partial_line and self._previous_partial_line:
+            lines.append(self._previous_partial_line)
+            self._previous_partial_line = ""
+        self._lines = []
+        return lines
+
+    def get_lines(self, include_partial_line: bool = False):
+        # this never clears the lines
+        lines = self._lines.copy()
+        if include_partial_line and self._previous_partial_line:
+            lines.append(self._previous_partial_line)
+        return lines
