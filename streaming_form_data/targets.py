@@ -191,10 +191,9 @@ class CSVTarget(BaseTarget):
     """
     CSVTarget enables the processing and release of csv lines as soon as they are
     completed by a chunk.
-    It enables developers to apply their own logic (e.g save to a db or send the
-    entry to another api) to each line
-    and free it from the memory in sequence, without the need to wait for the
-    whole file and/or save the file locally.
+    It enables developers to apply their own logic (e.g save to a db or send the entry
+    to another API) to each line and free it from the memory in sequence, without the
+    need to wait for the whole file and/or save the file locally.
     """
 
     def __init__(self, *args, **kwargs):
