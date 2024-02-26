@@ -38,7 +38,7 @@ jobs:
           python-version: 3.8
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.12.3
+        uses: pypa/cibuildwheel@v2.16.5
         with:
           output-dir: dist
         env:
