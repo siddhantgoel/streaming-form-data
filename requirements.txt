@@ -23,8 +23,10 @@ click==8.1.7
     # via
     #   black
     #   mkdocs
-cryptography==42.0.2
-    # via moto
+cryptography==42.0.4
+    # via
+    #   moto
+    #   secretstorage
 cython==0.29.34
     # via -r requirements.in
 docutils==0.20.1
@@ -43,6 +45,10 @@ iniconfig==2.0.0
     # via pytest
 jaraco-classes==3.3.0
     # via keyring
+jeepney==0.8.0
+    # via
+    #   keyring
+    #   secretstorage
 jinja2==3.1.3
     # via
     #   mkdocs
@@ -139,6 +145,8 @@ ruff==0.0.262
     # via -r requirements.in
 s3transfer==0.10.0
     # via boto3
+secretstorage==3.3.3
+    # via keyring
 six==1.16.0
     # via python-dateutil
 tomli==2.0.1
