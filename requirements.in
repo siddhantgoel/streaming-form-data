@@ -1,5 +1,5 @@
 black==23.3.0
-cython==0.29.34
+cython==3.0.9
 mkdocs==1.5.3
 moto==4.1.8
 mypy==1.2.0
