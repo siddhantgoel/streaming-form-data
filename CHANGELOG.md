@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.15.0
+- Build using Cython 3.0.9
+
 ## v1.14.0
 - Add `CSVTarget` for processing CSV files (thanks [@gabrielcedran])
 
