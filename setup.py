@@ -11,7 +11,7 @@ with open(here.joinpath("README.md")) as fd:
 
 setup(
     name="streaming-form-data",
-    version="1.14.0",
+    version="1.15.0",
     description="Streaming parser for multipart/form-data",
     long_description=long_description,
     long_description_content_type="text/markdown",
