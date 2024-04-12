@@ -35,7 +35,7 @@ exceptiongroup==1.2.0
     # via pytest
 ghp-import==2.1.0
     # via mkdocs
-idna==3.6
+idna==3.7
     # via requests
 importlib-metadata==7.0.2
     # via
