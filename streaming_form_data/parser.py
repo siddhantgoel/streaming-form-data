@@ -16,6 +16,10 @@ class UnexpectedPartException(ParseFailedException):
 
 
 def parse_content_boundary(headers: Mapping[str, str]) -> bytes:
+    """
+    Return the content boundary value as extracted from the Content-Type header
+    """
+
     content_type = None
 
     for key in headers.keys():
@@ -53,6 +57,10 @@ class StreamingFormDataParser:
         self._running = False
 
     def register(self, name: str, target: BaseTarget):
+        """
+        Register a target for the given part name
+        """
+
         if self._running:
             raise ParseFailedException(
                 "Registering parts not allowed while parser is running"
@@ -61,24 +69,45 @@ class StreamingFormDataParser:
         self._parser.register(name, target)
 
     def data_received(self, data: bytes):
+        """
+        Feed data to the parser synchronously
+        """
+
         if not self._running:
             self._running = True
 
-        result = self._parser.data_received(data)
+        error_code = self._parser.data_received(data)
 
-        if result > 0:
-            if ErrorGroup.Internal <= result < ErrorGroup.Delimiting:
-                message = "internal errors"
-            elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
-                message = "delimiting multipart stream into parts"
-            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnexpectedPart:
-                message = "parsing specific part headers"
-            elif ErrorGroup.UnexpectedPart == result:
-                part = self._parser.unexpected_part_name
-                raise UnexpectedPartException(
-                    f"parsing unexpected part '{part}' in strict mode", part
-                )
+        self._check(error_code)
 
-            raise ParseFailedException(
-                "_parser.data_received failed with {}".format(message)
+    async def async_data_received(self, data: bytes):
+        """
+        Feed data to the parser asynchronously
+        """
+
+        if not self._running:
+            self._running = True
+
+        error_code = await self._parser.data_received(data)
+
+        self._check(error_code)
+
+    def _check(self, error_code: int):
+        if error_code == 0:
+            return
+
+        if ErrorGroup.Internal <= error_code < ErrorGroup.Delimiting:
+            message = "internal errors"
+        elif ErrorGroup.Delimiting <= error_code < ErrorGroup.PartHeaders:
+            message = "delimiting multipart stream into parts"
+        elif ErrorGroup.PartHeaders <= error_code < ErrorGroup.UnexpectedPart:
+            message = "parsing specific part headers"
+        elif ErrorGroup.UnexpectedPart == error_code:
+            part = self._parser.unexpected_part_name
+            raise UnexpectedPartException(
+                f"parsing unexpected part '{part}' in strict mode", part
             )
+
+        raise ParseFailedException(
+            "_parser.data_received failed with {}".format(message)
+        )
