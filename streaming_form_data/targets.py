@@ -1,26 +1,21 @@
 import hashlib
 from pathlib import Path
-import smart_open  # type: ignore
 from typing import Callable, List, Optional
+
+import smart_open  # type: ignore
 
 
 class BaseTarget:
     """
     Targets determine what to do with some input once the parser is done
-    processing it. Any new Target should inherit from this base class and
-    override the :code:`data_received` function.
-
-    Attributes:
-        multipart_filename: the name of the file advertised by the user,
-            extracted from the :code:`Content-Disposition` header. Please note
-            that this value comes directly from the user input and is not
-            sanitized, so be careful in using it directly.
-        multipart_content_type: MIME Content-Type of the file, extracted from
-            the :code:`Content-Type` HTTP header
+    processing it.
     """
 
     def __init__(self, validator: Optional[Callable] = None):
+        # the name of the file extracted from the Content-Disposition header
         self.multipart_filename = None
+
+        # the MIME Content-Type extracted from the Content-Type header
         self.multipart_content_type = None
 
         self._started = False
@@ -30,6 +25,13 @@ class BaseTarget:
     def _validate(self, chunk: bytes):
         if self._validator:
             self._validator(chunk)
+
+
+class SyncTarget(BaseTarget):
+    """
+    SyncTarget handle inputs in a synchronous manner. Child classes should override the
+    on_data_received method to do the actual work.
+    """
 
     def start(self):
         self._started = True
@@ -53,7 +55,35 @@ class BaseTarget:
         pass
 
 
-class NullTarget(BaseTarget):
+class AsyncTarget(BaseTarget):
+    """
+    AsyncTarget handle inputs in an asynchronous manner. Child classes should override
+    the on_data_received method to do the actual work.
+    """
+
+    async def start(self):
+        self._started = True
+        await self.on_start()
+
+    async def on_start(self):
+        pass
+
+    async def data_received(self, chunk: bytes):
+        self._validate(chunk)
+        await self.on_data_received(chunk)
+
+    async def on_data_received(self, chunk: bytes):
+        raise NotImplementedError()
+
+    async def finish(self):
+        await self.on_finish()
+        self._finished = True
+
+    async def on_finish(self):
+        pass
+
+
+class NullTarget(SyncTarget):
     """NullTarget ignores whatever input is passed in.
 
     This is mostly useful for internal use and should (normally) not be
@@ -64,7 +94,18 @@ class NullTarget(BaseTarget):
         pass
 
 
-class ValueTarget(BaseTarget):
+class AsyncNullTarget(AsyncTarget):
+    """AsyncNullTarget ignores whatever input is passed in.
+
+    This is mostly useful for internal use and should (normally) not be
+    required by external users.
+    """
+
+    async def on_data_received(self, chunk: bytes):
+        pass
+
+
+class ValueTarget(SyncTarget):
     """ValueTarget stores the input in an in-memory list of bytes.
 
     This is useful in case you'd like to have the value contained in an
@@ -84,7 +125,7 @@ class ValueTarget(BaseTarget):
         return b"".join(self._values)
 
 
-class FileTarget(BaseTarget):
+class FileTarget(SyncTarget):
     """FileTarget writes (streams) the input to an on-disk file."""
 
     def __init__(self, filename: str, allow_overwrite: bool = True, *args, **kwargs):
@@ -107,7 +148,7 @@ class FileTarget(BaseTarget):
             self._fd.close()
 
 
-class DirectoryTarget(BaseTarget):
+class DirectoryTarget(SyncTarget):
     """DirectoryTarget writes (streams) the different inputs to an on-disk
     directory."""
 
@@ -143,7 +184,7 @@ class DirectoryTarget(BaseTarget):
             self._fd.close()
 
 
-class SHA256Target(BaseTarget):
+class SHA256Target(SyncTarget):
     """SHA256Target calculates the SHA256 hash of the given input."""
 
     def __init__(self, *args, **kwargs):
@@ -159,7 +200,7 @@ class SHA256Target(BaseTarget):
         return self._hash.hexdigest()
 
 
-class S3Target(BaseTarget):
+class S3Target(SyncTarget):
     """
     S3Target enables chunked uploads to S3 buckets (using smart_open)"""
 
@@ -187,7 +228,7 @@ class S3Target(BaseTarget):
             self._fd.close()
 
 
-class CSVTarget(BaseTarget):
+class CSVTarget(SyncTarget):
     """
     CSVTarget enables the processing and release of CSV lines as soon as they are
     completed by a chunk.

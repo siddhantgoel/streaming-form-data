@@ -7,7 +7,7 @@ from requests_toolbelt import MultipartEncoder
 
 from streaming_form_data import ParseFailedException, StreamingFormDataParser
 from streaming_form_data.targets import (
-    BaseTarget,
+    SyncTarget,
     FileTarget,
     DirectoryTarget,
     SHA256Target,
@@ -732,7 +732,7 @@ def test_target_raises_exception():
 
     content_type, body = encoded_dataset(filename)
 
-    class BadTarget(BaseTarget):
+    class BadTarget(SyncTarget):
         def data_received(self, data):
             raise ValueError()
 

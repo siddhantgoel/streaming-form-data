@@ -6,6 +6,7 @@ from moto import mock_s3
 import boto3
 
 from streaming_form_data.targets import (
+    AsyncNullTarget,
     BaseTarget,
     FileTarget,
     DirectoryTarget,
@@ -36,6 +37,21 @@ def test_null_target_basic():
 
     target.data_received(b"hello")
     target.finish()
+
+    assert target.multipart_filename == "file001.txt"
+
+
+@pytest.mark.asyncio
+async def test_async_null_target_basic():
+    target = AsyncNullTarget()
+
+    target.multipart_filename = "file001.txt"
+
+    await target.start()
+    assert target.multipart_filename == "file001.txt"
+
+    await target.data_received(b"hello")
+    await target.finish()
 
     assert target.multipart_filename == "file001.txt"
 
