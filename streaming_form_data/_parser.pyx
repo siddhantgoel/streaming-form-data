@@ -1,5 +1,6 @@
 # cython: language_level=3
 
+import asyncio
 from email.policy import HTTP
 from email.parser import Parser
 
@@ -119,7 +120,7 @@ cdef class Finder:
         return self.index
 
 
-cdef class Part:
+cdef class _Part:
     """One part of a multipart/form-data request
     """
 
@@ -141,6 +142,8 @@ cdef class Part:
         for target in self.targets:
             target.multipart_content_type = value
 
+
+cdef class Part(_Part):
     def start(self):
         for target in self.targets:
             target.start()
@@ -154,28 +157,7 @@ cdef class Part:
             target.finish()
 
 
-cdef class AsyncPart:
-    """One part of a multipart/form-data request
-    """
-
-    cdef public str name
-    cdef list targets
-
-    def __init__(self, str name, object target):
-        self.name = name
-        self.targets = [target]
-
-    def add_target(self, object target):
-        self.targets.append(target)
-
-    def set_multipart_filename(self, str value):
-        for target in self.targets:
-            target.multipart_filename = value
-
-    def set_multipart_content_type(self, str value):
-        for target in self.targets:
-            target.multipart_content_type = value
-
+cdef class AsyncPart(_Part):
     async def start(self):
         for target in self.targets:
             await target.start()
@@ -593,4 +575,7 @@ cdef class _Parser:
         self.state = ParserState.PS_ERROR
 
         if self.active_part:
-            self.active_part.finish()
+            if isinstance(self.active_part, Part):
+                self.active_part.finish()
+            else:
+                asyncio.get_event_loop().call_soon_threadsafe(self.active_part.finish())
