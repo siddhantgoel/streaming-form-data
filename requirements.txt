@@ -4,13 +4,11 @@
 #
 #    pip-compile requirements.in
 #
-backports-tarfile==1.1.0
-    # via jaraco-context
 black==24.3.0
     # via -r requirements.in
-boto3==1.34.86
+boto3==1.34.88
     # via moto
-botocore==1.34.86
+botocore==1.34.88
     # via
     #   boto3
     #   moto
@@ -29,26 +27,14 @@ cryptography==42.0.5
     # via moto
 cython==3.0.9
     # via -r requirements.in
-docutils==0.21.1
-    # via readme-renderer
-exceptiongroup==1.2.0
+exceptiongroup==1.2.1
     # via pytest
 ghp-import==2.1.0
     # via mkdocs
 idna==3.7
     # via requests
-importlib-metadata==7.1.0
-    # via
-    #   keyring
-    #   twine
 iniconfig==2.0.0
     # via pytest
-jaraco-classes==3.4.0
-    # via keyring
-jaraco-context==5.3.0
-    # via keyring
-jaraco-functools==4.0.0
-    # via keyring
 jinja2==3.1.3
     # via
     #   mkdocs
@@ -57,27 +43,17 @@ jmespath==1.0.1
     # via
     #   boto3
     #   botocore
-keyring==25.1.0
-    # via twine
 markdown==3.6
     # via mkdocs
-markdown-it-py==3.0.0
-    # via rich
 markupsafe==2.1.5
     # via
     #   jinja2
     #   mkdocs
     #   werkzeug
-mdurl==0.1.2
-    # via markdown-it-py
 mergedeep==1.3.4
     # via mkdocs
 mkdocs==1.5.3
     # via -r requirements.in
-more-itertools==10.2.0
-    # via
-    #   jaraco-classes
-    #   jaraco-functools
 moto==4.1.8
     # via -r requirements.in
 mypy==1.2.0
@@ -86,8 +62,6 @@ mypy-extensions==1.0.0
     # via
     #   black
     #   mypy
-nh3==0.2.17
-    # via readme-renderer
 packaging==24.0
     # via
     #   black
@@ -97,20 +71,14 @@ pathspec==0.12.1
     # via
     #   black
     #   mkdocs
-pkginfo==1.10.0
-    # via twine
 platformdirs==4.2.0
     # via
     #   black
     #   mkdocs
-pluggy==1.4.0
+pluggy==1.5.0
     # via pytest
 pycparser==2.22
     # via cffi
-pygments==2.17.2
-    # via
-    #   readme-renderer
-    #   rich
 pytest==7.3.1
     # via
     #   -r requirements.in
@@ -129,24 +97,15 @@ pyyaml==6.0.1
     #   responses
 pyyaml-env-tag==0.1
     # via mkdocs
-readme-renderer==43.0
-    # via twine
 requests==2.31.0
     # via
     #   moto
     #   requests-toolbelt
     #   responses
-    #   twine
 requests-toolbelt==0.10.1
-    # via
-    #   -r requirements.in
-    #   twine
+    # via -r requirements.in
 responses==0.25.0
     # via moto
-rfc3986==2.0.0
-    # via twine
-rich==13.7.1
-    # via twine
 ruff==0.0.262
     # via -r requirements.in
 s3transfer==0.10.1
@@ -158,8 +117,6 @@ tomli==2.0.1
     #   black
     #   mypy
     #   pytest
-twine==4.0.2
-    # via -r requirements.in
 typing-extensions==4.11.0
     # via
     #   black
@@ -170,7 +127,6 @@ urllib3==1.26.18
     #   botocore
     #   requests
     #   responses
-    #   twine
 watchdog==4.0.0
     # via mkdocs
 werkzeug==3.0.2
@@ -179,5 +135,3 @@ wheel==0.40.0
     # via -r requirements.in
 xmltodict==0.13.0
     # via moto
-zipp==3.18.1
-    # via importlib-metadata
