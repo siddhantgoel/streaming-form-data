@@ -121,7 +121,8 @@ cdef class Finder:
 
 
 cdef class _Part:
-    """One part of a multipart/form-data request
+    """
+    A single part of a multipart/form-data request
     """
 
     cdef public str name
@@ -142,6 +143,9 @@ cdef class _Part:
         for target in self.targets:
             target.multipart_content_type = value
 
+    def is_sync(self):
+        raise NotImplementedError()
+
 
 cdef class Part(_Part):
     def start(self):
@@ -156,6 +160,9 @@ cdef class Part(_Part):
         for target in self.targets:
             target.finish()
 
+    def is_sync(self):
+        return True
+
 
 cdef class AsyncPart(_Part):
     async def start(self):
@@ -169,6 +176,9 @@ cdef class AsyncPart(_Part):
     async def finish(self):
         for target in self.targets:
             await target.finish()
+
+    def is_sync(self):
+        return False
 
 
 cdef class _Parser:
@@ -287,6 +297,17 @@ cdef class _Parser:
 
         return (chunk, index)
 
+    cdef handle_ps_start(self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start):
+        cdef Byte byte = chunk_ptr[idx[0]]
+
+        if byte == c_hyphen:
+            buffer_start[0] = idx[0]
+            self.state = ParserState.PS_STARTING_BOUNDARY
+        elif byte == c_cr:
+            self.state = ParserState.PS_START_CR
+        else:
+            self.mark_error()
+
     def _parse(self, bytes chunk, size_t index):
         cdef size_t idx, buffer_start, chunk_len
         cdef size_t match_start, skip_count, matched_length
@@ -302,13 +323,9 @@ cdef class _Parser:
             byte = chunk_ptr[idx]
 
             if self.state == ParserState.PS_START:
-                if byte == c_hyphen:
-                    buffer_start = idx
-                    self.state = ParserState.PS_STARTING_BOUNDARY
-                elif byte == c_cr:
-                    self.state = ParserState.PS_START_CR
-                else:
-                    self.mark_error()
+                self.handle_ps_start(chunk_ptr, &idx, &buffer_start)
+
+                if self.has_error():
                     return ErrorCode.E_DELIMITING
 
             elif self.state == ParserState.PS_START_CR:
@@ -575,7 +592,10 @@ cdef class _Parser:
         self.state = ParserState.PS_ERROR
 
         if self.active_part:
-            if isinstance(self.active_part, Part):
+            if self.active_part.is_sync():
                 self.active_part.finish()
             else:
                 asyncio.get_event_loop().call_soon_threadsafe(self.active_part.finish())
+
+    cdef has_error(self):
+        return self.state == ParserState.PS_ERROR
