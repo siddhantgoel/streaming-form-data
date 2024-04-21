@@ -40,7 +40,7 @@ cdef class Finder:
 
     def __init__(self, target):
         if len(target) < 1:
-            raise ValueError('Empty values not allowed')
+            raise ValueError("Empty values not allowed")
 
         self.target = target
         self.target_ptr = self.target
@@ -205,12 +205,12 @@ cdef class _Parser:
         self.expected_parts = []
 
         self.active_part = None
-        self.default_part = Part('_default', NullTarget())
+        self.default_part = Part("_default", NullTarget())
 
         self._leftover_buffer = None
 
         self.strict = strict
-        self.unexpected_part_name = ''
+        self.unexpected_part_name = ""
 
     def register(self, str name, object target):
         part = self._part_for(name)
@@ -342,8 +342,7 @@ cdef class _Parser:
                     return ErrorGroup.Delimiting + 3
 
                 # ensure we have read correct starting delimiter
-                if b'\r\n' + chunk[buffer_start: idx + 1] != \
-                        self.delimiter_finder.target:
+                if b"\r\n" + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
                     self.mark_error()
                     return ErrorGroup.Delimiting + 5
 
@@ -359,15 +358,17 @@ cdef class _Parser:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 1
 
-                message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
+                message = Parser(policy=HTTP).parsestr(
+                    chunk[buffer_start: idx + 1].decode("utf-8")
+                )
 
-                if 'content-disposition' in message:
-                    if not message.get_content_disposition() == 'form-data':
+                if "content-disposition" in message:
+                    if not message.get_content_disposition() == "form-data":
                         self.mark_error()
                         return ErrorGroup.PartHeaders + 1
 
-                    params = message['content-disposition'].params
-                    name = params.get('name')
+                    params = message["content-disposition"].params
+                    name = params.get("name")
 
                     if name:
                         part = self._part_for(name)
@@ -378,8 +379,8 @@ cdef class _Parser:
                                 self.mark_error()
                                 return ErrorGroup.UnexpectedPart
 
-                        self.set_active_part(part, params.get('filename'))
-                elif 'content-type' in message:
+                        self.set_active_part(part, params.get("filename"))
+                elif "content-type" in message:
                     if self.active_part:
                         self.active_part.set_multipart_content_type(
                             message.get_content_type()
