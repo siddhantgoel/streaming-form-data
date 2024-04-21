@@ -297,7 +297,9 @@ cdef class _Parser:
 
         return (chunk, index)
 
-    cdef handle_ps_start(self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start):
+    cdef handle_ps_start(
+        self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start
+    ):
         cdef Byte byte = chunk_ptr[idx[0]]
 
         if byte == c_hyphen:
@@ -307,6 +309,57 @@ cdef class _Parser:
             self.state = ParserState.PS_START_CR
         else:
             self.mark_error()
+
+    cdef handle_ps_start_cr(
+        self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start
+    ):
+        cdef Byte byte = chunk_ptr[idx[0]]
+
+        if byte == c_lf:
+            self.state = ParserState.PS_START
+        else:
+            self.mark_error()
+
+    cdef handle_ps_starting_boundary(
+        self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start
+    ):
+        cdef Byte byte = chunk_ptr[idx[0]]
+
+        if byte == c_hyphen:
+            self.state = ParserState.PS_READING_BOUNDARY
+        else:
+            self.mark_error()
+
+    cdef handle_ps_reading_boundary(
+        self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start
+    ):
+        cdef Byte byte = chunk_ptr[idx[0]]
+
+        if byte == c_cr:
+            self.state = ParserState.PS_ENDING_BOUNDARY
+
+    cdef handle_ps_ending_boundary(
+        self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start
+    ):
+        cdef Byte byte = chunk_ptr[idx[0]]
+
+        if byte != c_lf:
+            self.mark_error()
+            return
+
+        # ensure we have read correct starting delimiter
+        if b"\r\n" + chunk_ptr[buffer_start[0]: idx[0] + 1] != self.delimiter_finder.target:
+            self.mark_error()
+            return
+
+        buffer_start[0] = idx[0] + 1
+        self.state = ParserState.PS_READING_HEADER
+
+    cdef handle_ps_reading_header(self, const Byte* chunk_ptr, size_t* idx, size_t* buffer_start):
+        cdef Byte byte = chunk_ptr[idx[0]]
+
+        if byte == c_cr:
+            self.state = ParserState.PS_ENDING_HEADER
 
     def _parse(self, bytes chunk, size_t index):
         cdef size_t idx, buffer_start, chunk_len
@@ -329,38 +382,28 @@ cdef class _Parser:
                     return ErrorCode.E_DELIMITING
 
             elif self.state == ParserState.PS_START_CR:
-                if byte == c_lf:
-                    self.state = ParserState.PS_START
-                else:
-                    self.mark_error()
+                self.handle_ps_start_cr(chunk_ptr, &idx, &buffer_start)
+
+                if self.has_error():
                     return ErrorCode.E_DELIMITING
 
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
-                if byte != c_hyphen:
-                    self.mark_error()
+                self.handle_ps_starting_boundary(chunk_ptr, &idx, &buffer_start)
+
+                if self.has_error():
                     return ErrorCode.E_DELIMITING
 
-                self.state = ParserState.PS_READING_BOUNDARY
             elif self.state == ParserState.PS_READING_BOUNDARY:
-                if byte == c_cr:
-                    self.state = ParserState.PS_ENDING_BOUNDARY
+                self.handle_ps_reading_boundary(chunk_ptr, &idx, &buffer_start)
 
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
-                if byte != c_lf:
-                    self.mark_error()
+                self.handle_ps_ending_boundary(chunk_ptr, &idx, &buffer_start)
+
+                if self.has_error():
                     return ErrorCode.E_DELIMITING
 
-                # ensure we have read correct starting delimiter
-                if b"\r\n" + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
-                    self.mark_error()
-                    return ErrorCode.E_DELIMITING
-
-                buffer_start = idx + 1
-
-                self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
-                if byte == c_cr:
-                    self.state = ParserState.PS_ENDING_HEADER
+                self.handle_ps_reading_header(chunk_ptr, &idx, &buffer_start)
 
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != c_lf:
