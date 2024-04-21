@@ -21,15 +21,45 @@ cdef enum FinderState:
     FS_START, FS_WORKING, FS_END
 
 
-# 100..199: internal program errors (asserts)
-# 200..299: problems with delimiting multipart stream into parts
-# 300..399: problems with parsing particular part headers
-# 400..499: problems with unregistered parts
-cpdef enum ErrorGroup:
-    Internal = 100
-    Delimiting = 200
-    PartHeaders = 300
-    UnexpectedPart = 400
+cpdef enum ErrorCode:
+    """
+    Error codes returned by the parser
+    """
+
+    # All good
+    E_OK,
+
+    # Internal program errors (asserts that should not fail)
+    E_INTERNAL,
+
+    # Problems with delimiting multipart stream into parts
+    E_DELIMITING,
+
+    # Problems with parsing specific part headers
+    E_PART_HEADERS,
+
+    # Problems with unregistered parts
+    E_UNEXPECTED_PART
+
+
+cdef enum ParserState:
+    PS_START,
+    PS_START_CR,
+
+    PS_STARTING_BOUNDARY,
+    PS_READING_BOUNDARY,
+    PS_ENDING_BOUNDARY,
+
+    PS_READING_HEADER,
+    PS_ENDING_HEADER,
+    PS_ENDED_HEADER,
+    PS_ENDING_ALL_HEADERS,
+
+    PS_READING_BODY,
+
+    PS_END,
+
+    PS_ERROR
 
 
 cdef class Finder:
@@ -159,26 +189,6 @@ cdef class AsyncPart:
             await target.finish()
 
 
-cdef enum ParserState:
-    PS_START,
-    PS_START_CR,
-
-    PS_STARTING_BOUNDARY,
-    PS_READING_BOUNDARY,
-    PS_ENDING_BOUNDARY,
-
-    PS_READING_HEADER,
-    PS_ENDING_HEADER,
-    PS_ENDED_HEADER,
-    PS_ENDING_ALL_HEADERS,
-
-    PS_READING_BODY,
-
-    PS_END,
-
-    PS_ERROR
-
-
 cdef class _Parser:
     cdef ParserState state
 
@@ -256,7 +266,7 @@ cdef class _Parser:
 
     def data_received(self, bytes data):
         if not data:
-            return 0
+            return ErrorCode.E_OK
 
         cdef bytes chunk
         cdef size_t index
@@ -267,7 +277,7 @@ cdef class _Parser:
 
     async def async_data_received(self, bytes data):
         if not data:
-            return 0
+            return ErrorCode.E_OK
 
         cdef bytes chunk
         cdef size_t index
@@ -317,19 +327,19 @@ cdef class _Parser:
                     self.state = ParserState.PS_START_CR
                 else:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 1
+                    return ErrorCode.E_DELIMITING
 
             elif self.state == ParserState.PS_START_CR:
                 if byte == c_lf:
                     self.state = ParserState.PS_START
                 else:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 4
+                    return ErrorCode.E_DELIMITING
 
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != c_hyphen:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 2
+                    return ErrorCode.E_DELIMITING
 
                 self.state = ParserState.PS_READING_BOUNDARY
             elif self.state == ParserState.PS_READING_BOUNDARY:
@@ -339,12 +349,12 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != c_lf:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 3
+                    return ErrorCode.E_DELIMITING
 
                 # ensure we have read correct starting delimiter
                 if b"\r\n" + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 5
+                    return ErrorCode.E_DELIMITING
 
                 buffer_start = idx + 1
 
@@ -356,7 +366,7 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != c_lf:
                     self.mark_error()
-                    return ErrorGroup.PartHeaders + 1
+                    return ErrorCode.E_PART_HEADERS
 
                 message = Parser(policy=HTTP).parsestr(
                     chunk[buffer_start: idx + 1].decode("utf-8")
@@ -365,7 +375,7 @@ cdef class _Parser:
                 if "content-disposition" in message:
                     if not message.get_content_disposition() == "form-data":
                         self.mark_error()
-                        return ErrorGroup.PartHeaders + 1
+                        return ErrorCode.E_PART_HEADERS
 
                     params = message["content-disposition"].params
                     name = params.get("name")
@@ -377,7 +387,7 @@ cdef class _Parser:
                             if self.strict:
                                 self.unexpected_part_name = name
                                 self.mark_error()
-                                return ErrorGroup.UnexpectedPart
+                                return ErrorCode.E_UNEXPECTED_PART
 
                         self.set_active_part(part, params.get("filename"))
                 elif "content-type" in message:
@@ -398,7 +408,7 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != c_lf:
                     self.mark_error()
-                    return ErrorGroup.PartHeaders + 2
+                    return ErrorCode.E_PART_HEADERS
 
                 buffer_start = idx + 1
 
@@ -412,7 +422,7 @@ cdef class _Parser:
 
                     if idx + 1 < self.delimiter_length:
                         self.mark_error()
-                        return ErrorGroup.Internal + 1
+                        return ErrorCode.E_INTERNAL
 
                     match_start = idx + 1 - self.delimiter_length
 
@@ -426,7 +436,7 @@ cdef class _Parser:
                         buffer_start = idx + 1
                     else:
                         self.mark_error()
-                        return ErrorGroup.Internal + 2
+                        return ErrorCode.E_INTERNAL
 
                     self.unset_active_part()
                     self.delimiter_finder.reset()
@@ -436,7 +446,7 @@ cdef class _Parser:
 
                     if idx + 1 < self.ender_length:
                         self.mark_error()
-                        return ErrorGroup.Internal + 3
+                        return ErrorCode.E_INTERNAL
                     match_start = idx + 1 - self.ender_length
 
                     if match_start >= buffer_start:
@@ -447,7 +457,7 @@ cdef class _Parser:
                             raise
                     else:
                         self.mark_error()
-                        return ErrorGroup.Internal + 4
+                        return ErrorCode.E_INTERNAL
 
                     buffer_start = idx + 1
 
@@ -467,20 +477,20 @@ cdef class _Parser:
                         idx += skip_count
 
             elif self.state == ParserState.PS_END:
-                return 0
+                return ErrorCode.E_OK
             else:
                 self.mark_error()
-                return ErrorGroup.Internal + 5
+                return ErrorCode.E_INTERNAL
 
             idx += 1
 
         if idx != chunk_len:
             self.mark_error()
-            return ErrorGroup.Internal + 6
+            return ErrorCode.E_INTERNAL
 
         if buffer_start > chunk_len:
             self.mark_error()
-            return ErrorGroup.Internal + 7
+            return ErrorCode.E_INTERNAL
 
         if self.state == ParserState.PS_READING_BODY:
             matched_length = max(
@@ -501,16 +511,16 @@ cdef class _Parser:
         if idx - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: idx]
 
-        return 0
-
-    # rewind_fast_forward searches for the '\r\n--' sequence in the provided
-    # buffer. It returns the number of characters which can be skipped before
-    # the delimiter starts (including potential 4-byte match). It may also
-    # update Finder object states.
+        return ErrorCode.E_OK
 
     cdef size_t rewind_fast_forward(
         self, const Byte *chunk_ptr, size_t pos_first, size_t pos_last
     ):
+        """
+        Return the number of characters that can be skipped before the delimiter starts
+        (including potential 4-byte match). It may also update Finder object states.
+        """
+
         cdef const Byte *ptr
         cdef const Byte *ptr_end
         cdef size_t skipped

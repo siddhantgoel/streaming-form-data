@@ -1,7 +1,7 @@
 from email.message import EmailMessage
 from typing import Mapping
 
-from streaming_form_data._parser import ErrorGroup, _Parser  # type: ignore
+from streaming_form_data._parser import ErrorCode, _Parser  # type: ignore
 from streaming_form_data.targets import BaseTarget
 
 
@@ -93,16 +93,16 @@ class StreamingFormDataParser:
         self._check(error_code)
 
     def _check(self, error_code: int):
-        if error_code == 0:
+        if error_code == ErrorCode.E_OK:
             return
 
-        if ErrorGroup.Internal <= error_code < ErrorGroup.Delimiting:
+        if error_code == ErrorCode.E_INTERNAL:
             message = "internal errors"
-        elif ErrorGroup.Delimiting <= error_code < ErrorGroup.PartHeaders:
+        elif error_code == ErrorCode.E_DELIMITING:
             message = "delimiting multipart stream into parts"
-        elif ErrorGroup.PartHeaders <= error_code < ErrorGroup.UnexpectedPart:
+        elif error_code == ErrorCode.E_PART_HEADERS:
             message = "parsing specific part headers"
-        elif ErrorGroup.UnexpectedPart == error_code:
+        elif error_code == ErrorCode.E_UNEXPECTED_PART:
             part = self._parser.unexpected_part_name
             raise UnexpectedPartException(
                 f"parsing unexpected part '{part}' in strict mode", part
