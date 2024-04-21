@@ -3,7 +3,7 @@
 from email.policy import HTTP
 from email.parser import Parser
 
-from streaming_form_data.targets import NullTarget
+from streaming_form_data.targets import NullTarget, is_async_target
 
 
 ctypedef unsigned char Byte  # noqa: E999
@@ -124,6 +124,41 @@ cdef class Part:
             target.finish()
 
 
+cdef class AsyncPart:
+    """One part of a multipart/form-data request
+    """
+
+    cdef public str name
+    cdef list targets
+
+    def __init__(self, str name, object target):
+        self.name = name
+        self.targets = [target]
+
+    def add_target(self, object target):
+        self.targets.append(target)
+
+    def set_multipart_filename(self, str value):
+        for target in self.targets:
+            target.multipart_filename = value
+
+    def set_multipart_content_type(self, str value):
+        for target in self.targets:
+            target.multipart_content_type = value
+
+    async def start(self):
+        for target in self.targets:
+            await target.start()
+
+    async def data_received(self, bytes chunk):
+        for target in self.targets:
+            await target.data_received(chunk)
+
+    async def finish(self):
+        for target in self.targets:
+            await target.finish()
+
+
 cdef enum ParserState:
     PS_START,
     PS_START_CR,
@@ -183,21 +218,36 @@ cdef class _Parser:
         if part:
             part.add_target(target)
         else:
-            self.expected_parts.append(Part(name, target))
+            part_cls = AsyncPart if is_async_target(target) else Part
+            self.expected_parts.append(part_cls(name, target))
 
     def set_active_part(self, part, str filename):
         self.active_part = part
         self.active_part.set_multipart_filename(filename)
         self.active_part.start()
 
+    async def async_set_active_part(self, part, str filename):
+        self.active_part = part
+        self.active_part.set_multipart_filename(filename)
+        await self.active_part.start()
+
     def unset_active_part(self):
         if self.active_part:
             self.active_part.finish()
         self.active_part = None
 
+    async def async_unset_active_part(self):
+        if self.active_part:
+            await self.active_part.finish()
+        self.active_part = None
+
     def on_body(self, bytes value):
         if self.active_part and len(value) > 0:
             self.active_part.data_received(value)
+
+    async def async_on_body(self, bytes value):
+        if self.active_part and len(value) > 0:
+            await self.active_part.data_received(value)
 
     cdef _part_for(self, str name):
         for part in self.expected_parts:
@@ -211,6 +261,30 @@ cdef class _Parser:
         cdef bytes chunk
         cdef size_t index
 
+        chunk, index = self.include_leftover_buffer(data)
+
+        return self._parse(chunk, index)
+
+    async def async_data_received(self, bytes data):
+        if not data:
+            return 0
+
+        cdef bytes chunk
+        cdef size_t index
+
+        chunk, index = self.include_leftover_buffer(data)
+
+        return await self._parse(chunk, index)
+
+    cdef include_leftover_buffer(self, bytes data):
+        """
+        Include any leftover buffer from the previous call in the current data and
+        return the new buffer and its index.
+        """
+
+        cdef bytes chunk
+        cdef size_t index
+
         if self._leftover_buffer:
             chunk = self._leftover_buffer + data
             index = len(self._leftover_buffer)
@@ -219,7 +293,7 @@ cdef class _Parser:
             chunk = data
             index = 0
 
-        return self._parse(chunk, index)
+        return (chunk, index)
 
     def _parse(self, bytes chunk, size_t index):
         cdef size_t idx, buffer_start, chunk_len

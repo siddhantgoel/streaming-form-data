@@ -276,3 +276,11 @@ class CSVTarget(SyncTarget):
         if include_partial_line and self._previous_partial_line:
             lines.append(self._previous_partial_line)
         return lines
+
+
+def is_async_target(target: BaseTarget) -> bool:
+    """
+    Return true if the target is asynchronous
+    """
+
+    return isinstance(target, AsyncTarget)
