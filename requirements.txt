@@ -125,7 +125,7 @@ pyyaml-env-tag==0.1
     # via mkdocs
 readme-renderer==43.0
     # via twine
-requests==2.31.0
+requests==2.32.0
     # via
     #   moto
     #   requests-toolbelt
