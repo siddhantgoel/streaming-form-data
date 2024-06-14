@@ -1,0 +1,53 @@
+[tool.poetry]
+name = "streaming-form-data"
+version = "1.15.0"
+description = "Streaming parser for multipart/form-data"
+authors = ["Siddhant Goel <me@sgoel.dev>"]
+license = "MIT"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Programming Language :: Cython",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+]
+keywords = ["cython", "form-data", "forms", "http", "multipart", "streaming", "web"]
+
+[tool.poetry.urls]
+homepage = "https://github.com/siddhantgoel/streaming-form-data"
+repository = "https://github.com/siddhantgoel/streaming-form-data"
+documentation = "https://streaming-form-data.readthedocs.io"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true
+
+[tool.poetry.dependencies]
+python = "^3.8"
+smart-open = "^6.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.4.2"
+cython = "^3.0.10"
+mkdocs = "^1.6.0"
+moto = "^5.0.9"
+mypy = "^1.10.0"
+pytest = "^8.2.2"
+requests-toolbelt = "^1.0.0"
+ruff = "^0.4.9"
+taskipy = "^1.12.2"
+
+[build-system]
+requires = ["poetry-core", "setuptools", "wheel"]
+build-backend = "poetry.core.masonry.api"
