@@ -46,7 +46,6 @@ mypy = "^1.10.0"
 pytest = "^8.2.2"
 requests-toolbelt = "^1.0.0"
 ruff = "^0.4.9"
-taskipy = "^1.12.2"
 
 [build-system]
 requires = ["poetry-core", "setuptools", "wheel"]

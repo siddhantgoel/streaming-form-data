@@ -55,7 +55,7 @@ Up-to-date documentation is available on [Read the Docs].
 
 ## Development
 
-Please make sure you have Python 3.9+ and [pip-tools] installed.
+Please make sure you have Python 3.9+, [poetry], and [just] installed.
 
 Since this package includes a C extension, please make sure you have a working C
 compiler available. On Debian-based distros this usually means installing the
@@ -65,15 +65,14 @@ compiler available. On Debian-based distros this usually means installing the
    `git clone https://github.com/siddhantgoel/streaming-form-data`
 
 2. Install the packages required for development:
-   `make pip-sync`
+   `poetry install`
 
-3. Install `streaming_form_data` itself:
-   `pip install .`
+4. That's basically it. You should now be able to run the test suite: `just test`
 
-4. That's basically it. You should now be able to run the test suite:
-   `make test`
+Note that if you make any changes to Cython files (`.pyx, .pxd, .pxi`), you'll need to
+re-compile (`just compile`) and re-install `streaming_form_data` before you can test
+your changes.
 
-Note that if you make any changes to Cython files (`.pyx, .pxd, .pxi`), you'll need to re-compile (`make compile`) and re-install `streaming_form_data` before you can test your changes.
-
-[pip-tools]: https://pypi.org/project/pip-tools/
-[Read the Docs]: https://streaming-form-data.readthedocs.io/
+[just]: https://just.systems
+[poetry]: https://python-poetry.org
+[Read the Docs]: https://streaming-form-data.readthedocs.io
