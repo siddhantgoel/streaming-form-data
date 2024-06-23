@@ -7,5 +7,5 @@ pytest==7.3.1
 requests-toolbelt==0.10.1
 ruff==0.0.262
 twine==4.0.2
-urllib3==1.26.18
+urllib3==1.26.19
 wheel==0.40.0
