@@ -83,13 +83,14 @@ class ValueTarget(BaseTarget):
     def value(self):
         return b"".join(self._values)
 
+
 class ListTarget(BaseTarget):
     """ValueTarget stores the input in an in-memory list of bytes.
     This is useful in case you'd like to have the value contained in an
     in-memory string.
     """
 
-    def __init__(self, _type = bytes, *args, **kwargs):
+    def __init__(self, _type=bytes, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self._temp_value = []
@@ -100,11 +101,11 @@ class ListTarget(BaseTarget):
         self._temp_value.append(chunk)
 
     def on_finish(self):
-        value = b''.join(self._temp_value)
+        value = b"".join(self._temp_value)
         self._temp_value = []
 
         if self._type == str:
-            value = value.decode('UTF-8')
+            value = value.decode("UTF-8")
         elif self._type == bytes:
             pass  # already is bytes, no need to do anything
         else:

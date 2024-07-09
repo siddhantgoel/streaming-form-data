@@ -103,13 +103,15 @@ def test_list_target_basic():
     target.finish()
 
     assert target.multipart_filename is None
-    assert target.value == [b"Cat",b"Dog",b"Fish"]
+    assert target.value == [b"Cat", b"Dog", b"Fish"]
+
 
 def test_list_target_not_set():
-    target=ListTarget()
+    target = ListTarget()
 
     assert target.multipart_filename is None
     assert target.value == []
+
 
 def test_file_target_basic():
     filename = os.path.join(tempfile.gettempdir(), "file.txt")
