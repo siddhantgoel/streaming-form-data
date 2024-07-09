@@ -82,7 +82,7 @@ class ValueTarget(BaseTarget):
     @property
     def value(self):
         return b"".join(self._values)
-    
+
 class ListTarget(BaseTarget):
     """ValueTarget stores the input in an in-memory list of bytes.
     This is useful in case you'd like to have the value contained in an

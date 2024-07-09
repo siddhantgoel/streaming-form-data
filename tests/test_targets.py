@@ -107,7 +107,7 @@ def test_list_target_basic():
 
 def test_list_target_not_set():
     target=ListTarget()
-    
+
     assert target.multipart_filename is None
     assert target.value == []
 
