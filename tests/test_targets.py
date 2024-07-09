@@ -11,6 +11,7 @@ from streaming_form_data.targets import (
     DirectoryTarget,
     NullTarget,
     ValueTarget,
+    ListTarget,
     S3Target,
     CSVTarget,
 )
@@ -81,6 +82,34 @@ def test_value_target_total_size_validator():
     with pytest.raises(ValidationError):
         target.data_received(b"world")
 
+
+def test_list_target_basic():
+    target = ListTarget()
+
+    assert target.value == []
+
+    target.multipart_filename = None
+
+    target.start()
+    assert target.multipart_filename is None
+    assert target.value == []
+
+    # Send and finish multiple values
+    target.data_received(b"Cat")
+    target.finish()
+    target.data_received(b"Dog")
+    target.finish()
+    target.data_received(b"Fish")
+    target.finish()
+
+    assert target.multipart_filename is None
+    assert target.value == [b"Cat",b"Dog",b"Fish"]
+
+def test_list_target_not_set():
+    target=ListTarget()
+    
+    assert target.multipart_filename is None
+    assert target.value == []
 
 def test_file_target_basic():
     filename = os.path.join(tempfile.gettempdir(), "file.txt")
