@@ -105,7 +105,7 @@ def test_list_target_basic():
     target.finish()
 
     assert target.multipart_filename is None
-    assert target.value == [b"Cat",b"Dog",b"Big Goldfish"]
+    assert target.value == [b"Cat", b"Dog", b"Big Goldfish"]
 
 
 def test_list_target_not_set():
