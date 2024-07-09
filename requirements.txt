@@ -175,5 +175,5 @@ wheel==0.40.0
     # via -r requirements.in
 xmltodict==0.13.0
     # via moto
-zipp==3.18.1
+zipp==3.19.1
     # via importlib-metadata
