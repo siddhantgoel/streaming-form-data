@@ -99,11 +99,13 @@ def test_list_target_basic():
     target.finish()
     target.data_received(b"Dog")
     target.finish()
-    target.data_received(b"Fish")
+    target.data_received(b"Big")
+    target.data_received(b" ")
+    target.data_received(b"Goldfish")
     target.finish()
 
     assert target.multipart_filename is None
-    assert target.value == [b"Cat", b"Dog", b"Fish"]
+    assert target.value == [b"Cat",b"Dog",b"Big Goldfish"]
 
 
 def test_list_target_not_set():
