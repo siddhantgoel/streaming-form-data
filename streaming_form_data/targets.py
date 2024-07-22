@@ -85,9 +85,12 @@ class ValueTarget(BaseTarget):
 
 
 class ListTarget(BaseTarget):
-    """ValueTarget stores the input in an in-memory list of bytes.
-    This is useful in case you'd like to have the value contained in an
-    in-memory string.
+    """ListTarget stores the input in an in-memory list of bytes,
+    which is then joined into the final value and appended to an in-memory
+    list of byte strings when each value is finished.
+
+    This is usefull for situations where more than one value may be submitted for
+    the same argument.
     """
 
     def __init__(self, _type=bytes, *args, **kwargs):
