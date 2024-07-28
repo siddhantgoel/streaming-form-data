@@ -172,6 +172,14 @@ in memory.
 >>> target = CSVTarget()
 ```
 
+#### `ListTarget`
+
+`ListTarget` objects store the input in an in-memory list of bytes.
+
+```python
+>>> target = ListTarget()
+```
+
 #### Custom `Target` classes
 
 It's possible to define custom targets for your specific use case by inheriting the
