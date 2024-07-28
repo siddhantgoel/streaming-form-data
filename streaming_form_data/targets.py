@@ -84,6 +84,47 @@ class ValueTarget(BaseTarget):
         return b"".join(self._values)
 
 
+class ListTarget(BaseTarget):
+    """ListTarget stores the input in an in-memory list of bytes,
+    which is then joined into the final value and appended to an in-memory
+    list of byte strings when each value is finished.
+
+    This is usefull for situations where more than one value may be submitted for
+    the same argument.
+    """
+
+    def __init__(self, _type=bytes, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._temp_value = []
+        self._values = []
+        self._type = _type
+
+    def on_data_received(self, chunk: bytes):
+        self._temp_value.append(chunk)
+
+    def on_finish(self):
+        value = b"".join(self._temp_value)
+        self._temp_value = []
+
+        if self._type == str:
+            value = value.decode("UTF-8")
+        elif self._type == bytes:
+            pass  # already is bytes, no need to do anything
+        else:
+            value = self._type(value)
+
+        self._values.append(value)
+
+    @property
+    def value(self):
+        return self._values
+
+    @property
+    def finished(self):
+        return self._finished
+
+
 class FileTarget(BaseTarget):
     """FileTarget writes (streams) the input to an on-disk file."""
 
