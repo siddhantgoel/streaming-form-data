@@ -107,9 +107,9 @@ class ListTarget(BaseTarget):
         value = b"".join(self._temp_value)
         self._temp_value = []
 
-        if self._type == str:
+        if self._type is str:
             value = value.decode("UTF-8")
-        elif self._type == bytes:
+        elif self._type is bytes:
             pass  # already is bytes, no need to do anything
         else:
             value = self._type(value)
