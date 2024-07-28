@@ -2,7 +2,7 @@ import os.path
 import tempfile
 
 import pytest
-from moto import mock_s3
+from moto import mock_aws
 import boto3
 
 from streaming_form_data.targets import (
@@ -299,7 +299,7 @@ def test_custom_target_not_sent():
 
 @pytest.fixture()
 def mock_client():
-    with mock_s3():
+    with mock_aws():
         client = boto3.client(service_name="s3")
         client.create_bucket(Bucket=BUCKET_NAME)
         yield client
