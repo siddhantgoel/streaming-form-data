@@ -28,7 +28,7 @@ lint-black:
 	black --check streaming_form_data/*.py tests/ utils/ examples/**/*.py
 
 lint-ruff:
-	ruff --select=B,C4,C9,E,F,PLC,PLE,PLW,W .
+	ruff check streaming_form_data/ tests/ examples/
 
 lint-mypy:
 	mypy streaming_form_data/
