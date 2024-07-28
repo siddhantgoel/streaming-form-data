@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.16.0
+- Add `ListTarget` (thanks [@ibrewster])
+- Build using Cython 3.0.10
+
 ## v1.15.0
 - Build using Cython 3.0.9
 
