@@ -8,15 +8,15 @@ class BaseTarget:
     """
     Targets determine what to do with some input once the parser is done
     processing it. Any new Target should inherit from this base class and
-    override the :code:`data_received` function.
+    override the :`data_received` function.
 
     Attributes:
         multipart_filename: the name of the file advertised by the user,
-            extracted from the :code:`Content-Disposition` header. Please note
+            extracted from the `Content-Disposition` header. Please note
             that this value comes directly from the user input and is not
             sanitized, so be careful in using it directly.
         multipart_content_type: MIME Content-Type of the file, extracted from
-            the :code:`Content-Type` HTTP header
+            the `Content-Type` HTTP header
     """
 
     def __init__(self, validator: Optional[Callable] = None):
@@ -52,9 +52,16 @@ class BaseTarget:
     def on_finish(self):
         pass
 
+    def set_multipart_filename(self, filename: str):
+        self.multipart_filename = filename
+
+    def set_multipart_content_type(self, content_type: str):
+        self.multipart_content_type = content_type
+
 
 class NullTarget(BaseTarget):
-    """NullTarget ignores whatever input is passed in.
+    """
+    NullTarget ignores whatever input is passed in.
 
     This is mostly useful for internal use and should (normally) not be
     required by external users.
@@ -65,7 +72,8 @@ class NullTarget(BaseTarget):
 
 
 class ValueTarget(BaseTarget):
-    """ValueTarget stores the input in an in-memory list of bytes.
+    """
+    ValueTarget stores the input in an in-memory list of bytes.
 
     This is useful in case you'd like to have the value contained in an
     in-memory string.
@@ -85,7 +93,8 @@ class ValueTarget(BaseTarget):
 
 
 class ListTarget(BaseTarget):
-    """ListTarget stores the input in an in-memory list of bytes, which is then joined
+    """
+    ListTarget stores the input in an in-memory list of bytes, which is then joined
     into the final value and appended to an in-memory list of byte strings when each
     value is finished.
 
@@ -126,7 +135,9 @@ class ListTarget(BaseTarget):
 
 
 class FileTarget(BaseTarget):
-    """FileTarget writes (streams) the input to an on-disk file."""
+    """
+    FileTarget writes (streams) the input to an on-disk file.
+    """
 
     def __init__(self, filename: str, allow_overwrite: bool = True, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -149,8 +160,10 @@ class FileTarget(BaseTarget):
 
 
 class DirectoryTarget(BaseTarget):
-    """DirectoryTarget writes (streams) the different inputs to an on-disk
-    directory."""
+    """
+    DirectoryTarget writes (streams) the different inputs to an on-disk
+    directory.
+    """
 
     def __init__(
         self, directory_path: str, allow_overwrite: bool = True, *args, **kwargs
@@ -185,7 +198,9 @@ class DirectoryTarget(BaseTarget):
 
 
 class SHA256Target(BaseTarget):
-    """SHA256Target calculates the SHA256 hash of the given input."""
+    """
+    SHA256Target calculates the SHA256 hash of the given input.
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -202,7 +217,8 @@ class SHA256Target(BaseTarget):
 
 class S3Target(BaseTarget):
     """
-    S3Target enables chunked uploads to S3 buckets (using smart_open)"""
+    S3Target enables chunked uploads to S3 buckets (using smart_open).
+    """
 
     def __init__(self, file_path, mode, transport_params=None, **kwargs):
         super().__init__(**kwargs)
@@ -232,13 +248,15 @@ class CSVTarget(BaseTarget):
     """
     CSVTarget enables the processing and release of CSV lines as soon as they are
     completed by a chunk.
-    It enables developers to apply their own logic (e.g save to a db or send the entry
-    to another API) to each line and free it from the memory in sequence, without the
-    need to wait for the whole file and/or save the file locally.
+
+    It enables developers to apply their own logic (e.g save to a database or send the
+    entry to another API) to each line and free it from the memory in sequence, without
+    the need to wait for the whole file and/or save the file locally.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self._lines = []
         self._previous_partial_line = ""
 
