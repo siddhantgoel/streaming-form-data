@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.17.0
+- Add `GCSTarget` for streaming files directly to GCS
+
 ## v1.16.0
 - Add `ListTarget` (thanks [@ibrewster])
 - Build using Cython 3.0.10
