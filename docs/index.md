@@ -164,6 +164,14 @@ in memory.
 >>> target = S3Target("s3://<bucket>/path/to/key", "wb")
 ```
 
+#### `GCSTarget`
+
+`GCSTarget` objects stream the contents of a file to a Google Cloud Storage bucket.
+
+```python
+>>> target = GCSTarget("gs://<bucket>/path/to/key", "wb")
+```
+
 #### `CSVTarget`
 
 `CSVTarget` objects process and release CSV lines in chunks.

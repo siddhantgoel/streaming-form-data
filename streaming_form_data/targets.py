@@ -215,9 +215,9 @@ class SHA256Target(BaseTarget):
         return self._hash.hexdigest()
 
 
-class S3Target(BaseTarget):
+class SmartOpenTarget(BaseTarget):
     """
-    S3Target enables chunked uploads to S3 buckets (using smart_open).
+    SmartOpenTarget is an adapter for targets using the smart_open library.
     """
 
     def __init__(self, file_path, mode, transport_params=None, **kwargs):
@@ -242,6 +242,18 @@ class S3Target(BaseTarget):
     def on_finish(self):
         if self._fd:
             self._fd.close()
+
+
+class S3Target(SmartOpenTarget):
+    """
+    S3Target enables chunked uploads to S3 Buckets (using smart_open).
+    """
+
+
+class GCSTarget(SmartOpenTarget):
+    """
+    GCSTarget enables chunked uploads to Google Cloud Storage Buckets (using smart_open).
+    """
 
 
 class CSVTarget(BaseTarget):

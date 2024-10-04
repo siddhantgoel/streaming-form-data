@@ -31,15 +31,16 @@ working with.
 
 ```python
 >>> from streaming_form_data import StreamingFormDataParser
->>> from streaming_form_data.targets import FileTarget, NullTarget, S3Target, ValueTarget
+>>> from streaming_form_data.targets import FileTarget, NullTarget, GCSTarget, S3Target, ValueTarget
 >>>
 >>> headers = {"Content-Type": "multipart/form-data; boundary=boundary"}
 >>>
 >>> parser = StreamingFormDataParser(headers=headers)
 >>>
 >>> parser.register("name", ValueTarget())
->>> parser.register("file-1", FileTarget("/path/to/file.txt"))
->>> parser.register("file-2", S3Target("s3://bucket/path/to/key"))
+>>> parser.register("file-local", FileTarget("/path/to/file.txt"))
+>>> parser.register("file-s3", S3Target("s3://bucket/path/to/key"))
+>>> parser.register("file-gcs", GCSTarget("gs://bucket/path/to/key"))
 >>> parser.register("discard-me", NullTarget())
 >>>
 >>> for chunk in request.body:
