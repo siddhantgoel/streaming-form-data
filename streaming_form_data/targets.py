@@ -20,8 +20,8 @@ class BaseTarget:
     """
 
     def __init__(self, validator: Optional[Callable] = None):
-        self.multipart_filename = None
-        self.multipart_content_type = None
+        self.multipart_filename: Optional[str] = None
+        self.multipart_content_type: Optional[str] = None
 
         self._started = False
         self._finished = False
