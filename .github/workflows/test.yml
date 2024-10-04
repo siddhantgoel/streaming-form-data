@@ -24,8 +24,6 @@ jobs:
    
       - name: Lint with ruff
         run: make lint-ruff
-      - name: Lint with black
-        run: make lint-black
       - name: Lint with mypy
         run: make lint-mypy
    

@@ -21,19 +21,13 @@ pip-sync:
 
 # lint
 
-fmt-black:
-	black streaming_form_data/*.py tests/ utils/ examples/**/*.py
-
-lint-black:
-	black --check streaming_form_data/*.py tests/ utils/ examples/**/*.py
-
 lint-ruff:
 	ruff check streaming_form_data/ tests/ examples/
 
 lint-mypy:
 	mypy streaming_form_data/
 
-lint: lint-ruff lint-black lint-mypy
+lint: lint-ruff lint-mypy
 
 # test
 
@@ -53,6 +47,6 @@ speed-test:
 .PHONY: clean \
 	annotate compile \
 	pip-compile pip-sync \
-	lint-black lint-flake8 lint-mypy lint \
+	lint-mypy lint-ruff lint \
 	test-pytest test \
 	speed-test profile

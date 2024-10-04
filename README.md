@@ -1,12 +1,9 @@
 # Streaming multipart/form-data parser
 
 [![image](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/test.yml/badge.svg)](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/test.yml) [![image](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/build.yml/badge.svg)](https://github.com/siddhantgoel/streaming-form-data/actions/workflows/build.yml)
-
 [![image](https://img.shields.io/pypi/v/streaming-form-data.svg)](https://pypi.python.org/pypi/streaming-form-data)
-
 [![image](https://img.shields.io/pypi/pyversions/streaming-form-data.svg)](https://pypi.python.org/pypi/streaming-form-data)
-
-[![image](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
 `streaming_form_data` provides a Python parser for parsing `multipart/form-data`
 input chunks (the encoding used when submitting data over HTTP through HTML
