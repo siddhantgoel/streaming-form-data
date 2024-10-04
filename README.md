@@ -54,7 +54,7 @@ Up-to-date documentation is available on [Read the Docs].
 
 ## Development
 
-Please make sure you have Python 3.8+ and [pip-tools] installed.
+Please make sure you have Python 3.9+ and [pip-tools] installed.
 
 Since this package includes a C extension, please make sure you have a working C
 compiler available. On Debian-based distros this usually means installing the
