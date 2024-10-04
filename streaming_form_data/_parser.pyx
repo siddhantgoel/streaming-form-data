@@ -105,11 +105,11 @@ cdef class Part:
 
     def set_multipart_filename(self, str value):
         for target in self.targets:
-            target.multipart_filename = value
+            target.set_multipart_filename(value)
 
     def set_multipart_content_type(self, str value):
         for target in self.targets:
-            target.multipart_content_type = value
+            target.set_multipart_content_type(value)
 
     def start(self):
         for target in self.targets:
@@ -285,7 +285,9 @@ cdef class _Parser:
                     self.mark_error()
                     return ErrorGroup.PartHeaders + 1
 
-                message = Parser(policy=HTTP).parsestr(chunk[buffer_start: idx + 1].decode('utf-8'))
+                message = Parser(policy=HTTP).parsestr(
+                    chunk[buffer_start: idx + 1].decode('utf-8')
+                )
 
                 if 'content-disposition' in message:
                     if not message.get_content_disposition() == 'form-data':
