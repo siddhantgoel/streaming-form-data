@@ -2,7 +2,7 @@ cython==3.0.10
 mkdocs==1.6.1
 moto==5.0.16
 mypy==1.11.2
-pytest==8.3.2
+pytest==8.3.3
 requests-toolbelt==1.0.0
 ruff==0.6.9
 urllib3==1.26.19
