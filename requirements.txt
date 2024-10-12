@@ -112,7 +112,7 @@ watchdog==5.0.3
     # via mkdocs
 werkzeug==3.0.4
     # via moto
-wheel==0.43.0
+wheel==0.44.0
     # via -r requirements.in
 xmltodict==0.13.0
     # via moto
