@@ -52,7 +52,7 @@ mkdocs==1.6.1
     # via -r requirements.in
 mkdocs-get-deps==0.2.0
     # via mkdocs
-moto==5.0.16
+moto==5.0.17
     # via -r requirements.in
 mypy==1.12.0
     # via -r requirements.in
