@@ -21,7 +21,7 @@ click==8.1.7
     # via mkdocs
 cryptography==43.0.1
     # via moto
-cython==3.0.10
+cython==3.0.11
     # via -r requirements.in
 ghp-import==2.1.0
     # via mkdocs

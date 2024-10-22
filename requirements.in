@@ -1,4 +1,4 @@
-cython==3.0.10
+cython==3.0.11
 mkdocs==1.6.1
 moto==5.0.18
 mypy==1.12.1
