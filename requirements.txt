@@ -102,7 +102,7 @@ six==1.16.0
     # via python-dateutil
 typing-extensions==4.12.2
     # via mypy
-urllib3==1.26.19
+urllib3==2.2.3
     # via
     #   -r requirements.in
     #   botocore
