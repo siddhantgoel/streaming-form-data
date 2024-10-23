@@ -12,6 +12,7 @@ from streaming_form_data.targets import (
     DirectoryTarget,
     SHA256Target,
     ValueTarget,
+    MultipleTargets,
 )
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
 
@@ -364,9 +365,7 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
 --123
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -448,9 +447,7 @@ def test_file_upload():
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -477,9 +474,7 @@ Foo
 Content-Disposition: form-data; name="files"; filename="cd.txt"
 
 Bar
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = DirectoryTarget(tmp_path)
 
@@ -508,9 +503,7 @@ def test_unquoted_names():
 Content-Disposition: form-data; name=files; filename=ab.txt
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -542,9 +535,7 @@ def test_special_filenames():
 Content-Disposition: form-data; name=files; filename={}
 
 Foo
---1234--""".format(
-                filename
-            )
+--1234--""".format(filename)
             .replace("\n", "\r\n")
             .encode("utf-8")
         )
@@ -567,9 +558,7 @@ def test_boundary_starts_and_ends_with_quotes():
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -589,11 +578,7 @@ def test_missing_headers():
 --1234
 
 Foo
---1234--""".replace(
-        "\n", "\r\n"
-    ).encode(
-        "utf-8"
-    )
+--1234--""".replace("\n", "\r\n").encode("utf-8")
 
     target = ValueTarget()
 
@@ -613,9 +598,7 @@ def test_invalid_content_disposition():
 Content-Disposition: invalid; name="files"; filename="ab.txt"
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -636,9 +619,7 @@ def test_without_name_parameter():
 Content-Disposition: form-data; filename="ab.txt"
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -659,9 +640,7 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
 --1234--
-""".replace(
-        b"\n", b"\r\n"
-    )
+""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -692,9 +671,7 @@ Content-Disposition: form-data; name="files"
 
 Foo
 --1234--
-""".replace(
-        b"\n", b"\r\n"
-    )
+""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -751,9 +728,7 @@ def test_target_exceeds_max_size():
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget(validator=MaxSizeValidator(1))
 
@@ -775,9 +750,7 @@ def test_file_target_exceeds_max_size(tmp_path):
 Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = FileTarget(tmp_path / "file.txt", validator=MaxSizeValidator(1))
 
@@ -854,9 +827,7 @@ Content-Type: text/plain;charset=windows-1250
 Content-Transfer-Encoding: quoted-printable
 
 Joe owes =80100.
---1234--""".replace(
-        b"\n", b"\r\n"
-    )
+--1234--""".replace(b"\n", b"\r\n")
 
     target = ValueTarget()
 
@@ -868,6 +839,39 @@ Joe owes =80100.
     parser.data_received(data)
 
     assert target.value == b"Joe owes =80100."
+
+
+def test_multiple_inputs(tmp_path):
+    for filename in ("first.txt", "second.txt", "third.txt"):
+        with open(tmp_path / filename, "w") as file:
+            file.write(f"{filename}")
+
+    encoder = MultipartEncoder(
+        fields=[
+            ("files", ("files", open(tmp_path / "first.txt", "rb"), "text/plain")),
+            ("files", ("files", open(tmp_path / "second.txt", "rb"), "text/plain")),
+            ("files", ("files", open(tmp_path / "third.txt", "rb"), "text/plain")),
+        ]
+    )
+
+    class next_target:
+        def __init__(self):
+            self._index = 0
+
+        def __call__(self):
+            return ValueTarget()
+
+    target = MultipleTargets(next_target())
+
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("files", target)
+
+    parser.data_received(encoder.to_string())
+
+    assert len(target.targets) == 3
+    assert target.targets[0].value == b"first.txt"
+    assert target.targets[1].value == b"second.txt"
+    assert target.targets[2].value == b"third.txt"
 
 
 def test_case_insensitive_content_disposition_header():
@@ -883,11 +887,7 @@ def test_case_insensitive_content_disposition_header():
 {header}: form-data; name="files"; filename="ab.txt"
 
 Foo
---1234--""".replace(
-            b"\n", b"\r\n"
-        ).replace(
-            b"{header}", header.encode("utf-8")
-        )
+--1234--""".replace(b"\n", b"\r\n").replace(b"{header}", header.encode("utf-8"))
 
         target = ValueTarget()
 
