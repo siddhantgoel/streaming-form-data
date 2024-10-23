@@ -1,7 +1,8 @@
 import hashlib
 from pathlib import Path
+from typing import Callable, List, Optional, Union
+
 import smart_open  # type: ignore
-from typing import Callable, List, Optional
 
 
 class BaseTarget:
@@ -65,28 +66,45 @@ class MultipleTargets(BaseTarget):
     """
 
     def __init__(self, next_target: Callable):
+        """
+        Args:
+            next_target:
+                A callable that returns a new target which should be used for the next
+                input of the multiple inputs allowed for the specific field
+        """
+
         self._next_target = next_target
 
-        self._targets = []
+        self.targets: List[BaseTarget] = []
         self._validator = None  # next_target should have a validator
+
+        self._next_multipart_filename: Optional[str] = None
+        self._next_multipart_content_type: Optional[str] = None
 
     def on_start(self):
         target = self._next_target()
 
-        self._targets.append(target)
+        if self._next_multipart_filename is not None:
+            target.set_multipart_filename(self._next_multipart_filename)
+            self._next_multipart_filename = None
+        if self._next_multipart_content_type is not None:
+            target.set_multipart_filename(self._next_multipart_content_type)
+            self._next_multipart_content_type = None
+
+        self.targets.append(target)
         target.start()
 
     def on_data_received(self, chunk: bytes):
-        self._targets[-1].data_received(chunk)
+        self.targets[-1].data_received(chunk)
 
     def on_finish(self):
-        self._targets[-1].finish()
+        self.targets[-1].finish()
 
     def set_multipart_filename(self, filename: str):
-        self._targets[-1].set_multipart_filename(filename)
+        self._next_multipart_filename = filename
 
     def set_multipart_content_type(self, content_type: str):
-        self._targets[-1].set_multipart_content_type(content_type)
+        self._next_multipart_content_type = content_type
 
 
 class NullTarget(BaseTarget):
@@ -170,7 +188,11 @@ class FileTarget(BaseTarget):
     """
 
     def __init__(
-        self, filename: str | Callable, allow_overwrite: bool = True, *args, **kwargs
+        self,
+        filename: Union[str, Callable],
+        allow_overwrite: bool = True,
+        *args,
+        **kwargs,
     ):
         """
         Args:
@@ -207,7 +229,7 @@ class DirectoryTarget(BaseTarget):
 
     def __init__(
         self,
-        directory_path: str | Callable,
+        directory_path: Union[str, Callable],
         allow_overwrite: bool = True,
         *args,
         **kwargs,
@@ -277,7 +299,11 @@ class SmartOpenTarget(BaseTarget):
     """
 
     def __init__(
-        self, file_path: str | Callable, mode: str, transport_params=None, **kwargs
+        self,
+        file_path: Union[str, Callable],
+        mode: str,
+        transport_params=None,
+        **kwargs,
     ):
         """
         Args:
