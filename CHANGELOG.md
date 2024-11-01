@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.18.0
+- Build using Cython 3.0.11
+- Support Python 3.13
+
 ## v1.17.0
 - Add `GCSTarget` for streaming files directly to GCS
 
