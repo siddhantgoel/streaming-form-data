@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "streaming-form-data"
-version = "1.18.0"
+version = "1.18.1"
 description = "Streaming parser for multipart/form-data"
 authors = ["Siddhant Goel <me@sgoel.dev>"]
 license = "MIT"
