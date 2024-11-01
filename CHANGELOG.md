@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.18.1
+- Publish binary wheels for Python 3.13
+
 ## v1.18.0
 - Build using Cython 3.0.11
 - Support Python 3.13
