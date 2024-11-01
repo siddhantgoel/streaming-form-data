@@ -16,10 +16,10 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
     "Programming Language :: Cython",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3 :: Only",
 ]
 keywords = ["cython", "form-data", "forms", "http", "multipart", "streaming", "web"]
@@ -34,7 +34,7 @@ script = "build.py"
 generate-setup-file = true
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 smart-open = "^6.0"
 
 [tool.poetry.group.dev.dependencies]
