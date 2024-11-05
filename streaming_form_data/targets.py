@@ -8,15 +8,15 @@ class BaseTarget:
     """
     Targets determine what to do with some input once the parser is done
     processing it. Any new Target should inherit from this base class and
-    override the :`data_received` function.
+    override the `data_received` function.
 
     Attributes:
-        multipart_filename: the name of the file advertised by the user,
-            extracted from the `Content-Disposition` header. Please note
-            that this value comes directly from the user input and is not
-            sanitized, so be careful in using it directly.
-        multipart_content_type: MIME Content-Type of the file, extracted from
-            the `Content-Type` HTTP header
+        multipart_filename:
+            the name of the file extracted from the `Content-Disposition` header.
+            Please note that this value comes directly from the user input and is not
+            sanitized.
+        multipart_content_type:
+            MIME Content-Type of the file, extracted from the `Content-Type` HTTP header
     """
 
     def __init__(self, validator: Optional[Callable] = None):
@@ -63,8 +63,8 @@ class NullTarget(BaseTarget):
     """
     NullTarget ignores whatever input is passed in.
 
-    This is mostly useful for internal use and should (normally) not be
-    required by external users.
+    This is mostly useful for internal use and should (normally) not be required by
+    external users.
     """
 
     def on_data_received(self, chunk: bytes):
@@ -75,8 +75,8 @@ class ValueTarget(BaseTarget):
     """
     ValueTarget stores the input in an in-memory list of bytes.
 
-    This is useful in case you'd like to have the value contained in an
-    in-memory string.
+    This is useful in case you'd like to have the value contained in an in-memory
+    string.
     """
 
     def __init__(self, *args, **kwargs):
@@ -139,10 +139,21 @@ class FileTarget(BaseTarget):
     FileTarget writes (streams) the input to an on-disk file.
     """
 
-    def __init__(self, filename: str, allow_overwrite: bool = True, *args, **kwargs):
+    def __init__(
+        self, filename: str | Callable, allow_overwrite: bool = True, *args, **kwargs
+    ):
+        """
+        Args:
+            filename:
+                The name of the file to write to. This can also be a callable that
+                accepts no arguments and returns a string.
+            allow_overwrite:
+                Whether or not an existing file should be overwritten
+        """
+
         super().__init__(*args, **kwargs)
 
-        self.filename = filename
+        self.filename = filename() if callable(filename) else filename
 
         self._mode = "wb" if allow_overwrite else "xb"
         self._fd = None
@@ -161,16 +172,30 @@ class FileTarget(BaseTarget):
 
 class DirectoryTarget(BaseTarget):
     """
-    DirectoryTarget writes (streams) the different inputs to an on-disk
-    directory.
+    DirectoryTarget writes (streams) the different inputs to an on-disk directory.
     """
 
     def __init__(
-        self, directory_path: str, allow_overwrite: bool = True, *args, **kwargs
+        self,
+        directory_path: str | Callable,
+        allow_overwrite: bool = True,
+        *args,
+        **kwargs,
     ):
+        """
+        Args:
+            directory_path:
+                The name of the directory to write to. This can also be a callable that
+                accepts no arguments and returns a string.
+            allow_overwrite:
+                Whether or not an existing file should be overwritten
+        """
+
         super().__init__(*args, **kwargs)
 
-        self.directory_path = directory_path
+        self.directory_path = (
+            directory_path() if callable(directory_path) else directory_path
+        )
 
         self._mode = "wb" if allow_overwrite else "xb"
         self._fd = None
@@ -193,6 +218,7 @@ class DirectoryTarget(BaseTarget):
     def on_finish(self):
         self.multipart_filenames.append(self.multipart_filename)
         self.multipart_content_types.append(self.multipart_content_type)
+
         if self._fd:
             self._fd.close()
 
@@ -220,10 +246,21 @@ class SmartOpenTarget(BaseTarget):
     SmartOpenTarget is an adapter for targets using the smart_open library.
     """
 
-    def __init__(self, file_path, mode, transport_params=None, **kwargs):
+    def __init__(
+        self, file_path: str | Callable, mode: str, transport_params=None, **kwargs
+    ):
+        """
+        Args:
+            file_path:
+                The name of the file to write to. This can also be a callable that
+                accepts no arguments and returns a string.
+            mode:
+                The mode in which the file should be opened
+        """
+
         super().__init__(**kwargs)
 
-        self._file_path = file_path
+        self._file_path = file_path() if callable(file_path) else file_path
         self._mode = mode
         self._transport_params = transport_params
         self._fd = None
@@ -294,15 +331,19 @@ class CSVTarget(BaseTarget):
     def pop_lines(self, include_partial_line: bool = False):
         # this clears the lines to keep memory usage low
         lines = self._lines
+
         if include_partial_line and self._previous_partial_line:
             lines.append(self._previous_partial_line)
             self._previous_partial_line = ""
         self._lines = []
+
         return lines
 
     def get_lines(self, include_partial_line: bool = False):
         # this never clears the lines
         lines = self._lines.copy()
+
         if include_partial_line and self._previous_partial_line:
             lines.append(self._previous_partial_line)
+
         return lines
