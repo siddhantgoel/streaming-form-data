@@ -6,9 +6,9 @@ from typing import Callable, List, Optional
 
 class BaseTarget:
     """
-    Targets determine what to do with some input once the parser is done
-    processing it. Any new Target should inherit from this base class and
-    override the `data_received` function.
+    Targets determine what to do with some input once the parser is done processing it.
+    Any new Target should inherit from this base class and override the `data_received`
+    method.
 
     Attributes:
         multipart_filename:
@@ -57,6 +57,36 @@ class BaseTarget:
 
     def set_multipart_content_type(self, content_type: str):
         self.multipart_content_type = content_type
+
+
+class MultipleTargets(BaseTarget):
+    """
+    Target class that enables processing multiple inputs for one field
+    """
+
+    def __init__(self, next_target: Callable):
+        self._next_target = next_target
+
+        self._targets = []
+        self._validator = None  # next_target should have a validator
+
+    def on_start(self):
+        target = self._next_target()
+
+        self._targets.append(target)
+        target.start()
+
+    def on_data_received(self, chunk: bytes):
+        self._targets[-1].data_received(chunk)
+
+    def on_finish(self):
+        self._targets[-1].finish()
+
+    def set_multipart_filename(self, filename: str):
+        self._targets[-1].set_multipart_filename(filename)
+
+    def set_multipart_content_type(self, content_type: str):
+        self._targets[-1].set_multipart_content_type(content_type)
 
 
 class NullTarget(BaseTarget):
