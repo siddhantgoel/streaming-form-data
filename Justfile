@@ -8,6 +8,9 @@ annotate:
 compile:
     poetry run cython {{parser_pyx}}
 
+server:
+    poetry run python utils/server.py
+
 # lint
 
 lint: lint-ruff lint-mypy
