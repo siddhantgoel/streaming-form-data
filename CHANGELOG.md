@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.19.0
+- Add `MultipleTargets` for handling multiple inputs for a single field
+- Allow using callables for `FileTarget` and `DirectoryTarget`
+
 ## v1.18.1
 - Publish binary wheels for Python 3.13
 
