@@ -42,7 +42,7 @@ jobs:
         uses: abatilo/actions-poetry@v3.0.1
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.3
+        uses: pypa/cibuildwheel@v2.22.0
         with:
           output-dir: dist
         env:
