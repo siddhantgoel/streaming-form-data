@@ -36,7 +36,7 @@ generate-setup-file = true
 
 [tool.poetry.dependencies]
 python = "^3.9"
-smart-open = "^6.0"
+smart-open = ">=6,<8"
 
 [tool.poetry.group.dev.dependencies]
 cython = "^3.0.10"
