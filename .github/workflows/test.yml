@@ -16,8 +16,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v3.0.1
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Install Task
         uses: arduino/setup-task@v2
@@ -26,7 +26,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
    
       - name: Install dependencies
-        run: poetry install
+        run: uv sync
    
       - name: Lint
         run: task lint
