@@ -1,0 +1,41 @@
+version: '3'
+
+vars:
+  PARSER_PYX: streaming_form_data/_parser.pyx
+
+tasks:
+  annotate:
+    desc: Produce an HTML file with annotated Cython code
+    cmds:
+      - poetry run cython --annotate {{.PARSER_PYX}} --output build/annotation.html
+
+  compile:
+    desc: Compile Cython extension to C
+    cmds:
+      - poetry run cython {{.PARSER_PYX}}
+
+  server:
+    desc: Run development server for printing client input to the console
+    cmds:
+      - poetry run python utils/server.py
+
+  lint:
+    desc: Run all the linters
+    deps:
+      - lint:ruff
+      - lint:mypy
+
+  lint:ruff:
+    desc: Lint code using Ruff
+    cmds:
+      - poetry run ruff check streaming_form_data/ tests/ examples/
+
+  lint:mypy:
+    desc: Lint code using Mypy
+    cmds:
+      - poetry run mypy streaming_form_data/
+
+  test:
+    desc: Run tests
+    cmds:
+      - poetry run pytest tests/

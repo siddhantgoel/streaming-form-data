@@ -55,7 +55,7 @@ Up-to-date documentation is available on [Read the Docs].
 
 ## Development
 
-Please make sure you have Python 3.9+, [poetry], and [just] installed.
+Please make sure you have Python 3.9+, [poetry], and [task] installed.
 
 Since this package includes a C extension, please make sure you have a working C
 compiler available. On Debian-based distros this usually means installing the
@@ -67,12 +67,12 @@ compiler available. On Debian-based distros this usually means installing the
 2. Install the packages required for development:
    `poetry install`
 
-4. That's basically it. You should now be able to run the test suite: `just test`
+4. That's basically it. You should now be able to run the test suite: `task test`
 
 Note that if you make any changes to Cython files (`.pyx, .pxd, .pxi`), you'll need to
-re-compile (`just compile`) and re-install `streaming_form_data` before you can test
+re-compile (`task compile`) and re-install `streaming_form_data` before you can test
 your changes.
 
-[just]: https://just.systems
+[task]: https://taskfile.dev
 [poetry]: https://python-poetry.org
 [Read the Docs]: https://streaming-form-data.readthedocs.io

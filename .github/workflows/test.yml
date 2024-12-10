@@ -19,13 +19,17 @@ jobs:
       - name: Install Poetry
         uses: abatilo/actions-poetry@v3.0.1
 
-      - uses: extractions/setup-just@v2
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
    
       - name: Install dependencies
         run: poetry install
    
       - name: Lint
-        run: just lint
+        run: task lint
    
       - name: Test
-        run: just test
+        run: task test
