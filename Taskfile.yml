@@ -1,7 +1,7 @@
 version: '3'
 
 vars:
-  PARSER_PYX: src/_parser.pyx
+  PARSER_PYX: src/streaming_form_data/_parser.pyx
 
 tasks:
   annotate:
