@@ -695,13 +695,13 @@ pyyaml = ">=5.1"
 
 [[package]]
 name = "moto"
-version = "5.0.25"
+version = "5.0.26"
 description = "A library that allows you to easily mock out tests based on AWS infrastructure"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "moto-5.0.25-py3-none-any.whl", hash = "sha256:ab790f9d7d08f30667a196af7cacead03e76c10be2d1148ea00a731d47918a1e"},
-    {file = "moto-5.0.25.tar.gz", hash = "sha256:deea8b158cec5a65c9635ae1fff4579d735b11ac8a0e5226fbbeb742ce0ce6b2"},
+    {file = "moto-5.0.26-py3-none-any.whl", hash = "sha256:803831f427ca6c0452ae4fb898d731cfc19906466a33a88cbc1076abcbfcbba7"},
+    {file = "moto-5.0.26.tar.gz", hash = "sha256:6829f58a670a087e7c5b63f8183c6b72d64a1444e420c212250b7326b69a9183"},
 ]
 
 [package.dependencies]
