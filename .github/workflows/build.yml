@@ -16,7 +16,7 @@ jobs:
           python-version: "3.12"
    
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v3.0.1
+        uses: abatilo/actions-poetry@v4.0.0
 
       - name: Build source distribution
         run: poetry build --format sdist
@@ -39,7 +39,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Poetry
-        uses: abatilo/actions-poetry@v3.0.1
+        uses: abatilo/actions-poetry@v4.0.0
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v2.22.0
