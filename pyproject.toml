@@ -26,9 +26,9 @@ classifiers = [
 keywords = ["cython", "form-data", "forms", "http", "multipart", "streaming", "web"]
 
 [tool.poetry.urls]
-homepage = "https://github.com/siddhantgoel/streaming-form-data"
-repository = "https://github.com/siddhantgoel/streaming-form-data"
-documentation = "https://streaming-form-data.readthedocs.io"
+Homepage = "https://github.com/siddhantgoel/streaming-form-data"
+Repository = "https://github.com/siddhantgoel/streaming-form-data"
+Documentation = "https://streaming-form-data.readthedocs.io"
 
 [tool.poetry.build]
 script = "build.py"
