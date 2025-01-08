@@ -26,7 +26,6 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
 ]
 keywords = ["cython", "form-data", "forms", "http", "multipart", "streaming", "web"]
-
 dependencies = [
     "smart-open>=7.0.5",
 ]
@@ -37,8 +36,14 @@ Repository = "https://github.com/siddhantgoel/streaming-form-data"
 Documentation = "https://streaming-form-data.readthedocs.io"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+ext-modules = [
+    {name = "streaming_form_data._parser", sources = ["src/streaming_form_data/_parser.c"]}
+]
 
 [dependency-groups]
 dev = [
