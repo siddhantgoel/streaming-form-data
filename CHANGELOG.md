@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.19.1
+- Switch project to uv
+
 ## v1.19.0
 - Add `MultipleTargets` for handling multiple inputs for a single field
 - Allow using callables for `FileTarget` and `DirectoryTarget`
