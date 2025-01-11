@@ -811,7 +811,7 @@ wheels = [
 
 [[package]]
 name = "streaming-form-data"
-version = "1.19.0"
+version = "1.19.1"
 source = { editable = "." }
 dependencies = [
     { name = "smart-open" },
