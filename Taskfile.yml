@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 vars:
   PARSER_PYX: src/streaming_form_data/_parser.pyx
@@ -28,7 +28,7 @@ tasks:
   lint:ruff:
     desc: Lint code using Ruff
     cmds:
-      - uv run ruff check src/ tests/ examples/
+      - uv run ruff check src/ tests/ examples/ scripts/
 
   lint:mypy:
     desc: Lint code using Mypy
