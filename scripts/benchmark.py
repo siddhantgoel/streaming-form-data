@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 """
-Comprehensive performance benchmark for streaming-form-data parser.
-Measures throughput, memory usage, and provides detailed profiling.
+Run performance benchmarks for the parser, measuring throughput, memory usage, and
+profiling information.
 """
 
 import argparse
@@ -87,7 +86,9 @@ def create_multipart_data(
         return encoder.to_string(), encoder.content_type
 
 
-def run_benchmark(data: bytes, chunk_size: int, memory_tracker: MemoryTracker) -> dict:
+def run_single_benchmark(
+    data: bytes, chunk_size: int, memory_tracker: MemoryTracker
+) -> dict:
     """Run a single benchmark with given parameters."""
     multipart_data, content_type = create_multipart_data(data)
 
@@ -169,8 +170,8 @@ def profile_benchmark(data: bytes, chunk_size: int) -> str:
     return stream.getvalue()
 
 
-def run_comprehensive_benchmark(args):
-    """Run comprehensive benchmark suite."""
+def run_benchmark(args):
+    """Run benchmark suite."""
     print("=== Streaming Form Data Parser Benchmark ===\n")
 
     # Test configurations
@@ -194,7 +195,7 @@ def run_comprehensive_benchmark(args):
                 gc.collect()  # Clean up before each run
                 memory_tracker = MemoryTracker()
 
-                result = run_benchmark(data, chunk_size, memory_tracker)
+                result = run_single_benchmark(data, chunk_size, memory_tracker)
                 result["memory"] = memory_tracker.get_stats()
                 result["data_size_mb"] = data_size
                 iteration_results.append(result)
@@ -278,7 +279,7 @@ def main():
     args = parser.parse_args()
 
     try:
-        run_comprehensive_benchmark(args)
+        run_benchmark(args)
     except KeyboardInterrupt:
         print("\nBenchmark interrupted by user")
         sys.exit(1)

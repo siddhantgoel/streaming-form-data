@@ -39,3 +39,8 @@ tasks:
     desc: Run tests
     cmds:
       - uv run pytest tests/
+
+  benchmark:
+    desc: Run benchmark script
+    cmds:
+      - uv run python scripts/benchmark.py
