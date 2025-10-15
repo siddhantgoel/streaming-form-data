@@ -16,7 +16,7 @@ jobs:
           python-version: "3.12"
    
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Build source distribution
         run: uv build --sdist
@@ -39,7 +39,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.1.3
