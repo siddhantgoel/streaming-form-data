@@ -14,6 +14,14 @@ from streaming_form_data.targets import (
     ListTarget,
     S3Target,
     CSVTarget,
+    BaseAsyncTarget,
+    AsyncFileTarget,
+    AsyncDirectoryTarget,
+    AsyncNullTarget,
+    AsyncValueTarget,
+    AsyncListTarget,
+    AsyncS3Target,
+    AsyncCSVTarget,
 )
 
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
@@ -300,7 +308,7 @@ def test_custom_target_not_sent():
 @pytest.fixture()
 def mock_client():
     with mock_aws():
-        client = boto3.client(service_name="s3")
+        client = boto3.client(service_name="s3", region_name="us-east-1")
         client.create_bucket(Bucket=BUCKET_NAME)
         yield client
 
@@ -404,3 +412,245 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk__include_partial():
     assert not target.pop_lines(include_partial_line=True)
 
     target.finish()
+
+@pytest.mark.asyncio
+async def test_null_target_basic_async():
+    target = AsyncNullTarget()
+
+    target.multipart_filename = "file001.txt"
+
+    await target.start()
+    assert target.multipart_filename == "file001.txt"
+
+    await target.data_received(b"hello")
+    await target.finish()
+
+    assert target.multipart_filename == "file001.txt"
+
+@pytest.mark.asyncio
+async def test_value_target_basic_async():
+    target = AsyncValueTarget()
+    assert target.value == b""
+    target.multipart_filename = None
+
+    await target.start()
+    assert target.multipart_filename is None
+    assert target.value == b""
+
+    await target.data_received(b"hello")
+    await target.data_received(b" ")
+    await target.data_received(b"world")
+
+    await target.finish()
+
+    assert target.multipart_filename is None
+    assert target.value == b"hello world"
+
+@pytest.mark.asyncio
+async def test_value_target_total_size_validator_async():
+    target = AsyncValueTarget(validator=MaxSizeValidator(10))
+
+    assert target.value == b""
+
+    await target.start()
+
+    await target.data_received(b"hello")
+    await target.data_received(b" ")
+
+    with pytest.raises(ValidationError):
+        await target.data_received(b"world")
+
+@pytest.mark.asyncio
+async def test_list_target_basic_async():
+    target = AsyncListTarget()
+
+    assert target.value == []
+
+    target.multipart_filename = None
+
+    await target.start()
+    assert target.multipart_filename is None
+    assert target.value == []
+
+    # Send and finish multiple values
+    await target.data_received(b"Cat")
+    await target.finish()
+    await target.data_received(b"Dog")
+    await target.finish()
+    await target.data_received(b"Big")
+    await target.data_received(b" ")
+    await target.data_received(b"Goldfish")
+    await target.finish()
+
+    assert target.multipart_filename is None
+    assert target.value == [b"Cat", b"Dog", b"Big Goldfish"]
+
+@pytest.mark.asyncio
+async def test_file_target_basic_async():
+    filename = os.path.join(tempfile.gettempdir(), "file_async.txt")
+
+    target = AsyncFileTarget(filename)
+
+    target.multipart_filename = "file001.txt"
+
+    await target.start()
+
+    assert target.filename == filename
+    assert target.multipart_filename == "file001.txt"
+    # Note: With aiofiles in 'wb', file is created on open.
+    assert os.path.exists(filename)
+
+    await target.data_received(b"hello")
+    await target.data_received(b" ")
+    await target.data_received(b"world")
+
+    await target.finish()
+
+    assert target.filename == filename
+    assert target.multipart_filename == "file001.txt"
+    assert os.path.exists(filename)
+
+    with open(filename, "rb") as file_:
+        assert file_.read() == b"hello world"
+
+@pytest.mark.asyncio
+async def test_directory_target_basic_async():
+    directory_path = tempfile.gettempdir()
+
+    target = AsyncDirectoryTarget(directory_path)
+
+    first_path = os.path.join(directory_path, "file001.txt")
+    target.multipart_filename = "file001.txt"
+
+    await target.start()
+
+    assert target.directory_path == directory_path
+    assert target.multipart_filename == "file001.txt"
+    assert os.path.exists(first_path)
+
+    await target.data_received(b"first")
+    await target.data_received(b" ")
+    await target.data_received(b"file")
+
+    await target.finish()
+
+    second_path = os.path.join(directory_path, "file002.txt")
+    target.multipart_filename = "file002.txt"
+
+    await target.start()
+
+    assert target.directory_path == directory_path
+    assert target.multipart_filename == "file002.txt"
+    assert os.path.exists(second_path)
+
+    await target.data_received(b"second")
+    await target.data_received(b" ")
+    await target.data_received(b"file")
+
+    await target.finish()
+
+    assert target.directory_path == directory_path
+    assert target.multipart_filenames == ["file001.txt", "file002.txt"]
+    assert os.path.exists(first_path)
+    assert os.path.exists(second_path)
+
+    with open(first_path, "rb") as file_:
+        assert file_.read() == b"first file"
+
+    with open(second_path, "rb") as file_:
+        assert file_.read() == b"second file"
+
+class AsyncCustomTarget(BaseAsyncTarget):
+    def __init__(self):
+        super().__init__()
+        self._values = []
+
+    async def start(self):
+        self._values.append(b"[start]")
+
+    async def data_received(self, chunk):
+        self._values.append(chunk)
+
+    async def finish(self):
+        self._values.append(b"[finish]")
+
+    @property
+    def value(self):
+        return b" ".join(self._values)
+
+@pytest.mark.asyncio
+async def test_custom_target_basic_async():
+    target = AsyncCustomTarget()
+
+    assert target.value == b""
+
+    target.multipart_filename = "file.txt"
+
+    assert not target._started
+    assert not target._finished
+
+    await target.start()
+    target._started = True
+
+    assert target.multipart_filename == "file.txt"
+    assert target.value == b"[start]"
+
+    await target.data_received(b"chunk1")
+    await target.data_received(b"chunk2")
+
+    assert target.value == b"[start] chunk1 chunk2"
+
+    await target.data_received(b"chunk3")
+
+    await target.finish()
+    target._finished = True
+
+    assert target.multipart_filename == "file.txt"
+    assert target.value == b"[start] chunk1 chunk2 chunk3 [finish]"
+    assert target._started
+    assert target._finished
+
+@pytest.mark.asyncio
+async def test_s3_upload_async(mock_client):
+    test_key = "test_async.txt"
+    path = f"s3://{BUCKET_NAME}/{test_key}"
+    target = AsyncS3Target(
+        path,
+        "wb",
+        transport_params={"client": mock_client},
+    )
+
+    await target.start()
+
+    await target.data_received(b"my test")
+    await target.data_received(b" ")
+    await target.data_received(b"file")
+
+    await target.finish()
+
+    resp = (
+        mock_client.get_object(Bucket=BUCKET_NAME, Key=test_key)["Body"]
+        .read()
+        .decode("utf-8")
+    )
+
+    assert resp == "my test file"
+
+@pytest.mark.asyncio
+async def test_csv_upload_async():
+    target = AsyncCSVTarget()
+    await target.start()
+
+    await target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
+    assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
+    assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
+
+    await target.data_received(b"nt,33\nMary,Bel,22\n")
+
+    assert target.get_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
+    assert target.pop_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
+
+    assert not target.pop_lines(include_partial_line=True)
+    assert not target.get_lines(include_partial_line=True)
+
+    await target.finish()
