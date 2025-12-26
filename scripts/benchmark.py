@@ -131,7 +131,7 @@ async def benchmark_async(data, multipart_data, content_type, chunk_size, iterat
     return avg
 
 
-async def main(data_size_mb: int = 100, chunk_size: int = 65536, iterations: int = 5):
+async def main(data_size_mb: int = 100, chunk_size: int = 131072, iterations: int = 30):
     print(f"Generating {data_size_mb}MB test data...")
     data = generate_test_data(data_size_mb)
     multipart_data, content_type = create_multipart_data(data)
