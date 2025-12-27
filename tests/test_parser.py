@@ -70,6 +70,7 @@ def test_basic_single():
 
 def test_case_insensitive_content_type():
     content_type_header = "Content-Type"
+
     for header_key in (
         content_type_header,
         content_type_header.lower(),
@@ -110,12 +111,17 @@ def test_basic_multiple():
     first = ValueTarget()
     second = ValueTarget()
     third = ValueTarget()
+    
     encoder = MultipartEncoder(fields={"first": "foo", "second": "bar", "third": "baz"})
+    
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    
     parser.register("first", first)
     parser.register("second", second)
     parser.register("third", third)
+    
     parser.data_received(encoder.to_string())
+    
     assert first.value == b"foo"
     assert second.value == b"bar"
     assert third.value == b"baz"
@@ -329,27 +335,27 @@ def test_parameter_contains_crlf():
 
 def test_parameter_ends_with_crlf():
     target = ValueTarget()
-    
+
     encoder = MultipartEncoder(fields={"value": "hello\r\n"})
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
     parser.register("value", target)
-    
+
     parser.data_received(encoder.to_string())
-    
+
     assert target.value == b"hello\r\n"
 
 
 def test_parameter_starts_with_crlf():
     target = ValueTarget()
-    
+
     encoder = MultipartEncoder(fields={"value": "\r\nworld"})
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
     parser.register("value", target)
-    
+
     parser.data_received(encoder.to_string())
-    
+
     assert target.value == b"\r\nworld"
 
 
@@ -361,16 +367,16 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 Foo
 --123
 --1234--""".replace(b"\n", b"\r\n")
-    
+
     target = ValueTarget()
-    
+
     parser = StreamingFormDataParser(
         headers={"Content-Type": "multipart/form-data; boundary=1234"}
     )
     parser.register("files", target)
-    
+
     parser.data_received(data)
-    
+
     assert target.multipart_filename == "ab.txt"
     assert target.value == b"Foo\r\n--123"
     assert target._started
@@ -380,16 +386,16 @@ Foo
 def test_multiple_files():
     txt_filename = "file.txt"
     png_filename = "image-600x400.png"
-    
+
     with open_dataset(txt_filename) as dataset_:
         expected_txt = dataset_.read()
-    
+
     with open_dataset(png_filename) as dataset_:
         expected_png = dataset_.read()
-    
+
     txt_target = ValueTarget()
     png_target = ValueTarget()
-    
+
     with open_dataset(txt_filename) as txt_file, open_dataset(png_filename) as png_file:
         encoder = MultipartEncoder(
             fields={
@@ -397,14 +403,14 @@ def test_multiple_files():
                 png_filename: (png_filename, png_file, "image/png"),
             }
         )
-    
+
         parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
-    
+
         parser.register(txt_filename, txt_target)
         parser.register(png_filename, png_target)
-    
+
         parser.data_received(encoder.to_string())
-    
+
         assert txt_target.value == expected_txt
         assert png_target.value == expected_png
 
@@ -418,16 +424,16 @@ def test_large_file():
     ]:
         with open_dataset(filename) as dataset_:
             expected_value = dataset_.read()
-    
+
         content_type, body = encoded_dataset(filename)
-    
+
         target = ValueTarget()
-    
+
         parser = StreamingFormDataParser(headers={"Content-Type": content_type})
         parser.register(filename, target)
-    
+
         parser.data_received(body)
-    
+
         assert target.value == expected_value
 
 
