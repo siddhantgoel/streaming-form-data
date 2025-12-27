@@ -1,8 +1,8 @@
 from email.message import EmailMessage
 from typing import Mapping
 
-from streaming_form_data._parser import ErrorGroup, _Parser, _AsyncParser  # type: ignore
-from streaming_form_data.targets import BaseTarget, BaseAsyncTarget
+from streaming_form_data._parser import ErrorGroup, _Parser  # type: ignore
+from streaming_form_data.targets import BaseTarget
 
 
 class ParseFailedException(Exception):
@@ -60,70 +60,34 @@ class StreamingFormDataParser:
 
         self._parser.register(name, target)
 
+    def _handle_result(self, result: int):
+        if result > 0:
+            if ErrorGroup.Internal <= result < ErrorGroup.Delimiting:
+                message = "internal errors"
+            elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
+                message = "delimiting multipart stream into parts"
+            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnexpectedPart:
+                message = "parsing specific part headers"
+            elif ErrorGroup.UnexpectedPart == result:
+                part = self._parser.unexpected_part_name
+                raise UnexpectedPartException(
+                    f"parsing unexpected part '{part}' in strict mode", part
+                )
+
+            raise ParseFailedException(
+                "_parser.data_received failed with {}".format(message)
+            )
+
     def data_received(self, data: bytes):
         if not self._running:
             self._running = True
 
         result = self._parser.data_received(data)
+        self._handle_result(result)
 
-        if result > 0:
-            if ErrorGroup.Internal <= result < ErrorGroup.Delimiting:
-                message = "internal errors"
-            elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
-                message = "delimiting multipart stream into parts"
-            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnexpectedPart:
-                message = "parsing specific part headers"
-            elif ErrorGroup.UnexpectedPart == result:
-                part = self._parser.unexpected_part_name
-                raise UnexpectedPartException(
-                    f"parsing unexpected part '{part}' in strict mode", part
-                )
-
-            raise ParseFailedException(
-                "_parser.data_received failed with {}".format(message)
-            )
-
-
-class AsyncStreamingFormDataParser:
-    def __init__(self, headers: Mapping[str, str], strict: bool = False):
-        self.headers = headers
-
-        raw_boundary = parse_content_boundary(headers)
-
-        delimiter = b"\r\n--" + raw_boundary + b"\r\n"
-        ender = b"\r\n--" + raw_boundary + b"--"
-
-        self._parser = _AsyncParser(delimiter, ender, strict)
-
-        self._running = False
-
-    def register(self, name: str, target: BaseAsyncTarget):
-        if self._running:
-            raise ParseFailedException(
-                "Registering parts not allowed while parser is running"
-            )
-
-        self._parser.register(name, target)
-
-    async def data_received(self, data: bytes):
+    async def adata_received(self, data: bytes):
         if not self._running:
             self._running = True
 
-        result = await self._parser.data_received(data)
-
-        if result > 0:
-            if ErrorGroup.Internal <= result < ErrorGroup.Delimiting:
-                message = "internal errors"
-            elif ErrorGroup.Delimiting <= result < ErrorGroup.PartHeaders:
-                message = "delimiting multipart stream into parts"
-            elif ErrorGroup.PartHeaders <= result < ErrorGroup.UnexpectedPart:
-                message = "parsing specific part headers"
-            elif ErrorGroup.UnexpectedPart == result:
-                part = self._parser.unexpected_part_name
-                raise UnexpectedPartException(
-                    f"parsing unexpected part '{part}' in strict mode", part
-                )
-
-            raise ParseFailedException(
-                "_parser.data_received failed with {}".format(message)
-            )
+        result = await self._parser.adata_received(data)
+        self._handle_result(result)

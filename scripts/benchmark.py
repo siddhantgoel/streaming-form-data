@@ -9,8 +9,8 @@ import psutil
 from numpy import random
 from requests_toolbelt import MultipartEncoder
 
-from streaming_form_data.parser import StreamingFormDataParser, AsyncStreamingFormDataParser
-from streaming_form_data.targets import NullTarget, AsyncNullTarget
+from streaming_form_data import StreamingFormDataParser
+from streaming_form_data.targets import NullTarget
 
 
 class MemoryTracker:
@@ -70,7 +70,6 @@ def run_single_benchmark_sync(
 
 
 def benchmark_sync(data, multipart_data, content_type, chunk_size, iterations):
-    print("Synchronous Benchmark:")
     throughputs = []
     
     for i in range(iterations):
@@ -89,8 +88,8 @@ def benchmark_sync(data, multipart_data, content_type, chunk_size, iterations):
 async def run_single_benchmark_async(
     data: bytes, multipart_data: bytes, content_type: str, chunk_size: int
 ):
-    parser = AsyncStreamingFormDataParser(headers={"Content-Type": content_type})
-    parser.register("file", AsyncNullTarget())
+    parser = StreamingFormDataParser(headers={"Content-Type": content_type})
+    parser.register("file", NullTarget())
 
     memory_tracker = MemoryTracker()
     memory_tracker.sample()
@@ -100,7 +99,7 @@ async def run_single_benchmark_async(
 
     while position < len(multipart_data):
         chunk_end = min(position + chunk_size, len(multipart_data))
-        await parser.data_received(multipart_data[position:chunk_end])
+        await parser.adata_received(multipart_data[position:chunk_end])
         position = chunk_end
         if position % (chunk_size * 100) == 0:
             memory_tracker.sample()
@@ -115,7 +114,6 @@ async def run_single_benchmark_async(
 
 
 async def benchmark_async(data, multipart_data, content_type, chunk_size, iterations):
-    print("Asynchronous Benchmark:")
     throughputs = []
     
     for i in range(iterations):
@@ -131,7 +129,7 @@ async def benchmark_async(data, multipart_data, content_type, chunk_size, iterat
     return avg
 
 
-async def main(data_size_mb: int = 100, chunk_size: int = 131072, iterations: int = 30):
+async def main(data_size_mb: int = 100, chunk_size: int = 1024, iterations: int = 5):
     print(f"Generating {data_size_mb}MB test data...")
     data = generate_test_data(data_size_mb)
     multipart_data, content_type = create_multipart_data(data)

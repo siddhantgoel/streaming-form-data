@@ -13,12 +13,13 @@ from io import BytesIO
 from numpy import random
 from requests_toolbelt import MultipartEncoder
 
-from streaming_form_data import StreamingFormDataParser, AsyncStreamingFormDataParser
-from streaming_form_data.targets import NullTarget, AsyncNullTarget
+from streaming_form_data import StreamingFormDataParser
+from streaming_form_data.targets import NullTarget
 
-NUM_UPLOADS = 10         # Number of concurrent uploads
-FILE_SIZE_MB = 1         # Size of each file
-CHUNK_SIZE = 8192        # Chunk size (8KB)
+# Configuration
+NUM_UPLOADS = 10          # Number of concurrent uploads
+FILE_SIZE_MB = 1          # Size of each file
+CHUNK_SIZE = 65536        # Chunk size (64KB)
 SIMULATED_LATENCY = 0.001 # 1ms latency per chunk (simulating network)
 
 def generate_multipart_data(size_mb: int) -> tuple[bytes, str]:
@@ -44,21 +45,18 @@ def process_upload_sync(multipart_data, content_type, chunk_size, latency):
         position = chunk_end
 
 def benchmark_sync(payloads):
-    print("Synchronous:")
-    print(f"Processing {len(payloads)} uploads one by one...")
-    
     start_time = time.perf_counter()
     
-    for i, (data, content_type) in enumerate(payloads):
+    for data, content_type in payloads:
         process_upload_sync(data, content_type, CHUNK_SIZE, SIMULATED_LATENCY)
         
     duration = time.perf_counter() - start_time
-    print(f"Total Time: {duration:.2f}s")
+    print(f"Synchronous: {duration:.2f}s")
     return duration
 
 async def process_upload_async(multipart_data, content_type, chunk_size, latency):
-    parser = AsyncStreamingFormDataParser(headers={"Content-Type": content_type})
-    parser.register("file", AsyncNullTarget())
+    parser = StreamingFormDataParser(headers={"Content-Type": content_type})
+    parser.register("file", NullTarget())
 
     position = 0
     while position < len(multipart_data):
@@ -66,13 +64,10 @@ async def process_upload_async(multipart_data, content_type, chunk_size, latency
         await asyncio.sleep(latency)
         
         chunk_end = min(position + chunk_size, len(multipart_data))
-        await parser.data_received(multipart_data[position:chunk_end])
+        await parser.adata_received(multipart_data[position:chunk_end])
         position = chunk_end
 
 async def benchmark_async(payloads):
-    print("Asynchronous:")
-    print(f"Processing {len(payloads)} uploads concurrently...")
-    
     start_time = time.perf_counter()
     
     tasks = [
@@ -82,7 +77,7 @@ async def benchmark_async(payloads):
     await asyncio.gather(*tasks)
     
     duration = time.perf_counter() - start_time
-    print(f"Total Time: {duration:.2f}s")
+    print(f"Asynchronous: {duration:.2f}s")
     return duration
 
 async def main():
@@ -95,7 +90,7 @@ async def main():
     async_time = await benchmark_async(payloads)
     
     speedup = sync_time / async_time
-    print(f"\nResult: Async was {speedup:.1f}x faster")
+    print(f"Result: Async was {speedup:.1f}x faster")
 
 if __name__ == "__main__":
     asyncio.run(main())
