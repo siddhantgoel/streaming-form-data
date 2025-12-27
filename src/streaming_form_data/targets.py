@@ -1,15 +1,17 @@
 import hashlib
+import asyncio
 from pathlib import Path
 from typing import Callable, List, Optional, Union
 
 import smart_open  # type: ignore
+import aiofiles  # type: ignore
 
 
 class BaseTarget:
     """
     Targets determine what to do with some input once the parser is done processing it.
     Any new Target should inherit from this base class and override the `data_received`
-    method.
+    and `adata_received` methods.
 
     Attributes:
         multipart_filename:
@@ -53,6 +55,27 @@ class BaseTarget:
     def on_finish(self):
         pass
 
+    async def astart(self):
+        self._started = True
+        await self.on_start_async()
+
+    async def on_start_async(self):
+        pass
+
+    async def adata_received(self, chunk: bytes):
+        self._validate(chunk)
+        await self.on_data_received_async(chunk)
+
+    async def on_data_received_async(self, chunk: bytes):
+        raise NotImplementedError()
+
+    async def afinish(self):
+        await self.on_finish_async()
+        self._finished = True
+
+    async def on_finish_async(self):
+        pass
+
     def set_multipart_filename(self, filename: str):
         self.multipart_filename = filename
 
@@ -72,26 +95,29 @@ class MultipleTargets(BaseTarget):
                 A callable that returns a new target which should be used for the next
                 input of the multiple inputs allowed for the specific field
         """
-
+         
         self._next_target = next_target
-
         self.targets: List[BaseTarget] = []
         self._validator = None  # next_target should have a validator
 
         self._next_multipart_filename: Optional[str] = None
         self._next_multipart_content_type: Optional[str] = None
 
-    def on_start(self):
+    def _prepare_target(self):
         target = self._next_target()
-
         if self._next_multipart_filename is not None:
             target.set_multipart_filename(self._next_multipart_filename)
             self._next_multipart_filename = None
         if self._next_multipart_content_type is not None:
             target.set_multipart_filename(self._next_multipart_content_type)
             self._next_multipart_content_type = None
-
+        
         self.targets.append(target)
+        
+        return target
+
+    def on_start(self):
+        target = self._prepare_target()
         target.start()
 
     def on_data_received(self, chunk: bytes):
@@ -99,6 +125,16 @@ class MultipleTargets(BaseTarget):
 
     def on_finish(self):
         self.targets[-1].finish()
+
+    async def on_start_async(self):
+        target = self._prepare_target()
+        await target.astart()
+
+    async def on_data_received_async(self, chunk: bytes):
+        await self.targets[-1].adata_received(chunk)
+
+    async def on_finish_async(self):
+        await self.targets[-1].afinish()
 
     def set_multipart_filename(self, filename: str):
         self._next_multipart_filename = filename
@@ -118,11 +154,14 @@ class NullTarget(BaseTarget):
     def on_data_received(self, chunk: bytes):
         pass
 
+    async def on_data_received_async(self, chunk: bytes):
+        pass
+
 
 class ValueTarget(BaseTarget):
     """
     ValueTarget stores the input in an in-memory list of bytes.
-
+    
     This is useful in case you'd like to have the value contained in an in-memory
     string.
     """
@@ -135,6 +174,9 @@ class ValueTarget(BaseTarget):
     def on_data_received(self, chunk: bytes):
         self._values.append(chunk)
 
+    async def on_data_received_async(self, chunk: bytes):
+        self._values.append(chunk)
+
     @property
     def value(self):
         return b"".join(self._values)
@@ -145,7 +187,7 @@ class ListTarget(BaseTarget):
     ListTarget stores the input in an in-memory list of bytes, which is then joined
     into the final value and appended to an in-memory list of byte strings when each
     value is finished.
-
+    
     This is useful for situations where more than one value may be submitted for the
     same argument.
     """
@@ -161,6 +203,15 @@ class ListTarget(BaseTarget):
         self._temp_value.append(chunk)
 
     def on_finish(self):
+        self._finalize_value()
+
+    async def on_data_received_async(self, chunk: bytes):
+        self._temp_value.append(chunk)
+
+    async def on_finish_async(self):
+        self._finalize_value()
+
+    def _finalize_value(self):
         value = b"".join(self._temp_value)
         self._temp_value = []
 
@@ -221,6 +272,17 @@ class FileTarget(BaseTarget):
         if self._fd:
             self._fd.close()
 
+    async def on_start_async(self):
+        self._fd = await aiofiles.open(self.filename, self._mode)
+
+    async def on_data_received_async(self, chunk: bytes):
+        if self._fd:
+            await self._fd.write(chunk)
+
+    async def on_finish_async(self):
+        if self._fd:
+            await self._fd.close()
+
 
 class DirectoryTarget(BaseTarget):
     """
@@ -254,14 +316,19 @@ class DirectoryTarget(BaseTarget):
         self.multipart_filenames: List[str] = []
         self.multipart_content_types: List[str] = []
 
-    def on_start(self):
+    def _prepare_file(self):
         # Properly handle the case where user does not upload a file
         if not self.multipart_filename:
             return
 
         # Path().resolve().name only keeps file name to prevent path traversal
         self.multipart_filename = Path(self.multipart_filename).resolve().name
-        self._fd = open(Path(self.directory_path) / self.multipart_filename, self._mode)
+        return Path(self.directory_path) / self.multipart_filename
+
+    def on_start(self):
+        path = self._prepare_file()
+        if path:
+            self._fd = open(path, self._mode)
 
     def on_data_received(self, chunk: bytes):
         if self._fd:
@@ -273,6 +340,21 @@ class DirectoryTarget(BaseTarget):
 
         if self._fd:
             self._fd.close()
+
+    async def on_start_async(self):
+        path = self._prepare_file()
+        if path:
+            self._fd = await aiofiles.open(path, self._mode)
+
+    async def on_data_received_async(self, chunk: bytes):
+        if self._fd:
+            await self._fd.write(chunk)
+
+    async def on_finish_async(self):
+        self.multipart_filenames.append(self.multipart_filename)
+        self.multipart_content_types.append(self.multipart_content_type)
+        if self._fd:
+            await self._fd.close()
 
 
 class SHA256Target(BaseTarget):
@@ -286,6 +368,9 @@ class SHA256Target(BaseTarget):
         self._hash = hashlib.sha256()
 
     def on_data_received(self, chunk: bytes):
+        self._hash.update(chunk)
+
+    async def on_data_received_async(self, chunk: bytes):
         self._hash.update(chunk)
 
     @property
@@ -336,6 +421,27 @@ class SmartOpenTarget(BaseTarget):
         if self._fd:
             self._fd.close()
 
+    async def on_start_async(self):
+        loop = asyncio.get_running_loop()
+        self._fd = await loop.run_in_executor(
+            None,
+            lambda: smart_open.open(
+                self._file_path,
+                self._mode,
+                transport_params=self._transport_params,
+            ),
+        )
+
+    async def on_data_received_async(self, chunk: bytes):
+        if self._fd:
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, self._fd.write, chunk)
+
+    async def on_finish_async(self):
+        if self._fd:
+            loop = asyncio.get_running_loop()
+            await loop.run_in_executor(None, self._fd.close)
+
 
 class S3Target(SmartOpenTarget):
     """
@@ -353,7 +459,7 @@ class CSVTarget(BaseTarget):
     """
     CSVTarget enables the processing and release of CSV lines as soon as they are
     completed by a chunk.
-
+    
     It enables developers to apply their own logic (e.g save to a database or send the
     entry to another API) to each line and free it from the memory in sequence, without
     the need to wait for the whole file and/or save the file locally.
@@ -365,7 +471,7 @@ class CSVTarget(BaseTarget):
         self._lines = []
         self._previous_partial_line = ""
 
-    def on_data_received(self, chunk: bytes):
+    def _process_chunk(self, chunk: bytes):
         # join the previous partial line with the new chunk
         combined = self._previous_partial_line + chunk.decode("utf-8")
 
@@ -383,6 +489,12 @@ class CSVTarget(BaseTarget):
         else:
             # otherwise, it is partial, and we save it for later
             self._previous_partial_line = lines[-1]
+
+    def on_data_received(self, chunk: bytes):
+        self._process_chunk(chunk)
+
+    async def on_data_received_async(self, chunk: bytes):
+        self._process_chunk(chunk)
 
     def pop_lines(self, include_partial_line: bool = False):
         # this clears the lines to keep memory usage low

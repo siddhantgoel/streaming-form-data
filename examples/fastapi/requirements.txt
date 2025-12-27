@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+aiofiles
+streaming-form-data

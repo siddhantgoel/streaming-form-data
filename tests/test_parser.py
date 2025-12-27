@@ -327,6 +327,7 @@ def test_parameter_contains_crlf():
 
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
     parser.register("value", target)
+
     parser.data_received(encoder.to_string())
 
     assert target.value == b"hello\r\nworld"
@@ -741,7 +742,8 @@ Foo
         parser.data_received(data)
 
     assert target._started
-    assert target._finished
+    # Target not finished because stream aborted
+    assert not target._finished
 
 
 def test_file_target_exceeds_max_size(tmp_path):
@@ -763,7 +765,8 @@ Foo
         parser.data_received(data)
 
     assert target._started
-    assert target._finished
+    # Target not finished because stream aborted
+    assert not target._finished
 
 
 def test_content_type_passed_to_target():
@@ -912,3 +915,292 @@ def test_leading_crlf():
     parser.data_received(b"\r\n\r\n" + encoder.to_string())
 
     assert target.value == b"hello world"
+
+
+@pytest.mark.asyncio
+async def test_smoke_async():
+    encoder = MultipartEncoder(fields={"name": "hello"})
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    await parser.adata_received(encoder.to_string())
+
+
+@pytest.mark.asyncio
+async def test_basic_single_async():
+    target = ValueTarget()
+    encoder = MultipartEncoder(fields={"value": "hello world"})
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("value", target)
+    await parser.adata_received(encoder.to_string())
+    assert target.value == b"hello world"
+    assert target._started
+    assert target._finished
+
+
+@pytest.mark.asyncio
+async def test_chunked_single_async():
+    expected_value = "hello world"
+    target = ValueTarget()
+    encoder = MultipartEncoder(fields={"value": expected_value})
+    body = encoder.to_string()
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("value", target)
+    index = body.index(b"world")
+    await parser.adata_received(body[:index])
+    await parser.adata_received(body[index:])
+    assert target.value == expected_value.encode("utf-8")
+
+
+@pytest.mark.asyncio
+async def test_chunked_multiple_async():
+    expected_first_value = "foo" * 1000
+    expected_second_value = "bar" * 1000
+    expected_third_value = "baz" * 1000
+    first = ValueTarget()
+    second = ValueTarget()
+    third = ValueTarget()
+    encoder = MultipartEncoder(
+        fields={
+            "first": expected_first_value,
+            "second": expected_second_value,
+            "third": expected_third_value,
+        }
+    )
+    body = encoder.to_string()
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("first", first)
+    parser.register("second", second)
+    parser.register("third", third)
+    chunks = []
+    size = 100
+    while len(body):
+        chunks.append(body[:size])
+        body = body[size:]
+    for chunk in chunks:
+        await parser.adata_received(chunk)
+    assert first.value == expected_first_value.encode("utf-8")
+    assert second.value == expected_second_value.encode("utf-8")
+    assert third.value == expected_third_value.encode("utf-8")
+
+
+@pytest.mark.asyncio
+async def test_break_chunk_at_boundary_async():
+    expected_first_value = "hello" * 500
+    expected_second_value = "hello" * 500
+    first = ValueTarget()
+    second = ValueTarget()
+    encoder = MultipartEncoder(fields={"first": "hello" * 500, "second": "hello" * 500})
+    body = encoder.to_string()
+    boundary = encoder.boundary.encode("utf-8")
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("first", first)
+    parser.register("second", second)
+    index = body[50:].index(boundary) + 5
+    await parser.adata_received(body[:index])
+    await parser.adata_received(body[index:])
+    assert first.value == expected_first_value.encode("utf-8")
+    assert second.value == expected_second_value.encode("utf-8")
+
+
+@pytest.mark.asyncio
+async def test_file_upload_async():
+    data = b"""\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--""".replace(b"\n", b"\r\n")
+    target = ValueTarget()
+    parser = StreamingFormDataParser(
+        headers={"Content-Type": "multipart/form-data; boundary=1234"}
+    )
+    parser.register("files", target)
+    await parser.adata_received(data)
+    assert target.multipart_filename == "ab.txt"
+    assert target.value == b"Foo"
+    assert target._started
+    assert target._finished
+
+
+@pytest.mark.asyncio
+async def test_directory_upload_async(tmp_path):
+    data = b"""\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234
+Content-Disposition: form-data; name="files"; filename="cd.txt"
+
+Bar
+--1234--""".replace(b"\n", b"\r\n")
+    target = DirectoryTarget(tmp_path)
+    parser = StreamingFormDataParser(
+        headers={"Content-Type": "multipart/form-data; boundary=1234"}
+    )
+    parser.register("files", target)
+    await parser.adata_received(data)
+    with open(tmp_path / "ab.txt") as file:
+        assert file.read() == "Foo"
+    with open(tmp_path / "cd.txt") as file:
+        assert file.read() == "Bar"
+    assert target.multipart_filenames == ["ab.txt", "cd.txt"]
+    assert tmp_path
+    assert target._started
+    assert target._finished
+
+
+@pytest.mark.asyncio
+async def test_mixed_content_varying_chunk_size_async():
+    with open_dataset("file.txt") as dataset_:
+        expected_value = dataset_.read()
+    with open_dataset("file.txt") as dataset_:
+        fields = {
+            "name": "hello world",
+            "age": "10",
+            "cv.txt": ("file.txt", dataset_, "text/plain"),
+        }
+        encoder = MultipartEncoder(fields=fields)
+        body = encoder.to_string()
+        content_type = encoder.content_type
+    for index in range(len(body)):
+        name = ValueTarget()
+        age = ValueTarget()
+        cv = ValueTarget()
+        parser = StreamingFormDataParser(headers={"Content-Type": content_type})
+        parser.register("name", name)
+        parser.register("age", age)
+        parser.register("cv.txt", cv)
+        await parser.adata_received(body[:index])
+        await parser.adata_received(body[index:])
+        assert name.value == b"hello world"
+        assert age.value == b"10"
+        assert cv.value == expected_value
+
+
+@pytest.mark.asyncio
+async def test_register_after_data_received_async():
+    encoder = MultipartEncoder(fields={"name": "hello"})
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    await parser.adata_received(encoder.to_string())
+    with pytest.raises(ParseFailedException):
+        parser.register("name", ValueTarget())
+
+
+@pytest.mark.asyncio
+async def test_target_raises_exception_async():
+    filename = "file.txt"
+    content_type, body = encoded_dataset(filename)
+
+    class BadTarget(BaseTarget):
+        async def on_data_received_async(self, data):
+            raise ValueError()
+
+    target = BadTarget()
+    parser = StreamingFormDataParser(headers={"Content-Type": content_type})
+    parser.register(filename, target)
+    with pytest.raises(ValueError):
+        await parser.adata_received(body)
+
+
+@pytest.mark.asyncio
+async def test_multiple_targets_async():
+    filename = "image-600x400.png"
+    with open_dataset(filename) as dataset_:
+        expected_data = dataset_.read()
+    value_target = ValueTarget()
+    sha256_target = SHA256Target()
+    with open_dataset(filename) as file_:
+        encoder = MultipartEncoder(fields={filename: (filename, file_, "image/png")})
+        parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+        parser.register(filename, value_target)
+        parser.register(filename, sha256_target)
+        assert not value_target.value
+        assert sha256_target.value == hashlib.sha256(b"").hexdigest()
+        await parser.adata_received(encoder.to_string())
+        assert value_target.value == expected_data
+        assert sha256_target.value == hashlib.sha256(expected_data).hexdigest()
+
+
+@pytest.mark.asyncio
+async def test_multiple_inputs_async(tmp_path):
+    for filename in ("first.txt", "second.txt", "third.txt"):
+        with open(tmp_path / filename, "w") as file:
+            file.write(f"{filename}")
+    encoder = MultipartEncoder(
+        fields=[
+            ("files", ("files", open(tmp_path / "first.txt", "rb"), "text/plain")),
+            ("files", ("files", open(tmp_path / "second.txt", "rb"), "text/plain")),
+            ("files", ("files", open(tmp_path / "third.txt", "rb"), "text/plain")),
+        ]
+    )
+
+    class next_target:
+        def __init__(self):
+            self._index = 0
+
+        def __call__(self):
+            return ValueTarget()
+
+    target = MultipleTargets(next_target())
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("files", target)
+    await parser.adata_received(encoder.to_string())
+    assert len(target.targets) == 3
+    assert target.targets[0].value == b"first.txt"
+    assert target.targets[1].value == b"second.txt"
+    assert target.targets[2].value == b"third.txt"
+
+
+@pytest.mark.asyncio
+async def test_missing_headers_async():
+    data = """\
+--1234
+
+Foo
+--1234--""".replace("\n", "\r\n").encode("utf-8")
+    target = ValueTarget()
+    parser = StreamingFormDataParser(
+        headers={"Content-Type": "multipart/form-data; boundary=1234"}
+    )
+    parser.register("files", target)
+    await parser.adata_received(data)
+    assert target.value == b""
+
+
+@pytest.mark.asyncio
+async def test_invalid_content_disposition_async():
+    data = b"""\
+--1234
+Content-Disposition: invalid; name="files"; filename="ab.txt"
+
+Foo
+--1234--""".replace(b"\n", b"\r\n")
+    target = ValueTarget()
+    parser = StreamingFormDataParser(
+        headers={"Content-Type": "multipart/form-data; boundary=1234"}
+    )
+    parser.register("files", target)
+    with pytest.raises(ParseFailedException):
+        await parser.adata_received(data)
+    assert target.value == b""
+
+
+@pytest.mark.asyncio
+async def test_file_target_async(tmp_path):
+    filename = tmp_path / "file.txt"
+    data = b"""\
+--1234
+Content-Disposition: form-data; name="files"; filename="ab.txt"
+
+Foo
+--1234--""".replace(b"\n", b"\r\n")
+    target = FileTarget(filename)
+    parser = StreamingFormDataParser(
+        headers={"Content-Type": "multipart/form-data; boundary=1234"}
+    )
+    parser.register("files", target)
+    await parser.adata_received(data)
+    assert target.multipart_filename == "ab.txt"
+    assert os.path.exists(filename)
+    with open(filename, "rb") as f:
+        assert f.read() == b"Foo"

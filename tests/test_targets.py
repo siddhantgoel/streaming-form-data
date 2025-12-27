@@ -234,7 +234,7 @@ def test_directory_target_path_traversal():
     assert target.multipart_filenames == ["file_path_traversal.txt"]
     assert os.path.exists(right_path)
     assert not os.path.exists(wrong_path)
-
+    
     with open(right_path, "rb") as file_:
         assert file_.read() == b"my file"
 
@@ -370,13 +370,12 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk():
     target.start()
 
     target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
-
     assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
     assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
 
     assert target.get_lines(include_partial_line=True) == ["Gabe,Sai"]
     assert target.pop_lines(include_partial_line=True) == ["Gabe,Sai"]
-
+    
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
 
@@ -402,5 +401,102 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk__include_partial():
 
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
-
+    
     target.finish()
+
+
+@pytest.mark.asyncio
+async def test_value_target_basic_async():
+    target = ValueTarget()
+    await target.astart()
+    await target.adata_received(b"hello world")
+    await target.afinish()
+    assert target.value == b"hello world"
+
+
+@pytest.mark.asyncio
+async def test_file_target_basic_async():
+    filename = os.path.join(tempfile.gettempdir(), "file_async.txt")
+    target = FileTarget(filename)
+    await target.astart()
+    await target.adata_received(b"hello world")
+    await target.afinish()
+    assert os.path.exists(filename)
+    with open(filename, "rb") as file_:
+        assert file_.read() == b"hello world"
+
+
+@pytest.mark.asyncio
+async def test_directory_target_basic_async():
+    directory_path = tempfile.gettempdir()
+    target = DirectoryTarget(directory_path)
+    target.multipart_filename = "file001_async.txt"
+    await target.astart()
+    await target.adata_received(b"first file")
+    await target.afinish()
+    path = os.path.join(directory_path, "file001_async.txt")
+    assert os.path.exists(path)
+    with open(path, "rb") as file_:
+        assert file_.read() == b"first file"
+
+
+@pytest.mark.asyncio
+async def test_s3_upload_async(mock_client):
+    test_key = "test_async.txt"
+    path = f"s3://{BUCKET_NAME}/{test_key}"
+    target = S3Target(
+        path,
+        "wb",
+        transport_params={"client": mock_client},
+    )
+    await target.astart()
+    await target.adata_received(b"my test file")
+    await target.afinish()
+    resp = (
+        mock_client.get_object(Bucket=BUCKET_NAME, Key=test_key)["Body"]
+        .read()
+        .decode("utf-8")
+    )
+    assert resp == "my test file"
+
+
+@pytest.mark.asyncio
+async def test_csv_upload_async():
+    target = CSVTarget()
+    await target.astart()
+    await target.adata_received(b"name,age\nBob,20\nAli")
+    assert target.get_lines() == ["name,age", "Bob,20"]
+    assert target.get_lines(include_partial_line=True) == ["name,age", "Bob,20", "Ali"]
+    await target.afinish()
+
+
+class CustomAsyncTarget(BaseTarget):
+    def __init__(self):
+        super().__init__()
+        self._values = []
+
+    async def on_start_async(self):
+        self._values.append(b"[start]")
+
+    async def on_data_received_async(self, chunk):
+        self._values.append(chunk)
+
+    async def on_finish_async(self):
+        self._values.append(b"[finish]")
+
+    @property
+    def value(self):
+        return b" ".join(self._values)
+
+
+@pytest.mark.asyncio
+async def test_custom_target_basic_async():
+    target = CustomAsyncTarget()
+    target.multipart_filename = "file.txt"
+    await target.astart()
+    await target.adata_received(b"chunk1")
+    await target.adata_received(b"chunk2")
+    await target.adata_received(b"chunk3")
+    await target.afinish()
+    # Note: start/finish logic adds tokens
+    assert target.value == b"[start] chunk1 chunk2 chunk3 [finish]"

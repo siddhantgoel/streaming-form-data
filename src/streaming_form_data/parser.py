@@ -60,12 +60,7 @@ class StreamingFormDataParser:
 
         self._parser.register(name, target)
 
-    def data_received(self, data: bytes):
-        if not self._running:
-            self._running = True
-
-        result = self._parser.data_received(data)
-
+    def _handle_result(self, result: int):
         if result > 0:
             if ErrorGroup.Internal <= result < ErrorGroup.Delimiting:
                 message = "internal errors"
@@ -82,3 +77,17 @@ class StreamingFormDataParser:
             raise ParseFailedException(
                 "_parser.data_received failed with {}".format(message)
             )
+
+    def data_received(self, data: bytes):
+        if not self._running:
+            self._running = True
+
+        result = self._parser.data_received(data)
+        self._handle_result(result)
+
+    async def adata_received(self, data: bytes):
+        if not self._running:
+            self._running = True
+
+        result = await self._parser.adata_received(data)
+        self._handle_result(result)
