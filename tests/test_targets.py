@@ -47,8 +47,8 @@ def test_value_target_basic():
     assert target.value == b""
 
     target.multipart_filename = None
-    target.start()
 
+    target.start()
     assert target.multipart_filename is None
     assert target.value == b""
 
@@ -104,50 +104,50 @@ def test_list_target_basic():
     target.data_received(b" ")
     target.data_received(b"Goldfish")
     target.finish()
-    
+
     assert target.multipart_filename is None
     assert target.value == [b"Cat", b"Dog", b"Big Goldfish"]
 
 
 def test_list_target_not_set():
     target = ListTarget()
-    
+
     assert target.multipart_filename is None
     assert target.value == []
 
 
 def test_file_target_basic():
     filename = os.path.join(tempfile.gettempdir(), "file.txt")
-    
+
     target = FileTarget(filename)
-    
+
     target.multipart_filename = "file001.txt"
-    
+
     target.start()
-    
+
     assert target.filename == filename
     assert target.multipart_filename == "file001.txt"
     assert os.path.exists(filename)
-    
+
     target.data_received(b"hello")
     target.data_received(b" ")
     target.data_received(b"world")
-    
+
     target.finish()
-    
+
     assert target.filename == filename
     assert target.multipart_filename == "file001.txt"
     assert os.path.exists(filename)
-    
+
     with open(filename, "rb") as file_:
         assert file_.read() == b"hello world"
 
 
 def test_file_target_not_set():
     filename = os.path.join(tempfile.gettempdir(), "file_not_sent.txt")
-    
+
     target = FileTarget(filename)
-    
+
     assert not os.path.exists(filename)
     assert target.filename == filename
     assert target.multipart_filename is None
@@ -155,83 +155,83 @@ def test_file_target_not_set():
 
 def test_directory_target_basic():
     directory_path = tempfile.gettempdir()
-    
+
     target = DirectoryTarget(directory_path)
-    
+
     first_path = os.path.join(directory_path, "file001.txt")
-    
+
     target.multipart_filename = "file001.txt"
-    
+
     target.start()
-    
+
     assert target.directory_path == directory_path
     assert target.multipart_filename == "file001.txt"
     assert os.path.exists(first_path)
-    
+
     target.data_received(b"first")
     target.data_received(b" ")
     target.data_received(b"file")
-    
+
     target.finish()
-    
+
     second_path = os.path.join(directory_path, "file002.txt")
     target.multipart_filename = "file002.txt"
-    
+
     target.start()
-    
+
     assert target.directory_path == directory_path
     assert target.multipart_filename == "file002.txt"
     assert os.path.exists(second_path)
-    
+
     target.data_received(b"second")
     target.data_received(b" ")
     target.data_received(b"file")
-    
+
     target.finish()
-    
+
     assert target.directory_path == directory_path
     assert target.multipart_filenames == ["file001.txt", "file002.txt"]
     assert os.path.exists(first_path)
     assert os.path.exists(second_path)
-    
+
     with open(first_path, "rb") as file_:
         assert file_.read() == b"first file"
-    
+
     with open(second_path, "rb") as file_:
         assert file_.read() == b"second file"
 
 
 def test_directory_target_not_set():
     directory_path = tempfile.gettempdir()
-    
+
     target = DirectoryTarget(directory_path)
-    
+
     assert target.directory_path == directory_path
     assert not target.multipart_filenames
 
 
 def test_directory_target_path_traversal():
     directory_path = tempfile.gettempdir()
-    
+
     target = DirectoryTarget(directory_path)
-    
+
     right_path = os.path.join(directory_path, "file_path_traversal.txt")
     wrong_path = os.path.join(directory_path, "../file_path_traversal.txt")
     target.multipart_filename = "../file_path_traversal.txt"
-    
+
     target.start()
-    
+
     assert target.directory_path == directory_path
     assert target.multipart_filename == "file_path_traversal.txt"
     assert os.path.exists(right_path)
     assert not os.path.exists(wrong_path)
-    
+
     target.data_received(b"my")
     target.data_received(b" ")
     target.data_received(b"file")
-    
+
     target.finish()
-    
+
     assert target.directory_path == directory_path
     assert target.multipart_filenames == ["file_path_traversal.txt"]
     assert os.path.exists(right_path)
@@ -262,30 +262,30 @@ class CustomTarget(BaseTarget):
 
 def test_custom_target_basic():
     target = CustomTarget()
-    
+
     assert target.value == b""
-    
+
     target.multipart_filename = "file.txt"
-    
+
     assert not target._started
     assert not target._finished
-    
+
     target.start()
     target._started = True
-    
+
     assert target.multipart_filename == "file.txt"
     assert target.value == b"[start]"
-    
+
     target.data_received(b"chunk1")
     target.data_received(b"chunk2")
-    
+
     assert target.value == b"[start] chunk1 chunk2"
-    
+
     target.data_received(b"chunk3")
-    
+
     target.finish()
     target._finished = True
-    
+
     assert target.multipart_filename == "file.txt"
     assert target.value == b"[start] chunk1 chunk2 chunk3 [finish]"
     assert target._started
@@ -294,7 +294,7 @@ def test_custom_target_basic():
 
 def test_custom_target_not_sent():
     target = CustomTarget()
-    
+
     assert target.value == b""
     assert target.multipart_filename is None
 
@@ -315,60 +315,60 @@ def test_s3_upload(mock_client):
         "wb",
         transport_params={"client": mock_client},
     )
-    
+
     target.start()
-    
+
     target.data_received(b"my test")
     target.data_received(b" ")
     target.data_received(b"file")
-    
+
     target.finish()
-    
+
     resp = (
         mock_client.get_object(Bucket=BUCKET_NAME, Key=test_key)["Body"]
         .read()
         .decode("utf-8")
     )
-    
+
     assert resp == "my test file"
 
 
 def test_csv_upload__incomplete_line_gets_completed_next_chunk__pop_between_chunks():
     target = CSVTarget()
     target.start()
-    
+
     target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
     assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
     assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
-    
+
     target.data_received(b"nt,33\nMary,Bel,22\n")
-    
+
     assert target.get_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
     assert target.pop_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
     assert not target.pop_lines(include_partial_line=True)
     assert not target.get_lines(include_partial_line=True)
-    
+
     target.finish()
 
 
 def test_csv_upload__complete_line_in_the_end_of_chunk():
     target = CSVTarget()
     target.start()
-    
+
     target.data_received(b"Odin,Grand,1029\nRachel,Ced,44\n")
-    
+
     assert target.get_lines() == ["Odin,Grand,1029", "Rachel,Ced,44"]
     assert target.pop_lines() == ["Odin,Grand,1029", "Rachel,Ced,44"]
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
-    
+
     target.finish()
 
 
 def test_csv_upload__incomplete_line_in_the_end_of_chunk():
     target = CSVTarget()
     target.start()
-    
+
     target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
     assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
     assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
@@ -376,16 +376,16 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk():
     assert target.pop_lines(include_partial_line=True) == ["Gabe,Sai"]
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
-    
+
     target.finish()
 
 
 def test_csv_upload__incomplete_line_in_the_end_of_chunk__include_partial():
     target = CSVTarget()
     target.start()
-    
+
     target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
-    
+
     assert target.get_lines(include_partial_line=True) == [
         "name,surname,age",
         "Don,Bob,99",
@@ -396,7 +396,7 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk__include_partial():
         "Don,Bob,99",
         "Gabe,Sai",
     ]
-    
+
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
     

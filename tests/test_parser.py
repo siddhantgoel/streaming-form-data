@@ -111,17 +111,17 @@ def test_basic_multiple():
     first = ValueTarget()
     second = ValueTarget()
     third = ValueTarget()
-    
+
     encoder = MultipartEncoder(fields={"first": "foo", "second": "bar", "third": "baz"})
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
-    
+
     parser.register("first", first)
     parser.register("second", second)
     parser.register("third", third)
-    
+
     parser.data_received(encoder.to_string())
-    
+
     assert first.value == b"foo"
     assert second.value == b"bar"
     assert third.value == b"baz"
@@ -657,8 +657,10 @@ Foo
 
 def test_register_after_data_received():
     encoder = MultipartEncoder(fields={"name": "hello"})
+
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
     parser.data_received(encoder.to_string())
+
     with pytest.raises(ParseFailedException):
         parser.register("name", ValueTarget())
 
@@ -671,35 +673,35 @@ Content-Disposition: form-data; name="files"
 Foo
 --1234--
 """.replace(b"\n", b"\r\n")
-    
+
     target = ValueTarget()
-    
+
     assert not target.multipart_filename
-    
+
     parser = StreamingFormDataParser(
         headers={"Content-Type": "multipart/form-data; boundary=1234"}
     )
     parser.register("files", target)
-    
+
     parser.data_received(data)
-    
+
     assert target.value == b"Foo"
     assert not target.multipart_filename
 
 
 def test_filename_passed_to_target():
     filename = "file.txt"
-    
+
     content_type, body = encoded_dataset(filename)
-    
+
     target = ValueTarget()
-    
+
     assert not target.multipart_filename
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": content_type})
     parser.register(filename, target)
     parser.data_received(body)
-    
+
     assert target.multipart_filename == filename
 
 
@@ -713,10 +715,10 @@ def test_target_raises_exception():
             raise ValueError()
 
     target = BadTarget()
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": content_type})
     parser.register(filename, target)
-    
+
     with pytest.raises(ValueError):
         parser.data_received(body)
 
@@ -728,17 +730,17 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
 --1234--""".replace(b"\n", b"\r\n")
-    
+
     target = ValueTarget(validator=MaxSizeValidator(1))
-    
+
     parser = StreamingFormDataParser(
         headers={"Content-Type": "multipart/form-data; boundary=1234"}
     )
     parser.register("files", target)
-    
+
     with pytest.raises(ValidationError):
         parser.data_received(data)
-    
+
     assert target._started
     # Target not finished because stream aborted
     assert not target._finished
@@ -751,17 +753,17 @@ Content-Disposition: form-data; name="files"; filename="ab.txt"
 
 Foo
 --1234--""".replace(b"\n", b"\r\n")
-    
+
     target = FileTarget(tmp_path / "file.txt", validator=MaxSizeValidator(1))
-    
+
     parser = StreamingFormDataParser(
         headers={"Content-Type": "multipart/form-data; boundary=1234"}
     )
     parser.register("files", target)
-    
+
     with pytest.raises(ValidationError):
         parser.data_received(data)
-    
+
     assert target._started
     # Target not finished because stream aborted
     assert not target._finished
@@ -772,22 +774,22 @@ def test_content_type_passed_to_target():
     for filename, content_type in files:
         with open_dataset(filename) as dataset_:
             expected_data = dataset_.read()
-        
+
         target = ValueTarget()
-        
+
         with open_dataset(filename) as file_:
             encoder = MultipartEncoder(
                 fields={filename: (filename, file_, content_type)}
             )
-        
+
             parser = StreamingFormDataParser(
                 headers={"Content-Type": encoder.content_type}
             )
-        
+
             parser.register(filename, target)
-        
+
             parser.data_received(encoder.to_string())
-        
+
             assert target.value == expected_data
             assert target.multipart_content_type == content_type
 
@@ -829,16 +831,16 @@ Content-Transfer-Encoding: quoted-printable
 
 Joe owes =80100.
 --1234--""".replace(b"\n", b"\r\n")
-    
+
     target = ValueTarget()
-    
+
     parser = StreamingFormDataParser(
         headers={"Content-Type": "multipart/form-data; boundary=1234"}
     )
     parser.register("files", target)
-    
+
     parser.data_received(data)
-    
+
     assert target.value == b"Joe owes =80100."
 
 
@@ -863,12 +865,12 @@ def test_multiple_inputs(tmp_path):
             return ValueTarget()
 
     target = MultipleTargets(next_target())
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
     parser.register("files", target)
-    
+
     parser.data_received(encoder.to_string())
-    
+
     assert len(target.targets) == 3
     assert target.targets[0].value == b"first.txt"
     assert target.targets[1].value == b"second.txt"
@@ -877,7 +879,7 @@ def test_multiple_inputs(tmp_path):
 
 def test_case_insensitive_content_disposition_header():
     content_disposition_header = "Content-Disposition"
-    
+
     for header in (
         content_disposition_header,
         content_disposition_header.lower(),
@@ -889,29 +891,29 @@ def test_case_insensitive_content_disposition_header():
 
 Foo
 --1234--""".replace(b"\n", b"\r\n").replace(b"{header}", header.encode("utf-8"))
-    
+
         target = ValueTarget()
-    
+
         parser = StreamingFormDataParser(
             headers={"Content-Type": "multipart/form-data; boundary=1234"}
         )
         parser.register("files", target)
-    
+
         parser.data_received(data)
-    
+
         assert target.value == b"Foo"
 
 
 def test_leading_crlf():
     target = ValueTarget()
-    
+
     encoder = MultipartEncoder(fields={"value": "hello world"})
-    
+
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
     parser.register("value", target)
-    
+
     parser.data_received(b"\r\n\r\n" + encoder.to_string())
-    
+
     assert target.value == b"hello world"
 
 
