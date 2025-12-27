@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Callable, List, Optional, Union
 
 import smart_open  # type: ignore
-import aiofiles
+import aiofiles  # type: ignore
 
 
 class BaseTarget:
