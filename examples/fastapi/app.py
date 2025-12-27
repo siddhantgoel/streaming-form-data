@@ -5,8 +5,8 @@ import time
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 
-from streaming_form_data import AsyncStreamingFormDataParser
-from streaming_form_data.targets import AsyncFileTarget, AsyncValueTarget
+from streaming_form_data import StreamingFormDataParser
+from streaming_form_data.targets import FileTarget, ValueTarget
 
 app = FastAPI()
 
@@ -40,14 +40,14 @@ async def upload(request: Request):
     filepath = os.path.join(tempfile.gettempdir(), filename)
 
     # Define targets
-    # AsyncValueTarget keeps the data in memory
-    name_target = AsyncValueTarget()
+    # ValueTarget keeps the data in memory
+    name_target = ValueTarget()
     
-    # AsyncFileTarget streams data to disk using aiofiles
-    file_target = AsyncFileTarget(filepath)
+    # FileTarget streams data to disk using aiofiles (when called asynchronously)
+    file_target = FileTarget(filepath)
 
-    # Initialize the Async parser with request headers
-    parser = AsyncStreamingFormDataParser(headers=request.headers)
+    # Initialize the parser with request headers
+    parser = StreamingFormDataParser(headers=request.headers)
 
     # Register targets
     parser.register("name", name_target)
@@ -55,7 +55,8 @@ async def upload(request: Request):
 
     # Iterate over the request stream asynchronously
     async for chunk in request.stream():
-        await parser.data_received(chunk)
+        # Call the asynchronous method 'adata_received'
+        await parser.adata_received(chunk)
 
     # Render a response
     content = f"""
