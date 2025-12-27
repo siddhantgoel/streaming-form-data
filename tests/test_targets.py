@@ -91,7 +91,6 @@ def test_list_target_basic():
     target.multipart_filename = None
 
     target.start()
-
     assert target.multipart_filename is None
     assert target.value == []
 
@@ -159,7 +158,6 @@ def test_directory_target_basic():
     target = DirectoryTarget(directory_path)
 
     first_path = os.path.join(directory_path, "file001.txt")
-
     target.multipart_filename = "file001.txt"
 
     target.start()
@@ -345,6 +343,7 @@ def test_csv_upload__incomplete_line_gets_completed_next_chunk__pop_between_chun
 
     assert target.get_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
     assert target.pop_lines() == ["Gabe,Saint,33", "Mary,Bel,22"]
+
     assert not target.pop_lines(include_partial_line=True)
     assert not target.get_lines(include_partial_line=True)
 
@@ -359,6 +358,7 @@ def test_csv_upload__complete_line_in_the_end_of_chunk():
 
     assert target.get_lines() == ["Odin,Grand,1029", "Rachel,Ced,44"]
     assert target.pop_lines() == ["Odin,Grand,1029", "Rachel,Ced,44"]
+
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
 
@@ -372,8 +372,10 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk():
     target.data_received(b"name,surname,age\nDon,Bob,99\nGabe,Sai")
     assert target.get_lines() == ["name,surname,age", "Don,Bob,99"]
     assert target.pop_lines() == ["name,surname,age", "Don,Bob,99"]
+
     assert target.get_lines(include_partial_line=True) == ["Gabe,Sai"]
     assert target.pop_lines(include_partial_line=True) == ["Gabe,Sai"]
+    
     assert not target.get_lines(include_partial_line=True)
     assert not target.pop_lines(include_partial_line=True)
 

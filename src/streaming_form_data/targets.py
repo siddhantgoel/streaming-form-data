@@ -98,7 +98,8 @@ class MultipleTargets(BaseTarget):
          
         self._next_target = next_target
         self.targets: List[BaseTarget] = []
-        self._validator = None
+        self._validator = None  # next_target should have a validator
+
         self._next_multipart_filename: Optional[str] = None
         self._next_multipart_content_type: Optional[str] = None
 
@@ -110,7 +111,9 @@ class MultipleTargets(BaseTarget):
         if self._next_multipart_content_type is not None:
             target.set_multipart_filename(self._next_multipart_content_type)
             self._next_multipart_content_type = None
+        
         self.targets.append(target)
+        
         return target
 
     def on_start(self):
@@ -143,6 +146,7 @@ class MultipleTargets(BaseTarget):
 class NullTarget(BaseTarget):
     """
     NullTarget ignores whatever input is passed in.
+
     This is mostly useful for internal use and should (normally) not be required by
     external users.
     """
@@ -157,12 +161,14 @@ class NullTarget(BaseTarget):
 class ValueTarget(BaseTarget):
     """
     ValueTarget stores the input in an in-memory list of bytes.
+    
     This is useful in case you'd like to have the value contained in an in-memory
     string.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self._values = []
 
     def on_data_received(self, chunk: bytes):
@@ -181,6 +187,7 @@ class ListTarget(BaseTarget):
     ListTarget stores the input in an in-memory list of bytes, which is then joined
     into the final value and appended to an in-memory list of byte strings when each
     value is finished.
+    
     This is useful for situations where more than one value may be submitted for the
     same argument.
     """
@@ -211,10 +218,10 @@ class ListTarget(BaseTarget):
         if self._type is str:
             value = value.decode("UTF-8")
         elif self._type is bytes:
-            pass
+            pass  # already is bytes, no need to do anything
         else:
             value = self._type(value)
-        
+
         self._values.append(value)
 
     @property
@@ -250,7 +257,7 @@ class FileTarget(BaseTarget):
         super().__init__(*args, **kwargs)
 
         self.filename = filename() if callable(filename) else filename
-        
+
         self._mode = "wb" if allow_overwrite else "xb"
         self._fd = None
 
@@ -312,8 +319,8 @@ class DirectoryTarget(BaseTarget):
     def _prepare_file(self):
         # Properly handle the case where user does not upload a file
         if not self.multipart_filename:
-            return None
-        
+            return
+
         # Path().resolve().name only keeps file name to prevent path traversal
         self.multipart_filename = Path(self.multipart_filename).resolve().name
         return Path(self.directory_path) / self.multipart_filename
@@ -330,7 +337,7 @@ class DirectoryTarget(BaseTarget):
     def on_finish(self):
         self.multipart_filenames.append(self.multipart_filename)
         self.multipart_content_types.append(self.multipart_content_type)
-        
+
         if self._fd:
             self._fd.close()
 
@@ -452,6 +459,7 @@ class CSVTarget(BaseTarget):
     """
     CSVTarget enables the processing and release of CSV lines as soon as they are
     completed by a chunk.
+    
     It enables developers to apply their own logic (e.g save to a database or send the
     entry to another API) to each line and free it from the memory in sequence, without
     the need to wait for the whole file and/or save the file locally.
@@ -473,7 +481,7 @@ class CSVTarget(BaseTarget):
         # process all lines except the last one (which may be partial)
         for line in lines[:-1]:
             self._lines.append(line.replace("\n", ""))
-        
+
         # if the last line ends with a newline, it is complete
         if lines[-1].endswith("\n"):
             self._lines.append(lines[-1].replace("\n", ""))
@@ -491,12 +499,12 @@ class CSVTarget(BaseTarget):
     def pop_lines(self, include_partial_line: bool = False):
         # this clears the lines to keep memory usage low
         lines = self._lines
-        
+
         if include_partial_line and self._previous_partial_line:
             lines.append(self._previous_partial_line)
             self._previous_partial_line = ""
         self._lines = []
-        
+
         return lines
 
     def get_lines(self, include_partial_line: bool = False):
@@ -505,5 +513,5 @@ class CSVTarget(BaseTarget):
 
         if include_partial_line and self._previous_partial_line:
             lines.append(self._previous_partial_line)
-            
+
         return lines
