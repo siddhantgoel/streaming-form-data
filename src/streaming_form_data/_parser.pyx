@@ -99,7 +99,7 @@ cdef class Part:
     cdef list targets
     cdef public object matches
 
-    def __init__(self, str name, object target, object matches=None):
+    def __init__(self, str name, object target, matches=None):
         self.name = name
         self.targets = [target]
         self.matches = matches or eq
@@ -181,7 +181,7 @@ cdef class _Parser:
         self.strict = strict
         self.unexpected_part_name = ''
 
-    def register(self, str name, object target, object matches=None):
+    def register(self, str name, object target, matches=None):
         part = self._part_for(name)
 
         if part:
