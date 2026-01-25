@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.0
+- Add async support (thanks [@mabdullahsoyturk])
+- Remove support for Python 3.9
+
 ## v1.20.0
 - Add regular expression based name matching (thanks [@yyweiss])
 
@@ -182,6 +186,7 @@
 [@ibrewster]: https://github.com/ibrewster
 [@jasopolis]: https://github.com/jasopolis
 [@kolomenkin]: https://github.com/kolomenkin
+[@mabdullahsoyturk]: https://github.com/mabdullahsoyturk
 [@mephi42]: https://github.com/mephi42
 [@NteRySin]: https://github.com/NteRySin
 [@raethlein]: https://github.com/raethlein
