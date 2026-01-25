@@ -24,6 +24,13 @@ in the PyPI package.
 
 ## Usage
 
+The parser supports both synchronous and asynchronous usage. The API is identical for
+both, with the only difference being that async usage requires calling
+`adata_received()` instead of `data_received()` and using `await` when processing
+chunks.
+
+### Synchronous Usage
+
 ```python
 from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import ValueTarget, FileTarget, NullTarget
@@ -38,6 +45,24 @@ parser.register("discard", NullTarget())
 
 for chunk in request.body:
      parser.data_received(chunk)
+```
+
+### Asynchronous Usage
+
+```python
+from streaming_form_data import StreamingFormDataParser
+from streaming_form_data.targets import ValueTarget, FileTarget, NullTarget
+
+headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
+
+parser = StreamingFormDataParser(headers=headers)
+
+parser.register("name", ValueTarget())
+parser.register("file", FileTarget("/tmp/file.txt"))
+parser.register("discard", NullTarget())
+
+async for chunk in request.stream():
+     await parser.adata_received(chunk)
 ```
 
 Usage is split into three stages.
@@ -106,10 +131,19 @@ At this stage the parser has everything it needs to be able to work. Depending o
 web framework you're using, you can send the actual HTTP request body to the parser,
 either one chunk at a time or the whole thing at once.
 
+#### Synchronous
+
 ```python
 chunk = read_next_chunk() # depends on your web framework of choice
 
 parser.data_received(chunk)
+```
+
+#### Asynchronous
+
+```python
+async for chunk in request.stream():  # depends on your web framework of choice
+    await parser.adata_received(chunk)
 ```
 
 ## API
@@ -124,7 +158,8 @@ the strict mode.
 ### `Target` classes
 
 When registering inputs with the parser, instances of subclasses of the `Target` class
-should be used. These target classes ultimately determine what to do with the data.
+should be used. These target classes ultimately determine what to do with the data. All
+target classes support both synchronous and asynchronous usage automatically.
 
 #### `ValueTarget`
 
@@ -136,7 +171,8 @@ target = ValueTarget()
 
 #### `FileTarget`
 
-`FileTarget` objects stream the contents to a file on disk.
+`FileTarget` objects stream the contents to a file on disk. When used with async
+parsing, file operations are handled asynchronously.
 
 ```python
 target = FileTarget("/tmp/file.txt")
@@ -145,7 +181,8 @@ target = FileTarget("/tmp/file.txt")
 #### `DirectoryTarget`
 
 `DirectoryTarget` objects stream the contents to a directory on disk; the filename will
-be picked from the `Content-Disposition` header.
+be picked from the `Content-Disposition` header. When used with async parsing, file
+operations are handled asynchronously.
 
 ```python
 target = DirectoryTarget("/tmp/uploads/")
@@ -170,7 +207,8 @@ target = NullTarget()
 
 #### `S3Target`
 
-`S3Target` objects stream the contents of a file to an S3 bucket.
+`S3Target` objects stream the contents of a file to an S3 bucket. When used with async
+parsing, cloud storage operations are automatically asynchronously using thread pools.
 
 ```python
 target = S3Target("s3://<bucket>/path/to/key", "wb")
@@ -178,7 +216,9 @@ target = S3Target("s3://<bucket>/path/to/key", "wb")
 
 #### `GCSTarget`
 
-`GCSTarget` objects stream the contents of a file to a Google Cloud Storage bucket.
+`GCSTarget` objects stream the contents of a file to a Google Cloud Storage bucket. When
+used with async parsing, cloud storage operations are handled asynchronously using
+thread pools.
 
 ```python
 target = GCSTarget("gs://<bucket>/path/to/key", "wb")
@@ -231,8 +271,9 @@ into this new target.
 #### Custom `Target` classes
 
 It's possible to define custom targets for your specific use case by inheriting the
-`streaming_form_data.targets.BaseTarget` class and overriding the `on_data_received`
-method.
+`streaming_form_data.targets.BaseTarget` class and overriding the appropriate methods.
+
+##### Synchronous custom targets
 
 ```python
 from streaming_form_data.targets import BaseTarget
@@ -240,6 +281,35 @@ from streaming_form_data.targets import BaseTarget
 class CustomTarget(BaseTarget):
      def on_data_received(self, chunk):
          do_something(chunk)
+```
+
+##### Asynchronous custom targets
+
+For async usage, override the `on_data_received_async` method instead:
+
+```python
+from streaming_form_data.targets import BaseTarget
+
+class CustomAsyncTarget(BaseTarget):
+     async def on_data_received_async(self, chunk):
+         await do_something_async(chunk)
+```
+
+You can also override the lifecycle methods `on_start_async` and `on_finish_async` for
+initialization and cleanup:
+
+```python
+from streaming_form_data.targets import BaseTarget
+
+class CustomAsyncTarget(BaseTarget):
+     async def on_start_async(self):
+         self._resource = await acquire_resource()
+
+     async def on_data_received_async(self, chunk):
+         await self._resource.write(chunk)
+
+     async def on_finish_async(self):
+         await self._resource.close()
 ```
 
 If the `Content-Disposition` header included the `filename` directive, this value will
