@@ -55,7 +55,7 @@ Up-to-date documentation is available on [Read the Docs].
 
 ## Development
 
-Please make sure you have Python 3.9+, [uv], and [task] installed.
+Please make sure you have Python 3.10+, [uv], and [task] installed.
 
 Since this package includes a C extension, please make sure you have a working C
 compiler available. On Debian-based distros this usually means installing the
