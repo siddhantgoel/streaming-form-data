@@ -1,5 +1,7 @@
 """Simple benchmark script for streaming-form-data parser."""
 
+import argparse
+import asyncio
 import time
 from io import BytesIO
 from statistics import mean, stdev
@@ -47,7 +49,7 @@ def create_multipart_data(file_data: bytes) -> tuple[bytes, str]:
 def run_single_benchmark(
     data: bytes, multipart_data: bytes, content_type: str, chunk_size: int
 ):
-    """Run a single benchmark iteration."""
+    """Run a single benchmark iteration (Sync)."""
     # Setup parser
     parser = StreamingFormDataParser(headers={"Content-Type": content_type})
     parser.register("file", NullTarget())
@@ -80,12 +82,48 @@ def run_single_benchmark(
     return throughput, memory_increase
 
 
+async def run_single_benchmark_async(
+    data: bytes, multipart_data: bytes, content_type: str, chunk_size: int
+):
+    """Run a single benchmark iteration (Async)."""
+    # Setup parser
+    parser = StreamingFormDataParser(headers={"Content-Type": content_type})
+    parser.register("file", NullTarget())
+
+    # Track memory
+    memory_tracker = MemoryTracker()
+    memory_tracker.sample()
+
+    # Parse data in chunks
+    start_time = time.perf_counter()
+    position = 0
+
+    while position < len(multipart_data):
+        chunk_end = min(position + chunk_size, len(multipart_data))
+        await parser.adata_received(multipart_data[position:chunk_end])
+        position = chunk_end
+
+        # Sample memory periodically
+        if position % (chunk_size * 100) == 0:
+            memory_tracker.sample()
+
+    end_time = time.perf_counter()
+    memory_tracker.sample()
+
+    # Calculate results
+    parse_time = end_time - start_time
+    throughput = (len(multipart_data) / parse_time) / (1024 * 1024)
+    memory_increase = memory_tracker.get_memory_increase_mb()
+
+    return throughput, memory_increase
+
+
 def benchmark_parser(
     data_size_mb: int = 100, chunk_size: int = 1024, iterations: int = 5
 ):
-    """Run benchmark with multiple iterations and statistics."""
+    """Run benchmark with multiple iterations and statistics (Sync)."""
     print(
-        f"Benchmarking {data_size_mb}MB file with {chunk_size} byte chunks ({iterations} iterations)..."
+        f"Benchmarking {data_size_mb}MB file with {chunk_size} byte chunks ({iterations} iterations) - SYNC..."
     )
 
     # Generate test data once
@@ -103,7 +141,7 @@ def benchmark_parser(
         throughputs.append(throughput)
         memory_increases.append(memory_increase)
         print(
-            f"  Iteration {i+1}: {throughput:.1f} MB/s, +{memory_increase:.1f}MB memory"
+            f"  Iteration {i + 1}: {throughput:.1f} MB/s, +{memory_increase:.1f}MB memory"
         )
 
     # Calculate statistics
@@ -111,11 +149,60 @@ def benchmark_parser(
     std_throughput = stdev(throughputs) if len(throughputs) > 1 else 0
     avg_memory = mean(memory_increases)
 
-    print("\nResults:")
+    print("\nResults (Sync):")
+    print(f"Throughput: {avg_throughput:.1f} ± {std_throughput:.1f} MB/s")
+    print(f"Memory increase: {avg_memory:.1f} MB")
+    print(f"Data processed: {len(multipart_data) / (1024 * 1024):.1f} MB")
+
+
+async def benchmark_parser_async(
+    data_size_mb: int = 100, chunk_size: int = 1024, iterations: int = 5
+):
+    """Run benchmark with multiple iterations and statistics (Async)."""
+    print(
+        f"Benchmarking {data_size_mb}MB file with {chunk_size} byte chunks ({iterations} iterations) - ASYNC..."
+    )
+
+    # Generate test data once
+    data = generate_test_data(data_size_mb)
+    multipart_data, content_type = create_multipart_data(data)
+
+    throughputs = []
+    memory_increases = []
+
+    # Run multiple iterations
+    for i in range(iterations):
+        throughput, memory_increase = await run_single_benchmark_async(
+            data, multipart_data, content_type, chunk_size
+        )
+        throughputs.append(throughput)
+        memory_increases.append(memory_increase)
+        print(
+            f"  Iteration {i + 1}: {throughput:.1f} MB/s, +{memory_increase:.1f}MB memory"
+        )
+
+    # Calculate statistics
+    avg_throughput = mean(throughputs)
+    std_throughput = stdev(throughputs) if len(throughputs) > 1 else 0
+    avg_memory = mean(memory_increases)
+
+    print("\nResults (Async):")
     print(f"Throughput: {avg_throughput:.1f} ± {std_throughput:.1f} MB/s")
     print(f"Memory increase: {avg_memory:.1f} MB")
     print(f"Data processed: {len(multipart_data) / (1024 * 1024):.1f} MB")
 
 
 if __name__ == "__main__":
-    benchmark_parser()
+    parser = argparse.ArgumentParser(description="Benchmark streaming-form-data parser")
+    parser.add_argument(
+        "--async",
+        action="store_true",
+        dest="run_async",
+        help="Run the benchmark in asynchronous mode",
+    )
+    args = parser.parse_args()
+
+    if args.run_async:
+        asyncio.run(benchmark_parser_async())
+    else:
+        benchmark_parser()

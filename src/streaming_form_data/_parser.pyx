@@ -33,6 +33,15 @@ cpdef enum ErrorGroup:
     PartHeaders = 300
     UnexpectedPart = 400
 
+# Scanner Actions
+cdef enum Action:
+    ACT_CONTINUE,
+    ACT_DONE,
+    ACT_EMIT_BODY,
+    ACT_PART_START,
+    ACT_PART_END,
+    ACT_ERROR
+
 
 cdef class Finder:
     cdef bytes target
@@ -127,6 +136,18 @@ cdef class Part:
         for target in self.targets:
             target.finish()
 
+    async def astart(self):
+        for target in self.targets:
+            await target.astart()
+
+    async def adata_received(self, bytes chunk):
+        for target in self.targets:
+            await target.adata_received(chunk)
+
+    async def afinish(self):
+        for target in self.targets:
+            await target.afinish()
+
 
 cdef enum ParserState:
     PS_START,
@@ -158,6 +179,7 @@ cdef class _Parser:
     cdef object active_part, default_part
 
     cdef bytes _leftover_buffer
+    cdef bytes _emit_data
 
     cdef bint strict
     cdef public str unexpected_part_name
@@ -177,6 +199,7 @@ cdef class _Parser:
         self.default_part = Part('_default', NullTarget())
 
         self._leftover_buffer = None
+        self._emit_data = None
 
         self.strict = strict
         self.unexpected_part_name = ''
@@ -189,19 +212,11 @@ cdef class _Parser:
         else:
             self.expected_parts.append(Part(name, target, matches))
 
-    def set_active_part(self, part, str filename):
+    # Helper to setup active part (called internally during scan)
+    cdef _set_active_part(self, part, str filename):
         self.active_part = part
         self.active_part.set_multipart_filename(filename)
-        self.active_part.start()
-
-    def unset_active_part(self):
-        if self.active_part:
-            self.active_part.finish()
-        self.active_part = None
-
-    def on_body(self, bytes value):
-        if self.active_part and len(value) > 0:
-            self.active_part.data_received(value)
+        # We don't call start() here, we let the caller do it based on return action
 
     cdef _part_for(self, str name, bint exact=True):
         for part in self.expected_parts:
@@ -209,23 +224,120 @@ cdef class _Parser:
                 return part
 
     def data_received(self, bytes data):
+        return self._run_loop(data, is_async=False)
+
+    async def adata_received(self, bytes data):
+        ret = self._run_loop(data, is_async=True)
+        # If the return is an int (status code), return it directly.
+        # If it is a coroutine (from async target action), await it.
+        if type(ret) is int:
+            return ret
+        return await ret
+
+    # Combined loop runner (Handles Sync/Async dispatch)
+    def _run_loop(self, bytes data, bint is_async):
         if not data:
             return 0
 
         cdef bytes chunk
         cdef size_t index
+        cdef size_t buffer_start
+        cdef Action action
 
         if self._leftover_buffer:
             chunk = self._leftover_buffer + data
             index = len(self._leftover_buffer)
+            # Important: When we have leftover buffer, we start scanning at 'index'
+            # (to avoid re-scanning bytes and corrupting state), but the buffer 
+            # we want to potentially emit starts at 0.
+            buffer_start = 0 
             self._leftover_buffer = None
         else:
             chunk = data
             index = 0
+            buffer_start = 0
 
-        return self._parse(chunk, index)
+        # Loop processing via _scan
+        while True:
+            action = self._scan(chunk, &index, &buffer_start)
+            
+            if action == ACT_CONTINUE:
+                continue
+            
+            elif action == ACT_DONE:
+                break
+                
+            elif action == ACT_EMIT_BODY:
+                if self.active_part:
+                    if is_async:
+                        return self._await_action(self.active_part.adata_received(self._emit_data), chunk, index, buffer_start)
+                    else:
+                        self.active_part.data_received(self._emit_data)
+                self._emit_data = None
+                
+            elif action == ACT_PART_START:
+                if self.active_part:
+                    if is_async:
+                        return self._await_action(self.active_part.astart(), chunk, index, buffer_start)
+                    else:
+                        self.active_part.start()
+            
+            elif action == ACT_PART_END:
+                if self.active_part:
+                    if is_async:
+                        return self._await_action(self.active_part.afinish(), chunk, index, buffer_start)
+                    else:
+                        self.active_part.finish()
+                    self.active_part = None
+            
+            elif action == ACT_ERROR:
+                if self.active_part:
+                    if is_async:
+                        return self._await_action(self.active_part.afinish(), chunk, index, buffer_start)
+                    else:
+                        self.active_part.finish()
+                return self._get_error_code()
 
-    def _parse(self, bytes chunk, size_t index):
+        return 0
+
+    # Helper for async recursion to keep the loop going after an await
+    async def _await_action(self, coro, bytes chunk, size_t index, size_t buffer_start):
+        await coro
+        self._emit_data = None # Clear data if it was used
+        
+        # Resume loop
+        cdef Action action
+        while True:
+            action = self._scan(chunk, &index, &buffer_start)
+            
+            if action == ACT_CONTINUE:
+                continue
+            elif action == ACT_DONE:
+                break
+            elif action == ACT_EMIT_BODY:
+                if self.active_part:
+                    await self.active_part.adata_received(self._emit_data)
+                self._emit_data = None
+            elif action == ACT_PART_START:
+                if self.active_part:
+                    await self.active_part.astart()
+            elif action == ACT_PART_END:
+                if self.active_part:
+                    await self.active_part.afinish()
+                    self.active_part = None
+            elif action == ACT_ERROR:
+                if self.active_part:
+                    await self.active_part.afinish()
+                return self._get_error_code()
+        return 0
+
+    cdef int _get_error_code(self):
+        return self._error_code
+
+    cdef int _error_code
+
+    # The core state machine
+    cdef Action _scan(self, bytes chunk, size_t *index_ptr, size_t *buffer_start_ptr):
         cdef size_t idx, buffer_start, chunk_len
         cdef size_t match_start, skip_count, matched_length
         cdef Byte byte
@@ -233,9 +345,10 @@ cdef class _Parser:
 
         chunk_ptr = chunk
         chunk_len = len(chunk)
-        buffer_start = 0
+        
+        buffer_start = buffer_start_ptr[0]
+        idx = index_ptr[0]
 
-        idx = index
         while idx < chunk_len:
             byte = chunk_ptr[idx]
 
@@ -247,21 +360,30 @@ cdef class _Parser:
                     self.state = ParserState.PS_START_CR
                 else:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 1
+                    self._error_code = ErrorGroup.Delimiting + 1
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
 
             elif self.state == ParserState.PS_START_CR:
                 if byte == c_lf:
                     self.state = ParserState.PS_START
                 else:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 4
+                    self._error_code = ErrorGroup.Delimiting + 4
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
 
             elif self.state == ParserState.PS_STARTING_BOUNDARY:
                 if byte != c_hyphen:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 2
-
+                    self._error_code = ErrorGroup.Delimiting + 2
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
                 self.state = ParserState.PS_READING_BOUNDARY
+
             elif self.state == ParserState.PS_READING_BOUNDARY:
                 if byte == c_cr:
                     self.state = ParserState.PS_ENDING_BOUNDARY
@@ -269,16 +391,20 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_BOUNDARY:
                 if byte != c_lf:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 3
+                    self._error_code = ErrorGroup.Delimiting + 3
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
 
                 # ensure we have read correct starting delimiter
-                if b'\r\n' + chunk[buffer_start: idx + 1] != \
-                        self.delimiter_finder.target:
+                if b'\r\n' + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
                     self.mark_error()
-                    return ErrorGroup.Delimiting + 5
+                    self._error_code = ErrorGroup.Delimiting + 5
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
 
                 buffer_start = idx + 1
-
                 self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
                 if byte == c_cr:
@@ -287,7 +413,10 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_HEADER:
                 if byte != c_lf:
                     self.mark_error()
-                    return ErrorGroup.PartHeaders + 1
+                    self._error_code = ErrorGroup.PartHeaders + 1
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
 
                 message = Parser(policy=HTTP).parsestr(
                     chunk[buffer_start: idx + 1].decode('utf-8')
@@ -296,7 +425,10 @@ cdef class _Parser:
                 if 'content-disposition' in message:
                     if not message.get_content_disposition() == 'form-data':
                         self.mark_error()
-                        return ErrorGroup.PartHeaders + 1
+                        self._error_code = ErrorGroup.PartHeaders + 1
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        return ACT_ERROR
 
                     params = message['content-disposition'].params
                     name = params.get('name')
@@ -308,9 +440,18 @@ cdef class _Parser:
                             if self.strict:
                                 self.unexpected_part_name = name
                                 self.mark_error()
-                                return ErrorGroup.UnexpectedPart
+                                self._error_code = ErrorGroup.UnexpectedPart
+                                index_ptr[0] = idx + 1
+                                buffer_start_ptr[0] = buffer_start
+                                return ACT_ERROR
 
-                        self.set_active_part(part, params.get('filename'))
+                        self._set_active_part(part, params.get('filename'))
+                        buffer_start = idx + 1
+                        self.state = ParserState.PS_ENDED_HEADER
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        return ACT_PART_START 
+
                 elif 'content-type' in message:
                     if self.active_part:
                         self.active_part.set_multipart_content_type(
@@ -329,11 +470,14 @@ cdef class _Parser:
             elif self.state == ParserState.PS_ENDING_ALL_HEADERS:
                 if byte != c_lf:
                     self.mark_error()
-                    return ErrorGroup.PartHeaders + 2
+                    self._error_code = ErrorGroup.PartHeaders + 2
+                    index_ptr[0] = idx + 1
+                    buffer_start_ptr[0] = buffer_start
+                    return ACT_ERROR
 
                 buffer_start = idx + 1
-
                 self.state = ParserState.PS_READING_BODY
+
             elif self.state == ParserState.PS_READING_BODY:
                 self.delimiter_finder.feed(byte)
                 self.ender_finder.feed(byte)
@@ -343,47 +487,56 @@ cdef class _Parser:
 
                     if idx + 1 < self.delimiter_length:
                         self.mark_error()
-                        return ErrorGroup.Internal + 1
+                        self._error_code = ErrorGroup.Internal + 1
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        return ACT_ERROR
 
                     match_start = idx + 1 - self.delimiter_length
 
                     if match_start >= buffer_start:
-                        try:
-                            self.on_body(chunk[buffer_start: match_start])
-                        except Exception:
-                            self.mark_error()
-                            raise
-
+                        self._emit_data = chunk[buffer_start: match_start]
+                        self.delimiter_finder.reset()
                         buffer_start = idx + 1
+                        index_ptr[0] = idx + 1 
+                        buffer_start_ptr[0] = buffer_start
+                        self._pending_finish = True
+                        return ACT_EMIT_BODY
                     else:
-                        self.mark_error()
-                        return ErrorGroup.Internal + 2
-
-                    self.unset_active_part()
-                    self.delimiter_finder.reset()
+                        self.delimiter_finder.reset()
+                        buffer_start = idx + 1
+                        self._pending_finish = True
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        return ACT_PART_END
 
                 elif self.ender_finder.found():
                     self.state = ParserState.PS_END
 
                     if idx + 1 < self.ender_length:
                         self.mark_error()
-                        return ErrorGroup.Internal + 3
+                        self._error_code = ErrorGroup.Internal + 3
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        return ACT_ERROR
+                        
                     match_start = idx + 1 - self.ender_length
 
                     if match_start >= buffer_start:
-                        try:
-                            self.on_body(chunk[buffer_start: match_start])
-                        except Exception:
-                            self.mark_error()
-                            raise
+                        self._emit_data = chunk[buffer_start: match_start]
+                        self.ender_finder.reset()
+                        buffer_start = idx + 1
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        self._pending_finish = True
+                        return ACT_EMIT_BODY
                     else:
-                        self.mark_error()
-                        return ErrorGroup.Internal + 4
-
-                    buffer_start = idx + 1
-
-                    self.unset_active_part()
-                    self.ender_finder.reset()
+                        self.ender_finder.reset()
+                        buffer_start = idx + 1
+                        self._pending_finish = True
+                        index_ptr[0] = idx + 1
+                        buffer_start_ptr[0] = buffer_start
+                        return ACT_PART_END
 
                 else:
                     # This block is purely for speed optimization.
@@ -396,22 +549,39 @@ cdef class _Parser:
                             chunk_ptr, idx + 1, chunk_len - 1
                         )
                         idx += skip_count
+            
+            if self._pending_finish:
+                 self._pending_finish = False
+                 index_ptr[0] = idx
+                 buffer_start_ptr[0] = buffer_start
+                 return ACT_PART_END
 
             elif self.state == ParserState.PS_END:
-                return 0
-            else:
-                self.mark_error()
-                return ErrorGroup.Internal + 5
+                index_ptr[0] = idx + 1
+                buffer_start_ptr[0] = buffer_start
+                return ACT_DONE 
+            
+            elif self.state == ParserState.PS_ERROR:
+                self._error_code = ErrorGroup.Internal + 5
+                index_ptr[0] = idx + 1
+                buffer_start_ptr[0] = buffer_start
+                return ACT_ERROR
 
             idx += 1
 
         if idx != chunk_len:
             self.mark_error()
-            return ErrorGroup.Internal + 6
+            self._error_code = ErrorGroup.Internal + 6
+            index_ptr[0] = idx
+            buffer_start_ptr[0] = buffer_start
+            return ACT_ERROR
 
         if buffer_start > chunk_len:
             self.mark_error()
-            return ErrorGroup.Internal + 7
+            self._error_code = ErrorGroup.Internal + 7
+            index_ptr[0] = idx
+            buffer_start_ptr[0] = buffer_start
+            return ACT_ERROR
 
         if self.state == ParserState.PS_READING_BODY:
             matched_length = max(
@@ -421,18 +591,27 @@ cdef class _Parser:
             match_start = idx - matched_length
 
             if match_start >= buffer_start + c_min_file_body_chunk_size:
-                try:
-                    self.on_body(chunk[buffer_start: match_start])
-                except Exception:
-                    self.mark_error()
-                    raise
-
+                self._emit_data = chunk[buffer_start: match_start]
                 buffer_start = match_start
+                index_ptr[0] = idx
+                buffer_start_ptr[0] = buffer_start
+                return ACT_EMIT_BODY
 
         if idx - buffer_start > 0:
             self._leftover_buffer = chunk[buffer_start: idx]
 
-        return 0
+        if self._pending_finish:
+             self._pending_finish = False
+             return ACT_PART_END
+
+        if self._emit_data is not None:
+             index_ptr[0] = idx
+             buffer_start_ptr[0] = buffer_start
+             return ACT_EMIT_BODY
+
+        index_ptr[0] = idx
+        buffer_start_ptr[0] = buffer_start
+        return ACT_DONE
 
     # rewind_fast_forward searches for the '\r\n--' sequence in the provided
     # buffer. It returns the number of characters which can be skipped before
@@ -515,3 +694,5 @@ cdef class _Parser:
 
         if self.active_part:
             self.active_part.finish()
+
+    cdef bint _pending_finish
