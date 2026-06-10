@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.1.0
+- Handle empty input data
+- Add support for Python 3.14
+
 ## v2.0.0
 - Add async support (thanks [@mabdullahsoyturk])
 - Remove support for Python 3.9
