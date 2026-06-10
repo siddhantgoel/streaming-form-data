@@ -1,7 +1,7 @@
-from io import BytesIO
 import hashlib
 import os
 import re
+from io import BytesIO
 
 import pytest
 from requests_toolbelt import MultipartEncoder
@@ -9,14 +9,13 @@ from requests_toolbelt import MultipartEncoder
 from streaming_form_data import ParseFailedException, StreamingFormDataParser
 from streaming_form_data.targets import (
     BaseTarget,
-    FileTarget,
     DirectoryTarget,
+    FileTarget,
+    MultipleTargets,
     SHA256Target,
     ValueTarget,
-    MultipleTargets,
 )
 from streaming_form_data.validators import MaxSizeValidator, ValidationError
-
 
 dataset = {
     "file.txt": b"this is a txt file\r\n" * 10,
@@ -44,6 +43,14 @@ def encoded_dataset(filename):
     encoder = MultipartEncoder(fields=fields)
 
     return (encoder.content_type, encoder.to_string())
+
+
+def test_empty():
+    encoder = MultipartEncoder(fields={})
+
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+
+    parser.data_received(encoder.to_string())
 
 
 def test_smoke():
