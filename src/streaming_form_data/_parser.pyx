@@ -396,16 +396,24 @@ cdef class _Parser:
                     buffer_start_ptr[0] = buffer_start
                     return ACT_ERROR
 
-                # ensure we have read correct starting delimiter
-                if b'\r\n' + chunk[buffer_start: idx + 1] != self.delimiter_finder.target:
+                # ensure we have read a valid boundary delimiter
+                boundary_candidate = b'\r\n' + chunk[buffer_start: idx + 1]
+
+                if boundary_candidate == self.delimiter_finder.target:
+                    buffer_start = idx + 1
+                    self.state = ParserState.PS_READING_HEADER
+                elif chunk[buffer_start: idx + 1].startswith(self.ender_finder.target[2:]):
+                    # End boundary at the start of the stream (empty multipart form)
+                    # self.ender_finder.target is \r\n--{boundary}--
+                    # Without the leading \r\n, the end boundary pattern is --{boundary}--
+                    buffer_start = idx + 1
+                    self.state = ParserState.PS_END
+                else:
                     self.mark_error()
                     self._error_code = ErrorGroup.Delimiting + 5
                     index_ptr[0] = idx + 1
                     buffer_start_ptr[0] = buffer_start
                     return ACT_ERROR
-
-                buffer_start = idx + 1
-                self.state = ParserState.PS_READING_HEADER
             elif self.state == ParserState.PS_READING_HEADER:
                 if byte == c_cr:
                     self.state = ParserState.PS_ENDING_HEADER
