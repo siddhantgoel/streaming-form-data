@@ -226,7 +226,13 @@ target = GCSTarget("gs://<bucket>/path/to/key", "wb")
 
 #### `CSVTarget`
 
-`CSVTarget` objects process and release CSV lines in chunks.
+`CSVTarget` objects process and release UTF-8 CSV lines in chunks. A UTF-8
+character may span multiple chunks. The parser finishes the target at the end of
+each part; when using the target directly, call `finish()` (or `afinish()` for
+async usage) to reject an incomplete final character with `UnicodeDecodeError`.
+Finishing does not publish an unterminated final line: use
+`get_lines(include_partial_line=True)` or `pop_lines(include_partial_line=True)`
+to retrieve it.
 
 ```python
 target = CSVTarget()
