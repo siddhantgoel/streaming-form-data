@@ -172,7 +172,10 @@ target = ValueTarget()
 #### `FileTarget`
 
 `FileTarget` objects stream the contents to a file on disk. When used with async
-parsing, file operations are handled asynchronously.
+parsing, file operations are handled asynchronously. If validation or writing raises
+an exception during this target's data callback, its file is closed without marking
+the target finished. The partial file remains on disk for the caller to remove.
+This does not handle request cancellation or errors outside this target's callback.
 
 ```python
 target = FileTarget("/tmp/file.txt")

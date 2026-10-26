@@ -264,6 +264,17 @@ class FileTarget(BaseTarget):
     def on_start(self):
         self._fd = open(self.filename, self._mode)
 
+    def data_received(self, chunk: bytes):
+        try:
+            super().data_received(chunk)
+        except Exception as error:
+            try:
+                if self._fd:
+                    self._fd.close()
+            except Exception as close_error:
+                raise error from close_error
+            raise
+
     def on_data_received(self, chunk: bytes):
         if self._fd:
             self._fd.write(chunk)
@@ -274,6 +285,17 @@ class FileTarget(BaseTarget):
 
     async def on_start_async(self):
         self._fd = await aiofiles.open(self.filename, self._mode)
+
+    async def adata_received(self, chunk: bytes):
+        try:
+            await super().adata_received(chunk)
+        except Exception as error:
+            try:
+                if self._fd:
+                    await self._fd.close()
+            except Exception as close_error:
+                raise error from close_error
+            raise
 
     async def on_data_received_async(self, chunk: bytes):
         if self._fd:
