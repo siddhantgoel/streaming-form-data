@@ -1,3 +1,4 @@
+import codecs
 import hashlib
 import asyncio
 from pathlib import Path
@@ -468,10 +469,27 @@ class CSVTarget(BaseTarget):
 
         self._lines = []
         self._previous_partial_line = ""
+        self._decoder = codecs.getincrementaldecoder("utf-8")()
+
+    def on_start(self):
+        self._decoder.reset()
+
+    async def on_start_async(self):
+        self._decoder.reset()
+
+    def on_finish(self):
+        self._decoder.decode(b"", final=True)
+
+    async def on_finish_async(self):
+        self._decoder.decode(b"", final=True)
 
     def _process_chunk(self, chunk: bytes):
+        text = self._decoder.decode(chunk)
+        if not text:
+            return
+
         # join the previous partial line with the new chunk
-        combined = self._previous_partial_line + chunk.decode("utf-8")
+        combined = self._previous_partial_line + text
 
         # split the combined string into lines
         lines = combined.splitlines(keepends=True)
